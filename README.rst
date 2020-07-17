@@ -41,17 +41,30 @@ charities must be specific about those items, however.
 For example, the Salvation Army won't be shown unless they
 choose the items themselves.
 
-Charities
-^^^^^^^^^
+Charities and Other Services
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Charities do not need to signup on the platform to be listed.
 Users (either on GitHub in the Feedback repository or the
 website itself) can tell us how to manage their content.
 
+However, this service is not exclusively for charities or 501(c)3's.
+We welcome several for-profit programs, including recycling, nursing
+facilities, and small businesses as this platform is about donations.
+Additionally, it is up to the donor as to who to donate to.
+For for-profit businesses like recyclers and small business owners,
+there is a separate process for identifying yourself and certain limits
+and regulations.
+
 Charities can manage their content on the website by filling
 out a form to be "verified." Once manually verified on the
 platform, they can manage their content with custom text
 without further verification for change on the website.
+
+Charities are typically 501(c)3's. Any user can register
+a charity by filling out an HTML form that includes
+the 501(c)3 record, website that specifies how to donate,
+and a template description and how-to-donate instruction.
 
 Roadmap
 -------
@@ -66,8 +79,9 @@ Recall our core guideline: Our goal is not to change people's perspective. In bu
 
 Please keep this in mind before suggesting new ideas. Donate Anything is a bandage; visit Donate Everything, a societal solution.
 
-- Machine learn what's "good," "ok/mild," or "bad" condition based on images. Should be easy with the amount of data from current charities. This makes filtering and deciding if items can be collected easier for donator end.
+- Machine learn what's "good," "ok/mild," or "bad" condition based on images. Should be easy with the amount of data from current charities. This makes filtering and deciding if items can be collected easier for donor's end.
 - Move searching from PostgreSQL to Elasticsearch for faster searching and better in terms of relevancy.
+- Improve text search with content context
 
 Hacking
 -------
