@@ -74,7 +74,8 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     "donate_anything.users.apps.UsersConfig",
-    # Your stuff: custom apps go here
+    "donate_anything.charity.apps.CharityConfig",
+    "donate_anything.item.apps.ItemConfig",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

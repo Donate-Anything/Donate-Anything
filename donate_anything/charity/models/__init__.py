@@ -1,0 +1,1 @@
+from .charity import Charity
