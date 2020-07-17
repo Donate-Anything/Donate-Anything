@@ -23,7 +23,7 @@ jobs:
         - postgresql
         - redis
       before_install:
-        - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.8.0-amd64.deb && sudo dpkg -i --force-confnew elasticsearch-7.8.0-amd.deb && sudo service elasticsearch restart
+        - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.8.0-amd64.deb && sudo dpkg -i --force-confnew elasticsearch-7.8.0-amd64.deb && sudo service elasticsearch restart
       install:
         - pip install -r requirements/local.txt
       before_script:
