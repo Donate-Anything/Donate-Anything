@@ -296,8 +296,6 @@ STATICFILES_FINDERS += ["compressor.finders.CompressorFinder"]
 
 # Elasticsearch
 # ------------------------------------------------------------------------------
-ELASTICSEARCH_DSL = {
-    "default": {"hosts": "localhost:9200"}
-}
+ELASTICSEARCH_DSL = {"default": {"hosts": "localhost:9200"}}
 if env("USE_DOCKER") == "yes":
     ELASTICSEARCH_DSL["default"] = {"hosts": "es01:9200"}
