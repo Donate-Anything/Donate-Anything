@@ -1,0 +1,36 @@
+os: linux
+dist: xenial
+
+language: python
+cache: pip
+python:
+  - "3.8"
+
+jobs:
+  include:
+    - name: "Lint"
+      install:
+        - pip install black isort==4.3.21
+      script:
+        - black donate_anything config --check && isort -c -rc -lai 2 -df
+
+    - name: "Django Test"
+      env:
+        - USE_DOCKER="no"
+        - DATABASE_URL="postgres:///donate_anything"
+        - CELERY_BROKER_URL="redis://localhost:6379/0"
+      services:
+        - postgresql
+        - redis
+      install:
+        - pip install -r requirements/local.txt
+      before_script:
+        - sudo mkdir /var/run/celery
+        - sudo mkdir /var/log/celery
+        - celery multi start worker beat -A config.celery_app --pool=solo
+      script:
+        - "pytest"
+
+  allow_failures:
+    - name: "Lint"
+      if: branch = master
