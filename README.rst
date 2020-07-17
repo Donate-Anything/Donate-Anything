@@ -80,7 +80,6 @@ Recall our core guideline: Our goal is not to change people's perspective. In bu
 Please keep this in mind before suggesting new ideas. Donate Anything is a bandage; visit Donate Everything, a societal solution.
 
 - Machine learn what's "good," "ok/mild," or "bad" condition based on images. Should be easy with the amount of data from current charities. This makes filtering and deciding if items can be collected easier for donor's end.
-- Move searching from PostgreSQL to Elasticsearch for faster searching and better in terms of relevancy.
 - Improve text search with content context
 
 Hacking

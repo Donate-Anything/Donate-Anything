@@ -18,3 +18,9 @@ django-allauth==0.42.0  # https://github.com/pennersr/django-allauth
 django-crispy-forms==1.9.1  # https://github.com/django-crispy-forms/django-crispy-forms
 django-compressor==2.4  # https://github.com/django-compressor/django-compressor
 django-redis==4.12.1  # https://github.com/jazzband/django-redis
+
+# Elasticsearch
+# ------------------------------------------------------------------------------
+elasticsearch==7.8.0 # https://github.com/elastic/elasticsearch-py
+elasticsearch-dsl==7.2.1  # https://github.com/elasticsearch/elasticsearch-dsl-py
+django-elasticsearch-dsl==7.1.4  # https://github.com/django-es/django-elasticsearch-dsl

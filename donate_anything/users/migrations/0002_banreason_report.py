@@ -7,23 +7,31 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0001_initial'),
+        ("users", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='BanReason',
+            name="BanReason",
             fields=[
-                ('id', models.BigAutoField(primary_key=True, serialize=False)),
-                ('reason', models.TextField(max_length=500)),
+                ("id", models.BigAutoField(primary_key=True, serialize=False)),
+                ("reason", models.TextField(max_length=500)),
             ],
         ),
         migrations.CreateModel(
-            name='Report',
+            name="Report",
             fields=[
-                ('id', models.BigAutoField(primary_key=True, serialize=False)),
-                ('reason', models.TextField(max_length=300)),
-                ('ban', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='users.BanReason')),
+                ("id", models.BigAutoField(primary_key=True, serialize=False)),
+                ("reason", models.TextField(max_length=300)),
+                (
+                    "ban",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="users.BanReason",
+                    ),
+                ),
             ],
         ),
     ]
