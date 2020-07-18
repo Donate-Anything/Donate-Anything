@@ -70,7 +70,7 @@ THIRD_PARTY_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     # "django_celery_beat",
-    "django_elasticsearch_dsl",
+    # "django_elasticsearch_dsl",
 ]
 
 LOCAL_APPS = [
@@ -296,6 +296,7 @@ STATICFILES_FINDERS += ["compressor.finders.CompressorFinder"]
 
 # Elasticsearch
 # ------------------------------------------------------------------------------
-ELASTICSEARCH_DSL = {"default": {"hosts": "localhost:9200"}}
-if env("USE_DOCKER") == "yes":
-    ELASTICSEARCH_DSL["default"] = {"hosts": "es01:9200"}
+# We'll use Elasticsearch once there's enough items to be beneficial
+# ELASTICSEARCH_DSL = {"default": {"hosts": "localhost:9200"}}
+# if env("USE_DOCKER") == "yes":
+#     ELASTICSEARCH_DSL["default"] = {"hosts": "es01:9200"}

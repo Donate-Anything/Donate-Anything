@@ -3,8 +3,6 @@ version: '3'
 volumes:
   local_postgres_data: {}
   local_postgres_data_backups: {}
-  local_elasticsearch_data_01:
-    driver: local
 
 services:
   django: # &django
@@ -16,7 +14,6 @@ services:
     depends_on:
       - postgres
       - mailhog
-      - es01
     volumes:
       - .:/app
     env_file:
@@ -59,26 +56,6 @@ services:
     container_name: mailhog
     ports:
       - "8025:8025"
-
-  es01:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.8.0
-    container_name: es01
-    environment:
-      - node.name=es01
-      - cluster.name=es-docker-cluster
-#      - discovery.seed_hosts=es02,es03
-      - cluster.initial_master_nodes=es01
-#      ,es02,es03
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    volumes:
-      - local_elasticsearch_data_01:/usr/share/elasticsearch/data
-    ports:
-      - 9200:9200
 
 #  redis:
 #    image: redis:5.0

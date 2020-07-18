@@ -21,6 +21,7 @@ django-redis==4.12.1  # https://github.com/jazzband/django-redis
 
 # Elasticsearch
 # ------------------------------------------------------------------------------
-elasticsearch==7.8.0 # https://github.com/elastic/elasticsearch-py
-elasticsearch-dsl==7.2.1  # https://github.com/elasticsearch/elasticsearch-dsl-py
-django-elasticsearch-dsl==7.1.4  # https://github.com/django-es/django-elasticsearch-dsl
+# We'll use Elasticsearch once there's enough items
+# elasticsearch==7.8.0 # https://github.com/elastic/elasticsearch-py
+# elasticsearch-dsl==7.2.1  # https://github.com/elasticsearch/elasticsearch-dsl-py
+# django-elasticsearch-dsl==7.1.4  # https://github.com/django-es/django-elasticsearch-dsl
