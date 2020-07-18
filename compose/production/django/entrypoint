@@ -42,4 +42,24 @@ until postgres_ready; do
 done
 >&2 echo 'PostgreSQL is available'
 
+elasticsearch_ready() {
+python << END
+import sys
+from elasticsearch import Elasticsearch
+
+try:
+  Elasticsearch()
+except:
+  sys.exit(-1)
+sys.exit(0)
+
+END
+}
+
+until elasticsearch_ready; do
+  >&2 echo 'Waiting for Elasticsearch to become available...'
+  sleep 1
+done
+>&2 echo 'Elasticsearch is available'
+
 exec "$@"
