@@ -18,3 +18,6 @@ class Charity(models.Model):
     how_to_donate = models.TextField(max_length=300)
 
     # Items are in a M2M ES model
+
+    def __str__(self):
+        return self.name

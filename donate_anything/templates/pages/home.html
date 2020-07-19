@@ -1,1 +1,27 @@
 {% extends "base.html" %}
+{% load static compress %}
+{% block css %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  {% compress css %}
+    <link href="{% static 'css/home.css' %}" rel="stylesheet">
+  {% endcompress %}
+
+{% endblock %}
+
+{# Suggestions use typeahead.js: https://twitter.github.io/typeahead.js/examples/ #}
+{# But we use the "maintained" fork at corejavascript #}
+{% block content %}
+  <div id="main-scrollable-dropdown-menu" style="text-align: center">
+  <form id="search-form" method="get" django-media-url="{{ MEDIA_URL }}">
+    <input id="search-box" class="typeahead" type="text" placeholder="Can I donate...">
+    <button type="submit"><i class="fa fa-search"></i></button>
+  </form>
+  </div>
+  {# Then show More Items dropdown (?) so that you can search for multiple items #}
+  {# However, upon searching, the user will instead be redirected. #}
+
+  <div id="organizations" style="text-align: center">
+  <p>to...</p>
+  </div>
+{% endblock %}

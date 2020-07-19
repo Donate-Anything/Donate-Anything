@@ -34,3 +34,10 @@ class Category(models.Model):
     id = models.BigAutoField(primary_key=True)
     charity = models.ForeignKey(Charity, on_delete=models.CASCADE)
     category = models.PositiveSmallIntegerField(choices=CATEGORY_TYPES)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["charity", "category"], name="charity_supports_category"
+            )
+        ]

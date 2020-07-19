@@ -2,4 +2,4 @@ from django.conf import settings
 
 
 def settings_context(_request):
-    return {"DEBUG": settings.DEBUG}
+    return {"MEDIA_URL": settings.MEDIA_URL}

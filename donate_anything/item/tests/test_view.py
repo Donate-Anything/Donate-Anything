@@ -149,6 +149,10 @@ class TestSearchMultipleItems:
         assert response.status_code == 200
         data = response.context["data"]
         assert len(data) == 7, data
+        assert data[0][0] == charity.id, (
+            "Target charity, which supports the most items "
+            "out of the searched, should be the first result."
+        )
 
     def test_search_multiple_items_with_page(self, rf):
         request = rf.get(f"item/multi-lookup/", {"q": 1, "page": str(1)})

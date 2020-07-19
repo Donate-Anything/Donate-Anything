@@ -21,9 +21,13 @@ class Item(models.Model):
             ),
         )
 
+    def __str__(self):
+        return self.name
+
 
 class WantedItem(models.Model):
     id = models.BigAutoField(primary_key=True)
+    # TODO Add condition
     item = models.ForeignKey(Item, on_delete=models.CASCADE, db_index=False)
     charity = models.ForeignKey(Charity, on_delete=models.CASCADE)
     # TODO Add geolocation for charity for filtering
@@ -34,3 +38,11 @@ class WantedItem(models.Model):
 
     class Meta:
         indexes = (BrinIndex(fields=["item"]),)
+        constraints = [
+            models.UniqueConstraint(
+                fields=["charity", "item"], name="charity_need_item"
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.charity} wants {self.item}"

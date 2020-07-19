@@ -95,4 +95,4 @@ def search_multiple_items(request):
         .distinct(),
         page_number,
     )
-    return render(request, "pages/home.html", context=context)
+    return render(request, "pages/multiple_orgs.html", context=context)
