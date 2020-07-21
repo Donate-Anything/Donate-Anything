@@ -8,7 +8,7 @@ class Item(models.Model):
     id = models.BigAutoField(primary_key=True)
     # TODO Some items need to be the same, e.g. pants + jeans or tshirt + t-shirt
     # This requires a self FK and a little rewriting of views
-    name = models.CharField(max_length=255, unique=True, db_index=False)
+    name = models.CharField(max_length=100, unique=True, db_index=False)
     image = models.ImageField(blank=True, null=True)
     is_appropriate = models.BooleanField(default=True)
 
@@ -23,6 +23,10 @@ class Item(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        self.name = self.name.lower()
+        super(Item, self).save(*args, **kwargs)
 
 
 class WantedItem(models.Model):

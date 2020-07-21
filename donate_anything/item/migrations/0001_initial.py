@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
             name="Item",
             fields=[
                 ("id", models.BigAutoField(primary_key=True, serialize=False)),
-                ("name", models.CharField(max_length=255, unique=True)),
+                ("name", models.CharField(max_length=100, unique=True)),
                 ("image", models.ImageField(blank=True, null=True, upload_to="")),
                 ("is_appropriate", models.BooleanField(default=True)),
             ],
@@ -95,6 +95,18 @@ class Migration(migrations.Migration):
             model_name="wanteditem",
             index=django.contrib.postgres.indexes.BrinIndex(
                 fields=["item"], name="item_wanted_item_id_b5f5d9_brin"
+            ),
+        ),
+        migrations.AddConstraint(
+            model_name="category",
+            constraint=models.UniqueConstraint(
+                fields=("charity", "category"), name="charity_supports_category"
+            ),
+        ),
+        migrations.AddConstraint(
+            model_name="wanteditem",
+            constraint=models.UniqueConstraint(
+                fields=("charity", "item"), name="charity_need_item"
             ),
         ),
     ]

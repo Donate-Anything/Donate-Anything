@@ -1,4 +1,3 @@
-from django.contrib.postgres.search import TrigramSimilarity
 from django.core.paginator import Paginator
 from django.db.models import Count
 from django.http import Http404, JsonResponse
@@ -20,12 +19,7 @@ def search_item_autocomplete(request):
         raise Http404(_("You must specify a query"))
     queryset = (
         Item.objects.defer("is_appropriate")
-        .annotate(
-            similarity=TrigramSimilarity("name", str(query))
-            # TrigramSimilarity and Difference are just opposites
-        )
-        .filter(similarity__gt=0.3, is_appropriate=True)
-        .order_by("-similarity")
+        .filter(name__icontains=str(query), is_appropriate=True)
         .values_list("id", "name", "image")[:15]
     )
     return JsonResponse(data={"data": list(queryset)})

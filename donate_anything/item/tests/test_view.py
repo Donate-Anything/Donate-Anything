@@ -28,18 +28,18 @@ def _convert_json_response_to_python(data: str) -> dict:
 
 
 class TestItemAutocompleteView:
-    def test_show_similar_item_names(self, rf):
-        query = "chair"
-        ItemFactory.create(name="chai")
-        ItemFactory.create(name="hair")  # DONATABLE BTW
-        target = ItemFactory.create(name=query)
+    def test_typeahead(self, rf):
+        query = "an"
+        ItemFactory.create(name="pan")
+        ItemFactory.create(name="canned food")
+        ItemFactory.create(name="blah")
         request = rf.get("item/api/v1/item-autocomplete/", {"q": query})
         response = search_item_autocomplete(request)
         assert response.status_code == 200
-        # Make sure the more similar one is first.
         data = _convert_json_response_to_python(response.content)
-        assert len(data["data"]) == 3, f"Response {data}"
-        assert data["data"][0] == [target.id, target.name, target.image]
+        assert len(data["data"]) == 2, f"Response {data}"
+        assert query in data["data"][0][1]
+        assert query in data["data"][1][1]
 
     def test_dissimilar_item_names(self, rf):
         query = "chair"

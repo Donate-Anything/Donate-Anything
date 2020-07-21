@@ -82,6 +82,7 @@ Please keep this in mind before suggesting new ideas. Donate Anything is a banda
 - Migrate from PostgreSQL to Elasticsearch (it's already setup, but using Elasticsearch early on would be too costly. Visit `this GH issue <https://github.com/Donate-Anything/Donate-Anything/issues/1>`_ for integration).
 - Machine learn what's "good," "ok/mild," or "bad" condition based on images. Should be easy with the amount of data from current charities. This makes filtering and deciding if items can be collected easier for donor's end.
 - Improve text search with content context
+- Gamify the donation process. Should organizations be giving the points? Or automatic upon verification?
 
 Hacking
 -------
