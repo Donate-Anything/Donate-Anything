@@ -4,6 +4,4 @@ from donate_anything.charity.views import organization
 
 
 app_name = "charity"
-urlpatterns = [
-    path("<int:pk>/", organization, name="organization")
-]
+urlpatterns = [path("<int:pk>/", organization, name="organization")]

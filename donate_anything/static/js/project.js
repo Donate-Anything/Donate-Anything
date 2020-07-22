@@ -3,25 +3,35 @@
 
 // TODO Use cached results rather than always calling API.
 
-
-function selectOneInitial(id) {
+function selectOne(id, value, page) {
     /* Get charities that support selected item
     * and fill them out in the template. */
     $.ajax({
-        url: '/item/lookup/' + id + '/',
+        url: '/item/lookup/' + id + '/?page=' + page,
         dataType: "json",
         type: "GET",
         success: function(data) {
             // returned data is list_of(charity id, name, description[:150]) and has_next bool
             // TODO Maybe add branding description field? Kind of loses the lure though with people writing single line quotes.
-            let html = ""
+            let html;
+            if (page.toString() === "1") {
+                html = ""
+            } else {
+                html = document.getElementById("organizations").innerHTML;
+            }
             for (let x of data.data) {
                 html += '<h3><a href="/organization/' +
                     x[0] + '/">' + x[1] + '</a></h3><p>' + x[2] + '</p>'
             }
             $('#organizations').html(html);
-            let refresh = window.location.protocol + "//" + window.location.host + window.location.pathname + '?page=1';
-            window.history.pushState({path: refresh}, '', refresh)
+            let refresh = window.location.protocol + "//" + window.location.host + window.location.pathname +
+                '?q=' + value + '&&page=' + page + '&&q_id=' + id + '';
+            window.history.pushState({path: refresh}, 'Donate Anything', refresh)
+            if (data.has_next) {
+                $('#more-organizations-button').css("visibility", "visible");
+            } else {
+                $('#more-organizations-button').css("visibility", "hidden");
+            }
         },
         fail: function(_) {
             // TODO Show as an error message
@@ -29,6 +39,28 @@ function selectOneInitial(id) {
         }
     })
 }
+
+const getParams = function (url) {
+    let params = {};
+    const parser = document.createElement('a');
+    parser.href = url;
+    const query = parser.search.substring(1);
+    const vars = query.split('&');
+    for (let i = 0; i < vars.length; i++) {
+        const pair = vars[i].split('=');
+        params[pair[0]] = decodeURIComponent(pair[1]);
+    }
+    return params;
+};
+
+$("#more-organizations-button").click(function() {
+  const searchParams = getParams(window.location.href);
+  selectOne(
+      searchParams["q_id"],
+      searchParams["q"],
+      searchParams["page"]
+  )
+});
 
 $('#search-box').typeahead({
     minLength: 1,
@@ -80,5 +112,5 @@ $('#search-box').typeahead({
     }
 }
 ).bind("typeahead:select", function(ev, suggestion) {
-    selectOneInitial(suggestion.id);
+    selectOne(suggestion.id, suggestion.value, 1);
 });
