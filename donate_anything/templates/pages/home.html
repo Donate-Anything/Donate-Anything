@@ -12,16 +12,15 @@
 {# Suggestions use typeahead.js: https://twitter.github.io/typeahead.js/examples/ #}
 {# But we use the "maintained" fork at corejavascript #}
 {% block content %}
-  <div id="main-scrollable-dropdown-menu" style="text-align: center">
+  <div id="main-scrollable-dropdown-menu" style="text-align: center; padding-top: 70px">
   <form id="search-form" method="get" django-media-url="{{ MEDIA_URL }}">
-    <input id="search-box" class="typeahead" type="text" placeholder="Can I donate...">
-    <button type="submit"><i class="fa fa-search"></i></button>
+    <input id="search-box" class="typeahead" type="text" placeholder="Can I donate a(n)...">
+{# Show if multi-input? Or support both single and multi? <button type="submit"><i class="fa fa-search"></i></button>#}
   </form>
+  <p>to...</p>
   </div>
   {# Then show More Items dropdown (?) so that you can search for multiple items #}
   {# However, upon searching, the user will instead be redirected. #}
 
-  <div id="organizations" style="text-align: center">
-  <p>to...</p>
-  </div>
+  <div id="organizations" style="text-align: center"></div>
 {% endblock %}
