@@ -1,9 +1,11 @@
+from typing import Iterable
+
 from django.core.paginator import Paginator
-from django.db.models import Count
 from django.http import Http404, JsonResponse
 from django.shortcuts import render
 from django.utils.translation import gettext_lazy as _
 
+from donate_anything.charity.models.charity import Charity
 from donate_anything.item.models.category import CATEGORY_TYPES, Category
 from donate_anything.item.models.item import Item, WantedItem
 
@@ -25,14 +27,18 @@ def search_item_autocomplete(request):
     return JsonResponse(data={"data": list(queryset)})
 
 
-def _paginate_via_charity(queryset, page_number: int = 1, page_limit: int = 25) -> dict:
+def _paginate_via_charity(
+    queryset,
+    page_number: int = 1,
+    page_limit: int = 25,
+    values_list: Iterable[str] = (
+        "charity__id",
+        "charity__name",
+        "charity__description",
+    ),
+) -> dict:
     paginator = Paginator(
-        list(
-            queryset.select_related("charity").values_list(
-                "charity__id", "charity__name", "charity__description"
-            )
-        ),
-        page_limit,
+        list(queryset.select_related("charity").values_list(*values_list)), page_limit,
     )
     # Can't raise error since Django makes sures there's always one page...
     # Even on an empty page or a string page...
@@ -73,20 +79,48 @@ def search_multiple_items(request):
     specifically for showing which organizations can
     fulfill the most items.
     :return List of charities in order of organizations
-    that can take the most inputted items.
+    that can take the most inputted items with which items
+    are allowed.
     """
     try:
         page_number = int(request.GET.get("page", 1))
         item_ids = [int(x) for x in request.GET.getlist("q")]
     except (TypeError, ValueError):
         raise Http404(_("You must specify the item IDs."))
-    # TODO Show which items the org can fulfill for multi-search
-    # Not the names since the client already has them. We just need the IDs.
-    context = _paginate_via_charity(
-        WantedItem.objects.annotate(org_count=Count("charity_id"))
-        .filter(item_id__in=item_ids)
-        .order_by("-org_count")
-        .distinct(),
-        page_number,
+
+    # Load all charities that can fulfill any item asked for.
+    # FIXME Multi-search has to practically load an entire database
+    #  because organizations can have thousands of WantedItems.
+    #  There is a fix: Trigram and marking items as duplicates.
+    #  Follow GH #3 https://github.com/Donate-Anything/Donate-Anything/issues/3
+    # Or you can just find a better query :P
+    queryset = WantedItem.objects.filter(item_id__in=item_ids).values_list(
+        "charity_id", "item_id"
     )
+    charity_fulfillment: dict = {}
+    for obj in queryset:
+        try:
+            charity_fulfillment[obj[0]].append(obj[1])
+        except KeyError:
+            charity_fulfillment[obj[0]] = [obj[1]]
+    charity_fulfillment = {
+        k: v
+        for k, v in sorted(
+            charity_fulfillment.items(), key=lambda x: len(x[1]), reverse=True
+        )
+    }
+    # Get the charity IDs that are paginated.
+    paginator = Paginator(list(charity_fulfillment.keys()), 25,)
+    page_obj = paginator.get_page(page_number)
+    # Memory management: remove all that are not a part of this list.
+    charity_fulfillment = {k: charity_fulfillment[k] for k in page_obj.object_list}
+
+    # Get the charities themselves and extend into array
+    for c_id, name, description in Charity.objects.filter(
+        id__in=charity_fulfillment.keys()
+    ).values_list("id", "name", "description"):
+        charity_fulfillment[c_id].extend([name, description[:150]])
+
+    context = {"data": charity_fulfillment, "has_next": page_obj.has_next()}
+
     return render(request, "pages/multiple_orgs.html", context=context)

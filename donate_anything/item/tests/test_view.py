@@ -8,6 +8,7 @@ from donate_anything.item.tests.factories import (
     CATEGORY_TYPES,
     CategoryFactory,
     ItemFactory,
+    WantedItem,
     WantedItemFactory,
 )
 from donate_anything.item.views import (
@@ -143,16 +144,36 @@ class TestSearchMultipleItems:
         WantedItemFactory.create_batch(2, item=pan)  # 6
         WantedItemFactory.create(item=jeans)  # 7
 
+        WantedItemFactory.create_batch(25, item=jeans)
+
         response = client.get(
             f"/item/multi-lookup/?q={chair.id}&&q={pan.id}&&q={jeans.id}"
         )
         assert response.status_code == 200
-        data = response.context["data"]
-        assert len(data) == 7, data
-        assert data[0][0] == charity.id, (
+        data: dict = response.context["data"]
+        assert len(data) == 25, f"Supposed to show 25 max pagination.\n{data}"
+        assert response.context["has_next"] is True
+        first_key = list(data.keys())[0]
+        assert first_key == charity.id, (
             "Target charity, which supports the most items "
             "out of the searched, should be the first result."
         )
+        assert (
+            len(data[first_key][:-2])
+            == WantedItem.objects.filter(
+                item_id__in=[chair.id, pan.id, jeans.id], charity=charity,
+            ).count()
+        ), (
+            "Assuming the additional information is only name and description"
+            "of the organization, hence -2 in the test, then you're missing items."
+        )
+
+        charities_seen = []
+        for k in data.keys():
+            # Check the rest isn't the exact same charity
+            assert k not in charities_seen, "Charities shown must be distinct"
+            charities_seen.append(k)
+            # Check the necessary information is there: name, description
 
     def test_search_multiple_items_with_page(self, rf):
         request = rf.get(f"item/multi-lookup/", {"q": 1, "page": str(1)})
