@@ -19,7 +19,7 @@
       <b>+ Add more items</b>
     </div>
     <div id="search-multi-button" class="rounded-button">
-      <i class="fa fa-search"></i> Lookup organizations
+      <i class="fa fa-search"></i> Lookup organizations that fulfill the most items
     </div>
     <p style="font-size: larger">to...</p>
 
@@ -27,6 +27,22 @@
     <div id="more-organizations-button" class="rounded-button">
       <i class="down-arrow"></i>
       <b>More results</b>
+    </div>
+  </div>
+{% endblock %}
+
+{% block modal %}
+  <div id="readonlyModal" class="modal fade">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+        </div>
+        <div class="modal-body">
+          You can only read these inputs. To edit, delete
+          the input and retype it in.
+        </div>
+      </div>
     </div>
   </div>
 {% endblock %}

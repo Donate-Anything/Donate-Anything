@@ -1,10 +1,11 @@
 /* Project specific Javascript goes here. */
-// Typeahead specific JS
 
 // TODO Use cached results rather than always calling API.
 
 const multiItemArrayKey = "multiItemArrayKey"
 const multiItemStrArrayKey = "multiItemStrArrayKey"
+const maxFields = 50;
+const typeAheadID = "#typeahead-input-field.tt-input";
 
 function selectOne(id, value, page) {
     /* Get charities that support selected item
@@ -67,7 +68,7 @@ $("#more-organizations-button").click(function() {
 
 $("#search-multi-button").click(function() {
     let prefix = window.location.protocol + "//" + window.location.host + '/item/multi-lookup/?';
-    let idArray = Array.from(localStorage.getItem(multiItemArrayKey).split(","));
+    let idArray = Array.from(sessionStorage.getItem(multiItemArrayKey).split(","));
     for (let x of idArray) {
         if (x === "") {
             continue
@@ -131,28 +132,24 @@ $('#typeahead-input-field').typeahead({
 }
 ).bind("typeahead:select", function(ev, suggestion) {
     selectOne(suggestion.id, suggestion.value, 1);
-    // For multi-items, we set attributes in localStorage for searching multi later on.
-    localStorage.setItem(multiItemArrayKey, localStorage.getItem(multiItemArrayKey) + suggestion.id + ",")
-    localStorage.setItem(multiItemStrArrayKey, localStorage.getItem(multiItemStrArrayKey) + suggestion.value + ",")
+    // For multi-items, we set attributes in sessionStorage for searching multi later on.
+    sessionStorage.setItem(multiItemArrayKey, sessionStorage.getItem(multiItemArrayKey) + suggestion.id + ",")
+    sessionStorage.setItem(multiItemStrArrayKey, sessionStorage.getItem(multiItemStrArrayKey) + suggestion.value + ",")
 });
 
 $(document).ready(function() {
     /* Allow for multiple input fields. Not all are Typeahead.
     * Only some because */
-    let maxFields = 50;
     let inputWrapper = $("#main-scrollable-dropdown-menu");
     let addButton = $("#add-multi-button");
-    const typeAheadID = "#typeahead-input-field.tt-input";
 
     // Set blank on page load if no items found
-    let fieldCount = 1;
-    let _idArray = localStorage.getItem(multiItemArrayKey);
-    if (_idArray === null) {
-        localStorage.setItem(multiItemArrayKey, "");
-        localStorage.setItem(multiItemStrArrayKey, "");
-    } else {
-        // If found, then it was "go backwards"
-        fieldCount = _idArray.length;
+    // If found, then it was "go backwards"
+    let fieldCount = inputWrapper.length;
+    if (fieldCount === 1 && $(typeAheadID).val() === "") {
+        sessionStorage.setItem(multiItemArrayKey, "");
+        sessionStorage.setItem(multiItemStrArrayKey, "");
+        $('#search-multi-button').css('visibility', 'hidden');
     }
 
     // add custom input box, not typeahead
@@ -164,16 +161,16 @@ $(document).ready(function() {
             let typeaheadVal = $(typeAheadID).val();
             $(inputWrapper).append(
                 '<div><input class="typeahead" readonly style="margin-bottom: 25px"' +
-                ' value="' + typeaheadVal + '">' +
+                ' value="' + typeaheadVal + '" data-toggle="modal" href="#readonlyModal">' +
                 '<a href="#" style="padding-left: 9px" class="delete-input">Delete</a></div>'
             );
             // Remove typeahead input.
             $(typeAheadID).val("");
-            if (fieldCount === 1) {
-                $('#search-multi-button').css('visibility', 'visible')
+            if (fieldCount > 1) {
+                $('#search-multi-button').css('visibility', 'visible');
             }
         } else {
-            alert('You can only search ' + maxFields + ' items at a time.')
+            alert('You can only search ' + maxFields + ' items at a time.');
         }
     });
 
@@ -181,19 +178,19 @@ $(document).ready(function() {
     $(inputWrapper).on("click", ".delete-input", function(e) {
         e.preventDefault();
         // Remove item from arrays
-        let nameArray = Array.from(localStorage.getItem(multiItemStrArrayKey).split(","));
-        let idArray = Array.from(localStorage.getItem(multiItemArrayKey).split(","));
+        let nameArray = Array.from(sessionStorage.getItem(multiItemStrArrayKey).split(","));
+        let idArray = Array.from(sessionStorage.getItem(multiItemArrayKey).split(","));
         const index = nameArray.indexOf($(this).siblings('.typeahead').val());
         if (index > -1) {
-          localStorage.setItem(multiItemStrArrayKey, nameArray.splice(index, 1).toString());
-          localStorage.setItem(multiItemArrayKey, idArray.splice(index, 1).toString());
+          sessionStorage.setItem(multiItemStrArrayKey, nameArray.splice(index, 1).toString());
+          sessionStorage.setItem(multiItemArrayKey, idArray.splice(index, 1).toString());
         }
 
         // Remove element
         $(this).parent('div').remove();
         fieldCount--;
         if (fieldCount === 1) {
-            $('#search-multi-button').css('visibility', 'hidden')
+            $('#search-multi-button').css('visibility', 'hidden');
         }
     })
 })
