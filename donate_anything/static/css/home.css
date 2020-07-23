@@ -33,7 +33,7 @@
 
 .tt-menu {
   width: 422px;
-  margin: 12px 0;
+  margin: -12px 0;
   padding: 8px 0;
   background-color: #fff;
   border: 1px solid #ccc;
@@ -68,17 +68,29 @@
   margin: 0;
 }
 
-#more-organizations-button {
+#home-container {
+  text-align: center;
+  padding-top: 70px;
+}
+
+#home-container .rounded-button {
+  margin-bottom: 25px;
+}
+
+.rounded-button {
   -webkit-border-radius: 40px;
      -moz-border-radius: 40px;
           border-radius: 40px;
   width: 100%;
   text-align: center;
   border-color: gray;
+}
+
+#more-organizations-button {
   visibility: hidden;
 }
 
-#more-organizations-button b {
+.rounded-button b {
   color: #1e90ff;
   padding: 20px;
   text-decoration: none;
@@ -88,7 +100,7 @@
   margin: 4px 2px;
 }
 
-#more-organizations-button:hover {
+.rounded-button:hover {
   background-color: lightgray;
   cursor: pointer;
 }

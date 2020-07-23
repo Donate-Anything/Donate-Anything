@@ -84,7 +84,7 @@ def search_multiple_items(request):
     """
     try:
         page_number = int(request.GET.get("page", 1))
-        item_ids = [int(x) for x in request.GET.getlist("q")]
+        item_ids = set(int(x) for x in request.GET.getlist("q"))
     except (TypeError, ValueError):
         raise Http404(_("You must specify the item IDs."))
 

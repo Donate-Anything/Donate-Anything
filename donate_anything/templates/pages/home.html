@@ -9,22 +9,22 @@
 
 {% endblock %}
 
-{# Suggestions use typeahead.js: https://twitter.github.io/typeahead.js/examples/ #}
-{# But we use the "maintained" fork at corejavascript #}
 {% block content %}
-  <div id="main-scrollable-dropdown-menu" style="text-align: center; padding-top: 70px">
-  <form id="search-form" method="get" django-media-url="{{ MEDIA_URL }}">
-    <input id="search-box" class="typeahead" type="text" placeholder="Can I donate a(n)...">
-{# Show if multi-input? Or support both single and multi? <button type="submit"><i class="fa fa-search"></i></button>#}
-  </form>
-  <p>to...</p>
-  </div>
-  {# Then show More Items dropdown (?) so that you can search for multiple items #}
-  {# However, upon searching, the user will instead be redirected. #}
+  <div id="home-container">
+    <div django-media-url="{{ MEDIA_URL }}" id="main-scrollable-dropdown-menu">
+      <input id="typeahead-input-field" class="typeahead" type="text"
+             placeholder="Can I donate a(n)..." style="margin-bottom: 25px">
+    </div>
+    <div id="add-multi-button" class="rounded-button">
+      <b>+ Add more items</b>
+    </div>
+    <div id="search-multi-button" class="rounded-button">
+      <i class="fa fa-search"></i> Lookup organizations
+    </div>
+    <p style="font-size: larger">to...</p>
 
-  <div style="text-align: center;">
     <div id="organizations"></div>
-    <div id="more-organizations-button">
+    <div id="more-organizations-button" class="rounded-button">
       <i class="down-arrow"></i>
       <b>More results</b>
     </div>

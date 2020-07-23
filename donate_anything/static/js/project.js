@@ -3,6 +3,9 @@
 
 // TODO Use cached results rather than always calling API.
 
+const multiItemArrayKey = "multiItemArrayKey"
+const multiItemStrArrayKey = "multiItemStrArrayKey"
+
 function selectOne(id, value, page) {
     /* Get charities that support selected item
     * and fill them out in the template. */
@@ -62,7 +65,19 @@ $("#more-organizations-button").click(function() {
   )
 });
 
-$('#search-box').typeahead({
+$("#search-multi-button").click(function() {
+    let prefix = window.location.protocol + "//" + window.location.host + '/item/multi-lookup/?';
+    let idArray = Array.from(localStorage.getItem(multiItemArrayKey).split(","));
+    for (let x of idArray) {
+        if (x === "") {
+            continue
+        }
+        prefix += 'q=' + x + '&'
+    }
+    window.location.href = prefix + 'page=1'
+})
+
+$('#typeahead-input-field').typeahead({
     minLength: 1,
     highlight: true
 },
@@ -78,7 +93,7 @@ $('#search-box').typeahead({
             type: "GET",
             success: function(data) {
                 asyncResults($.map(data, function(item) {
-                    let textArray = [];  // Ref: https://twitter.github.io/typeahead.js/data/films/post_1960.json
+                    let textArray = [];
                     for (let x of item) {
                         textArray.push({
                             id: x[0],
@@ -101,16 +116,84 @@ $('#search-box').typeahead({
             if (window.location.pathname === "/") {
                 // Show image only on landing page.
                 // Top right search bar shouldn't show.
-                return '<div style="text-align: left">' +
-                '<img style="height: 1em; width: 1em; float: left;" src="' +
-                $("#search-form").attr("django-media-url") + data.imageURL + '">' +
-                data.value + '</div>';
+                const mediaURL = $("#main-scrollable-dropdown-menu").attr("django-media-url");
+                let imageHTML = '';
+                if (data.imageURL === mediaURL) {
+                    imageHTML = '<img style="height: 1em; width: 1em; float: left;" src="' +
+                        mediaURL + data.imageURL + '">';
+                }
+                return '<div style="text-align: left">' + imageHTML + data.value + '</div>';
             } else {
-                return '<div style="text-align: left">' + data + '</div>';
+                return '<div style="text-align: left">' + data.value + '</div>';
             }
         }
     }
 }
 ).bind("typeahead:select", function(ev, suggestion) {
     selectOne(suggestion.id, suggestion.value, 1);
+    // For multi-items, we set attributes in localStorage for searching multi later on.
+    localStorage.setItem(multiItemArrayKey, localStorage.getItem(multiItemArrayKey) + suggestion.id + ",")
+    localStorage.setItem(multiItemStrArrayKey, localStorage.getItem(multiItemStrArrayKey) + suggestion.value + ",")
 });
+
+$(document).ready(function() {
+    /* Allow for multiple input fields. Not all are Typeahead.
+    * Only some because */
+    let maxFields = 50;
+    let inputWrapper = $("#main-scrollable-dropdown-menu");
+    let addButton = $("#add-multi-button");
+    const typeAheadID = "#typeahead-input-field.tt-input";
+
+    // Set blank on page load if no items found
+    let fieldCount = 1;
+    let _idArray = localStorage.getItem(multiItemArrayKey);
+    if (_idArray === null) {
+        localStorage.setItem(multiItemArrayKey, "");
+        localStorage.setItem(multiItemStrArrayKey, "");
+    } else {
+        // If found, then it was "go backwards"
+        fieldCount = _idArray.length;
+    }
+
+    // add custom input box, not typeahead
+    $(addButton).click(function(e) {
+        e.preventDefault();
+        if (fieldCount < maxFields) {
+            fieldCount++;
+            // Grab the typeahead input and insert into new custom random field.
+            let typeaheadVal = $(typeAheadID).val();
+            $(inputWrapper).append(
+                '<div><input class="typeahead" readonly style="margin-bottom: 25px"' +
+                ' value="' + typeaheadVal + '">' +
+                '<a href="#" style="padding-left: 9px" class="delete-input">Delete</a></div>'
+            );
+            // Remove typeahead input.
+            $(typeAheadID).val("");
+            if (fieldCount === 1) {
+                $('#search-multi-button').css('visibility', 'visible')
+            }
+        } else {
+            alert('You can only search ' + maxFields + ' items at a time.')
+        }
+    });
+
+    // remove custom input box, not typeahead input
+    $(inputWrapper).on("click", ".delete-input", function(e) {
+        e.preventDefault();
+        // Remove item from arrays
+        let nameArray = Array.from(localStorage.getItem(multiItemStrArrayKey).split(","));
+        let idArray = Array.from(localStorage.getItem(multiItemArrayKey).split(","));
+        const index = nameArray.indexOf($(this).siblings('.typeahead').val());
+        if (index > -1) {
+          localStorage.setItem(multiItemStrArrayKey, nameArray.splice(index, 1).toString());
+          localStorage.setItem(multiItemArrayKey, idArray.splice(index, 1).toString());
+        }
+
+        // Remove element
+        $(this).parent('div').remove();
+        fieldCount--;
+        if (fieldCount === 1) {
+            $('#search-multi-button').css('visibility', 'hidden')
+        }
+    })
+})
