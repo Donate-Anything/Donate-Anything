@@ -1,2 +1,23 @@
 {% extends "base.html" %}
+{% load static compress %}
 {# Displays a custom UI for multiple organizations rather than staying on one page. #}
+{# Context in format {data: {c_id: [list of item IDs, name, desc.[:150]}, has_next: bool} #}
+{# Quick setup if used create_item_data command http://localhost:8000/item/multi-lookup/?q=1&q=2&page=1 #}
+{% block content %}
+  {% for org_id, value in data.items %}
+    <h2 id="item-count-{{ value|length|add:"-2" }}">{{ value|length|add:"-2" }} Items</h2>
+    <hr id="item-count-hr-{{ value|length|add:"-2" }}">
+    <h3><a href="{% url 'charity:organization' org_id %}">{{ value|slice:"-2:-1"|first }}</a></h3>
+    <p>{{ value|last }}</p>
+    <p><i class="item-data-treasure" item-data="{{ value|slice:":-2" }}"></i></p>
+  {% empty %}
+    <h2>Whoops!</h2>
+    <p>Looks like no organization can fulfill your donation.</p>
+  {% endfor %}
+{% endblock %}
+
+{% block javascript %}
+  {% compress js %}
+    <script src="{% static 'js/multi_lookup.js' %}" type="text/javascript"></script>
+  {% endcompress %}
+{% endblock %}

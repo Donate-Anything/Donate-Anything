@@ -11,7 +11,7 @@
 
 {% block content %}
   <div id="home-container">
-    <div django-media-url="{{ MEDIA_URL }}" id="main-scrollable-dropdown-menu">
+    <div django-media-url="{% get_media_prefix %}" id="main-scrollable-dropdown-menu">
       <input id="typeahead-input-field" class="typeahead" type="text"
              placeholder="Can I donate a(n)..." style="margin-bottom: 25px">
     </div>
