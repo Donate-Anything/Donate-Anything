@@ -121,6 +121,9 @@ def search_multiple_items(request):
     ).values_list("id", "name", "description"):
         charity_fulfillment[c_id].extend([name, description[:150]])
 
-    context = {"data": charity_fulfillment, "has_next": page_obj.has_next()}
+    context = {
+        "data": charity_fulfillment,
+        "page_obj": page_obj,
+    }
 
     return render(request, "pages/multiple_orgs.html", context=context)

@@ -152,7 +152,8 @@ class TestSearchMultipleItems:
         assert response.status_code == 200
         data: dict = response.context["data"]
         assert len(data) == 25, f"Supposed to show 25 max pagination.\n{data}"
-        assert response.context["has_next"] is True
+        assert response.context["page_obj"].has_next() is True
+        assert response.context["page_obj"].has_previous() is False
         first_key = list(data.keys())[0]
         assert first_key == charity.id, (
             "Target charity, which supports the most items "

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static compress %}
+{% load static compress paginate %}
 {# Displays a custom UI for multiple organizations rather than staying on one page. #}
 {# Context in format {data: {c_id: [list of item IDs, name, desc.[:150]}, has_next: bool} #}
 {# Quick setup if used create_item_data command http://localhost:8000/item/multi-lookup/?q=1&q=2&page=1 #}
@@ -14,6 +14,41 @@
     <h2>Whoops!</h2>
     <p>Looks like no organization can fulfill your donation.</p>
   {% endfor %}
+
+  <!-- Show 10 numbers. If in middle, show 5 left, 4 right. -->
+  <nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+      {% if page_obj.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="{% url 'item:lookup-multi-item' %}{{ request.get_full_path|get_all_but_page }}&page={{ page_obj.previous_page_number }}" tabindex="-1">
+            Previous
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <a class="page-link" href="#" tabindex="-1">Previous</a>
+        </li>
+      {% endif %}
+      {% for link, value in request.get_full_path|paginate:page_obj.paginator.num_pages %}
+        <li class="page-item{% if page_obj.number == value %} active{% endif %}">
+          <a class="page-link" href="{% url 'item:lookup-multi-item' %}{{ link }}">
+            {{ value }}
+          </a>
+        </li>
+      {% endfor %}
+      {% if page_obj.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="{% url 'item:lookup-multi-item' %}{{ request.get_full_path|get_all_but_page }}&page={{ page_obj.next_page_number }}">
+            Next
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <a class="page-link" href="#">Next</a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
 {% endblock %}
 
 {% block javascript %}

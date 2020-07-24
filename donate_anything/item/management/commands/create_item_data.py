@@ -3,6 +3,7 @@ from django.core.management.base import BaseCommand
 
 from donate_anything.charity.models import Charity
 from donate_anything.item.models import Item, WantedItem
+from donate_anything.item.tests.factories import WantedItemFactory
 
 
 class Command(BaseCommand):
@@ -50,4 +51,7 @@ class Command(BaseCommand):
         WantedItem.objects.create(item=item_2, charity=org_2)
         WantedItem.objects.create(item=item_1, charity=org_3)
         WantedItem.objects.create(item=item_3, charity=org_3)
+
+        # For testing pagination - change to 1 in paginating
+        WantedItemFactory.create_batch(25, item=item_1)
         print("Finished creating Item app data.")
