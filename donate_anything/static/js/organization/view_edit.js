@@ -1,14 +1,6 @@
 // Code for viewing application and editing/suggesting
 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-$(document).ready(function() {
-    let converter = new showdown.Converter();
-    converter.setFlavor('github');
-    $("#org-description").html(converter.makeHtml($("org-description").innerText));
-    $("#org-instructions").html(converter.makeHtml($("org-instructions").innerText));
-    $("#org-legal-doc").html(converter.makeHtml($("org-legal-doc").innerText));
-})
-
 function handleFormSuccess(data, textStatus, jqXHR) {
     console.log(data) // nothing
     console.log(textStatus) // "success"

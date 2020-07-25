@@ -23,8 +23,8 @@
   <script type="text/javascript">
   let converter = new showdown.Converter();
   converter.setFlavor('github');
-  $("#org-description").html(converter.makeHtml($("org-description").innerText));
-  $("#org-instructions").html(converter.makeHtml($("org-instructions").innerText));
+  $("#org-description").html(converter.makeHtml(document.getElementById("org-description").innerHTML));
+  $("#org-instructions").html(converter.makeHtml(document.getElementById("org-instructions").innerHTML));
   </script>
   <!-- Animate on scroll -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js" integrity="sha512-A7AYk1fGKX6S2SsHywmPkrnzTZHrgiVT7GcQkLGDe2ev0aWb8zejytzS8wjo7PGEXKqJOrjQ4oORtnimIRZBtw==" crossorigin="anonymous"></script>
