@@ -47,6 +47,9 @@
             <li class="nav-item">
               <a class="nav-link" href="{% url 'about' %}">About</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'charity:apply' %}">Apply</a>
+            </li>
             {% if request.user.is_authenticated %}
               <li class="nav-item">
                 {# URL provided by django-allauth/account/urls.py #}
@@ -74,7 +77,7 @@
 
     </div>
 
-    <div class="container">
+    <div class="container pt-2">
 
       {% if messages %}
           {% for message in messages %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+  <h3 class="text-center pb-3 pt-2" data-aos="fade-up">Are you a(n)...</h3>
+  <div class="row text-center">
+    <div class="col-md-6" data-aos="fade-up-right">
+      <div class="card text-center">
+        <div class="card-header">
+          Organization / Charity
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">The core body of society</h5>
+          <p class="card-text">
+            Applying for an organization means you're spreading the true love
+            of being human. There's nothing better than selflessly helping others
+            who're in hardship.
+          </p>
+          <a href="{% url "charity:apply-organization" %}" class="btn btn-primary">Apply</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6" data-aos="fade-up-left">
+      <div class="card text-center">
+        <div class="card-header">
+          Business
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">The responsible of society</h5>
+          <p class="card-text">
+            Applying as a business gets special treatment. Whether you're a recycling
+            company or a small business, community matters, and we're glad you care.
+          </p>
+          <a href="{% url "charity:apply-business" %}" class="btn btn-primary">Apply</a>
+        </div>
+      </div>
+    </div>
+    <p class="font-italic font-weight-light text-center pt-4" data-aos="fade-up">
+      Note: you do not have to be the owner of the entity to apply for them.
+      All documentation of proof should simply be public. You must be signed in.
+    </p>
+  </div>
+{% endblock %}
+
+{% block javascript %}
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>AOS.init();</script>
+{% endblock %}

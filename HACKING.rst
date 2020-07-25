@@ -16,8 +16,8 @@ Moved to settings_.
 Basic Commands
 --------------
 
-Setting Up Your Users
-^^^^^^^^^^^^^^^^^^^^^
+Setting Up Data
+^^^^^^^^^^^^^^^
 
 * To create a **normal user account**, just go to Sign Up and fill out the form. Once you submit it, you'll see a "Verify Your E-mail Address" page. Go to your console to see a simulated email verification message. Copy the link into your browser. Now the user's email should be verified and ready to go.
 
@@ -30,6 +30,12 @@ For convenience, you can keep your normal user logged in on Chrome and your supe
 The purpose of user accounts is to manage your organization, talk
 in discussion rooms on the website, chat with organizations, etc..
 
+Data for fast setup::
+
+    $ docker-compose -f local.yml run --rm django python manage.py create_item_data
+
+If you use PyCharm, there is a run configuration called "Restart" which will
+set up all the needed data for you with a provided superuser: test, test@test.com, test.
 Lint
 ^^^^
 
@@ -76,3 +82,10 @@ With MailHog running, to view messages that are sent by your application, open y
 
 .. _mailhog: https://github.com/mailhog/MailHog
 .. _`cookiecutter-django Docker documentation`: http://cookiecutter-django.readthedocs.io/en/latest/deployment-with-docker.html
+
+Setting Environment Variables
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+When making a PR, if you need to set an environment variable for production
+use, specify the environment variable name. We use Travis to encrypt our
+files for Zappa, which means you'll not be able to decrypt the settings file.

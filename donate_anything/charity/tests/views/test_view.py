@@ -1,7 +1,7 @@
 import pytest
 from django.http import Http404
 
-from donate_anything.charity.views import organization
+from donate_anything.charity.views.list import organization
 
 
 pytestmark = pytest.mark.django_db
