@@ -79,7 +79,7 @@ def applied_organization_edits(request, pk):
     """
     qs = AppliedOrganizationEdit.objects.select_related("user").filter(
         proposed_entity_id=pk
-    )
+    ).order_by("id")
     return _paginate_and_return_json(qs, request)
 
 
@@ -90,7 +90,7 @@ def applied_business_edits(request, pk):
     """
     qs = AppliedBusinessEdit.objects.select_related("user").filter(
         proposed_entity_id=pk
-    )
+    ).order_by("id")
     return _paginate_and_return_json(qs, request)
 
 
