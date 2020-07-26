@@ -45,3 +45,12 @@ $.ajaxSetup({
         }
     }
 })
+
+$(document).ready(function() {
+    converter = new showdown.Converter();
+    converter.setFlavor('github');
+    $('*[id*="-showdown"]').each(function() {
+        const text = document.getElementById(this.id.slice(0, -9)).value;
+        $(this).html(converter.makeHtml(text));
+    });
+})
