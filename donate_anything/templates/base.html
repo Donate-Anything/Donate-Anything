@@ -22,76 +22,77 @@
 
     {% compress css %}
     <!-- This file stores project-specific CSS -->
-
     <link href="{% static 'css/project.css' %}" rel="stylesheet">
-
     {% endcompress %}
     {% endblock %}
-
   </head>
 
   <body>
+  {# TODO Add search to top right https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_searchbar3 #}
 
-    <div class="mb-1">
-      <nav class="navbar navbar-expand-md navbar-light bg-light">
-        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <a class="navbar-brand" href="{% url 'home' %}">Donate Anything</a>
+    <div id="full-body-wrapper">
+      <!-- page-content-wrapper is meant for sidebar usage -->
+      <div id="page-content-wrapper">
+        <!-- Navbar -->
+        <div class="mb-1">
+          <nav id="top-main-nav-bar" class="navbar navbar-expand-md navbar-light bg-light">
+            <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <a class="navbar-brand" href="{% url 'home' %}">Donate Anything</a>
 
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-              <a class="nav-link" href="{% url 'home' %}">Home <span class="sr-only">(current)</span></a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'about' %}">About</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'charity:apply' %}">Apply</a>
-            </li>
-            {% if request.user.is_authenticated %}
-              <li class="nav-item">
-                {# URL provided by django-allauth/account/urls.py #}
-                <a class="nav-link" href="{% url 'users:detail' request.user.username  %}">{% trans "My Profile" %}</a>
-              </li>
-              <li class="nav-item">
-                {# URL provided by django-allauth/account/urls.py #}
-                <a class="nav-link" href="{% url 'account_logout' %}">{% trans "Sign Out" %}</a>
-              </li>
-            {% else %}
-              <li class="nav-item">
-                {# URL provided by django-allauth/account/urls.py #}
-                <a id="sign-up-link" class="nav-link" href="{% url 'account_signup' %}">{% trans "Sign Up" %}</a>
-              </li>
-              <li class="nav-item">
-                {# URL provided by django-allauth/account/urls.py #}
-                <a id="log-in-link" class="nav-link" href="{% url 'account_login' %}">{% trans "Sign In" %}</a>
-              </li>
-            {% endif %}
-          </ul>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                  <a class="nav-link" href="{% url 'home' %}">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'about' %}">About</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'charity:apply' %}">Apply</a>
+                </li>
+                {% if request.user.is_authenticated %}
+                  <li class="nav-item">
+                    {# URL provided by django-allauth/account/urls.py #}
+                    <a class="nav-link" href="{% url 'users:detail' request.user.username  %}">{% trans "My Profile" %}</a>
+                  </li>
+                  <li class="nav-item">
+                    {# URL provided by django-allauth/account/urls.py #}
+                    <a class="nav-link" href="{% url 'account_logout' %}">{% trans "Sign Out" %}</a>
+                  </li>
+                {% else %}
+                  <li class="nav-item">
+                    {# URL provided by django-allauth/account/urls.py #}
+                    <a id="sign-up-link" class="nav-link" href="{% url 'account_signup' %}">{% trans "Sign Up" %}</a>
+                  </li>
+                  <li class="nav-item">
+                    {# URL provided by django-allauth/account/urls.py #}
+                    <a id="log-in-link" class="nav-link" href="{% url 'account_login' %}">{% trans "Sign In" %}</a>
+                  </li>
+                {% endif %}
+              </ul>
+            </div>
+          </nav>
         </div>
-      </nav>
 
-{# TODO Add search to top right https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_searchbar3 #}
+        <div class="container">
+          {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>
+            {% endfor %}
+          {% endif %}
 
-    </div>
-
-    <div class="container pt-2">
-
-      {% if messages %}
-          {% for message in messages %}
-              <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>
-          {% endfor %}
-      {% endif %}
-
-      {% block content %}
-        <p>Use this document as a way to quick start any new project.</p>
-      {% endblock content %}
-
-    </div> <!-- /container -->
+          {% block content %}
+            <p>Use this document as a way to quick start any new project.</p>
+          {% endblock content %}
+        </div>
+      </div>
+      <!-- /container -->
 
     {% block modal %}{% endblock modal %}
+    {% block sidebar %}{% endblock %}
+    </div>
 
     <!-- Le javascript
     ================================================== -->
