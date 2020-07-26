@@ -22,12 +22,6 @@ from donate_anything.item.views import (
 pytestmark = pytest.mark.django_db
 
 
-def _convert_json_response_to_python(data: str) -> dict:
-    """Transform JsonResponse object's data Pythonically
-    """
-    return json.loads(data)
-
-
 class TestItemAutocompleteView:
     def test_typeahead(self, rf):
         query = "an"
@@ -37,7 +31,7 @@ class TestItemAutocompleteView:
         request = rf.get("item/api/v1/item-autocomplete/", {"q": query})
         response = search_item_autocomplete(request)
         assert response.status_code == 200
-        data = _convert_json_response_to_python(response.content)
+        data = json.loads(response.content)
         assert len(data["data"]) == 2, f"Response {data}"
         assert query in data["data"][0][1]
         assert query in data["data"][1][1]
@@ -49,7 +43,7 @@ class TestItemAutocompleteView:
         request = rf.get("item/api/v1/item-autocomplete/", {"q": query})
         response = search_item_autocomplete(request)
         assert response.status_code == 200
-        data = _convert_json_response_to_python(response.content)
+        data = json.loads(response.content)
         assert len(data["data"]) == 1, f"Response {data}"
         assert data["data"][0] == [target.id, target.name, target.image]
 
@@ -66,7 +60,7 @@ class TestItemAutocompleteView:
         request = rf.get("item/api/v1/item-autocomplete/", {"q": "chair"})
         response = search_item_autocomplete(request)
         assert response.status_code == 200
-        data = _convert_json_response_to_python(response.content)
+        data = json.loads(response.content)
         assert len(data["data"]) == 1
         assert data["data"][0] == [target.id, target.name, target.image]
 
@@ -95,7 +89,7 @@ class TestPaginateViaCharity:
         response = search_category(request, category_type)
 
         assert response.status_code == 200
-        data = _convert_json_response_to_python(response.content)
+        data = json.loads(response.content)
         assert len(data["data"]) == 3
         # Make sure the data is correct.
         _assert_org_list_eq(data["data"], categories)
@@ -109,7 +103,7 @@ class TestPaginateViaCharity:
         request = rf.get(f"item/api/v1/category/{category_type}/", {"page": 2})
         response = search_category(request, category_type)
         assert response.status_code == 200
-        data = _convert_json_response_to_python(response.content)
+        data = json.loads(response.content)
         assert (
             len(data["data"]) == 1
         ), "The paginator should show only 1 organization since page size is 25."
@@ -126,7 +120,7 @@ class TestPaginateViaCharity:
         request = rf.get(f"item/lookup/{item.id}")
         response = search_item(request, item.id)
         assert response.status_code == 200
-        data = _convert_json_response_to_python(response.content)
+        data = json.loads(response.content)
         assert len(data["data"]) == 3
         _assert_org_list_eq(data["data"], wanted_items)
 

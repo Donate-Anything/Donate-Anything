@@ -66,11 +66,13 @@ class Edits(models.Model):
     """
 
     id = models.BigAutoField(primary_key=True)
+    created = models.DateTimeField(auto_now_add=True, editable=False)
+    updated = models.DateTimeField(auto_now=True, editable=False)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True
     )
     edit = models.TextField(max_length=5000)
-    accepted = models.BooleanField(default=False)
+    viewed = models.BooleanField(default=False)
 
     class Meta:
         abstract = True

@@ -33,6 +33,7 @@ in discussion rooms on the website, chat with organizations, etc..
 Data for fast setup::
 
     $ docker-compose -f local.yml run --rm django python manage.py create_item_data
+    $ docker-compose -f local.yml run --rm django python manage.py create_charity_data
 
 If you use PyCharm, there is a run configuration called "Restart" which will
 set up all the needed data for you with a provided superuser: test, test@test.com, test.

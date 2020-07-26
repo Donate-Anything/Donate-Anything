@@ -9,16 +9,10 @@ from donate_anything.charity.forms import BusinessForm, OrganizationForm
 from donate_anything.charity.models import BusinessApplication, OrganizationApplication
 
 
-class ApplyOrganizationFormView(LoginRequiredMixin, FormView):
-    template_name = "organization/apply/apply_org.html"
-    form_class = OrganizationForm
-
+class ApplyView(LoginRequiredMixin, FormView):
     def __init__(self, *args, **kwargs):
-        super(ApplyOrganizationFormView, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.object = None
-
-    def get_success_url(self):
-        return reverse("charity:applied-organization", kwargs={"pk": self.object.id})
 
     def post(self, request, *args, **kwargs):
         form = self.get_form_class()(request.POST, user=request.user)
@@ -31,33 +25,25 @@ class ApplyOrganizationFormView(LoginRequiredMixin, FormView):
         """If the form is valid, save the associated model."""
         self.object = form.save()
         return super().form_valid(form)
+
+
+class ApplyOrganizationFormView(ApplyView):
+    template_name = "organization/apply/apply_org.html"
+    form_class = OrganizationForm
+
+    def get_success_url(self):
+        return reverse("charity:applied-organization", kwargs={"pk": self.object.id})
 
 
 apply_organization_view = ApplyOrganizationFormView.as_view()
 
 
-class ApplyBusinessFormView(LoginRequiredMixin, FormView):
+class ApplyBusinessFormView(ApplyView):
     template_name = "organization/apply/apply_bus.html"
     form_class = BusinessForm
 
-    def __init__(self, *args, **kwargs):
-        super(ApplyBusinessFormView, self).__init__(*args, **kwargs)
-        self.object = None
-
     def get_success_url(self):
         return reverse("charity:applied-business", kwargs={"pk": self.object.id})
-
-    def post(self, request, *args, **kwargs):
-        form = self.get_form_class()(request.POST, user=request.user)
-        if form.is_valid():
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
-
-    def form_valid(self, form):
-        """If the form is valid, save the associated model."""
-        self.object = form.save()
-        return super().form_valid(form)
 
 
 apply_business_view = ApplyBusinessFormView.as_view()

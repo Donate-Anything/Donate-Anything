@@ -11,15 +11,18 @@
 {% block title %}{{ obj.name }} | Application | Donate Anything{% endblock %}
 
 {% block sidebar %}
-  <div class="bg-light border-right" id="sidebar-wrapper">
+  <div data-sidebar-url="{% url 'charity:applied-business-edits' obj.id %}" class="bg-light border-right" id="sidebar-wrapper">
     <div class="sidebar-heading">Suggested Edits </div>
-    <div class="list-group list-group-flush">
-      <a href="#" class="list-group-item list-group-item-action bg-light">Dashboard</a>
-      <a href="#" class="list-group-item list-group-item-action bg-light">Shortcuts</a>
-      <a href="#" class="list-group-item list-group-item-action bg-light">Overview</a>
-      <a href="#" class="list-group-item list-group-item-action bg-light">Events</a>
-      <a href="#" class="list-group-item list-group-item-action bg-light">Profile</a>
-      <a href="#" class="list-group-item list-group-item-action bg-light">Status</a>
+    <div id="sidebar-body"
+         {% if request.user == obj.applier %}data-allow-read{% endif %}
+         data-mark-viewed-url="{% url 'charity:mark-applied-bus-edit-viewed' '0' %}"
+         data-username-url="{% url 'users:detail' 'placeholder' %}"
+         class="list-group list-group-flush">
+    {% csrf_token %}
+{# TODO Show seen as well <a href="#" class="list-group-item list-group-item-action bg-light">Show seen</a>#}
+    </div>
+    <div class="text-center">
+      <button id="load-more-button" class="btn btn-info" data-next-page="2" onclick="loadMoreButtonClick(this)">Load More</button>
     </div>
   </div>
 {% endblock %}

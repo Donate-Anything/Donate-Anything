@@ -1,8 +1,13 @@
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404, render
+from django.utils.translation import gettext_lazy as _
 
 from donate_anything.charity.forms import BusinessForm, OrganizationForm
 from donate_anything.charity.models import (
+    AppliedBusinessEdit,
+    AppliedOrganizationEdit,
     BusinessApplication,
     Charity,
     OrganizationApplication,
@@ -37,3 +42,81 @@ def applied_business(request, pk):
     if request.user == obj.applier:
         context["form"] = BusinessForm(instance=obj)
     return render(request, "organization/apply/view_bus.html", context)
+
+
+def _paginate_and_return_json(qs, request) -> JsonResponse:
+    """Paginates qs and and checks
+    for certain query parameters for
+    list organization edits
+    """
+    unseen = request.GET.get("unseen", False)
+    if unseen == "1":
+        qs = qs.filter(viewed=False)
+    # Already ordered by time since AutoField
+    paginator = Paginator(qs, 25)
+    page_obj = paginator.get_page(request.GET.get("page", 1))
+    if unseen == "1":
+        data = {
+            "data": [
+                [x.id, x.user.get_username(), x.edit, x.created, x.updated]
+                for x in page_obj.object_list
+            ]
+        }
+    else:
+        data = {
+            "data": [
+                [x.id, x.user.get_username(), x.edit, x.created, x.updated, x.viewed]
+                for x in page_obj.object_list
+            ]
+        }
+    return JsonResponse(data=data)
+
+
+@login_required
+def applied_organization_edits(request, pk):
+    """Returns suggested edits for OrganizationApplications
+    using Paginator. Returns username, edit, datetime
+    """
+    qs = AppliedOrganizationEdit.objects.select_related("user").filter(
+        proposed_entity_id=pk
+    )
+    return _paginate_and_return_json(qs, request)
+
+
+@login_required
+def applied_business_edits(request, pk):
+    """Returns suggested edits for BusinessApplications
+    using Paginator. Returns username, user pk, edit, created+updated
+    """
+    qs = AppliedBusinessEdit.objects.select_related("user").filter(
+        proposed_entity_id=pk
+    )
+    return _paginate_and_return_json(qs, request)
+
+
+def _mark_view(user_id: int, obj):
+    if obj.proposed_entity.applier_id != user_id:
+        return HttpResponseForbidden(
+            _("You must be the applicant to mark a suggestion as viewed.")
+        )
+    obj.viewed = not obj.viewed
+    obj.save(update_fields=["viewed"])
+    return HttpResponse()
+
+
+@login_required
+def viewed_org_edit(request, edit_pk: int):
+    """Mark an organization edit as viewed.
+    Reversible
+    """
+    obj = get_object_or_404(AppliedOrganizationEdit, id=edit_pk)
+    return _mark_view(request.user.id, obj)
+
+
+@login_required
+def viewed_bus_edit(request, edit_pk: int):
+    """Mark a business edit as viewed.
+    Reversible
+    """
+    obj = get_object_or_404(AppliedBusinessEdit, id=edit_pk)
+    return _mark_view(request.user.id, obj)

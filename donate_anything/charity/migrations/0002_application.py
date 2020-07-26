@@ -174,7 +174,9 @@ class Migration(migrations.Migration):
             fields=[
                 ("id", models.BigAutoField(primary_key=True, serialize=False)),
                 ("edit", models.TextField(max_length=5000)),
-                ("accepted", models.BooleanField(default=False)),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                ("viewed", models.BooleanField(default=False)),
                 (
                     "proposed_entity",
                     models.ForeignKey(
@@ -199,7 +201,9 @@ class Migration(migrations.Migration):
             fields=[
                 ("id", models.BigAutoField(primary_key=True, serialize=False)),
                 ("edit", models.TextField(max_length=5000)),
-                ("accepted", models.BooleanField(default=False)),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                ("viewed", models.BooleanField(default=False)),
                 (
                     "proposed_entity",
                     models.ForeignKey(
