@@ -128,3 +128,16 @@ class BusinessForm(forms.ModelForm):
             if create_proposed:
                 ProposedBusinessItem.objects.create(entity=instance, item=[])
         return instance
+
+
+class SuggestedEditForm(forms.Form):
+    """If create is True, id is entity ID.
+    Else, it's the suggested edit's ID.
+    """
+
+    id = forms.IntegerField(widget=forms.HiddenInput())
+    edit = forms.CharField(
+        label="Suggest in Markdown", widget=MDWidget(), max_length=5000
+    )
+    # Not sure why this can't be BooleanField...
+    create = forms.CharField(widget=forms.HiddenInput())

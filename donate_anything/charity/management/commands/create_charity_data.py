@@ -35,11 +35,11 @@ class Command(BaseCommand):
 
         # Create some edits
         # Last one won't have any edits since it's the newest
-        AppliedOrganizationEditFactory.create_batch(
-            randint(3, 10), proposed_entity=org_apps[0]
-        )
+        AppliedOrganizationEditFactory.create_batch(30, proposed_entity=org_apps[0])
         for org in org_apps[1:-1]:
-            AppliedOrganizationEditFactory.create_batch(30, proposed_entity=org)
+            AppliedOrganizationEditFactory.create_batch(
+                randint(3, 10), proposed_entity=org
+            )
 
         AppliedBusinessEditFactory.create_batch(30, proposed_entity=bus_apps[0])
         for bus in bus_apps[1:-1]:

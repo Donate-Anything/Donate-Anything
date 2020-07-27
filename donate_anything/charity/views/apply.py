@@ -1,12 +1,27 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import (
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseForbidden,
+    JsonResponse,
+)
 from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_protect, requires_csrf_token
 from django.views.generic import FormView, UpdateView
 
-from donate_anything.charity.forms import BusinessForm, OrganizationForm
-from donate_anything.charity.models import BusinessApplication, OrganizationApplication
+from donate_anything.charity.forms import (
+    BusinessForm,
+    OrganizationForm,
+    SuggestedEditForm,
+)
+from donate_anything.charity.models import (
+    AppliedBusinessEdit,
+    AppliedOrganizationEdit,
+    BusinessApplication,
+    OrganizationApplication,
+)
 
 
 class ApplyView(LoginRequiredMixin, FormView):
@@ -84,3 +99,54 @@ class AppliedBusinessUpdateView(AppliedBaseUpdateView):
 
 
 applied_business_update_view = AppliedBusinessUpdateView.as_view()
+
+
+class SuggestEditView(LoginRequiredMixin, FormView):
+    form_class = SuggestedEditForm
+    model = None
+    parent_model = None
+
+    def form_valid(self, form):
+        pk = form.cleaned_data["id"]
+        create = form.cleaned_data["create"]
+        if create.lower() == "true":
+            if self.parent_model.objects.filter(id=pk).exists():
+                obj = self.model.objects.create(
+                    user=self.request.user,
+                    edit=form.cleaned_data["edit"],
+                    proposed_entity_id=pk,
+                )
+                return JsonResponse(
+                    {"id": obj.id, "username": self.request.user.get_username()}
+                )
+            else:
+                return HttpResponseBadRequest(_("Application doesn't exist."))
+        else:
+            try:
+                obj = self.model.objects.get(id=pk)
+            except self.model.DoesNotExist:
+                return HttpResponseForbidden(_("Suggestion does not exist."))
+            if obj.user != self.request.user:
+                return HttpResponseForbidden(_("You may not edit this suggestion."))
+            obj.edit = form.cleaned_data["edit"]
+            obj.save(update_fields=["edit"])
+        return HttpResponse()
+
+    def form_invalid(self, form):
+        return HttpResponseBadRequest(_("Must fill in all fields."))
+
+
+class SuggestEditAppliedOrgView(SuggestEditView):
+    model = AppliedOrganizationEdit
+    parent_model = OrganizationApplication
+
+
+suggest_edit_org_form_view = SuggestEditAppliedOrgView.as_view()
+
+
+class SuggestEditAppliedBusView(SuggestEditView):
+    model = AppliedBusinessEdit
+    parent_model = BusinessApplication
+
+
+suggest_edit_bus_form_view = SuggestEditAppliedBusView.as_view()

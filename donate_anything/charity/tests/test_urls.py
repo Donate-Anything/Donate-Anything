@@ -146,3 +146,25 @@ def test_mark_bus_suggested_edit_viewed(business_application_suggested_edit):
         ).view_name
         == "charity:mark-applied-bus-edit-viewed"
     )
+
+
+def test_edit_suggested_org():
+    assert (
+        reverse("charity:edit-suggest-applied-org",)
+        == "/organization/applied/organization/suggested/edit/"
+    )
+    assert (
+        resolve("/organization/applied/organization/suggested/edit/").view_name
+        == "charity:edit-suggest-applied-org"
+    )
+
+
+def test_edit_suggested_bus():
+    assert (
+        reverse("charity:edit-suggest-applied-bus",)
+        == "/organization/applied/business/suggested/edit/"
+    )
+    assert (
+        resolve("/organization/applied/business/suggested/edit/").view_name
+        == "charity:edit-suggest-applied-bus"
+    )

@@ -36,6 +36,11 @@ urlpatterns = [
         apply.applied_organization_update_view,
         name="edit-applied-org",
     ),
+    path(
+        "applied/organization/suggested/edit/",
+        apply.suggest_edit_org_form_view,
+        name="edit-suggest-applied-org",
+    ),
     path("applied/business/<int:pk>/", list.applied_business, name="applied-business"),
     path(
         "applied/business/edit/<int:pk>/",
@@ -51,5 +56,10 @@ urlpatterns = [
         "applied/business/suggested/<int:edit_pk>/viewed/",
         list.viewed_bus_edit,
         name="mark-applied-bus-edit-viewed",
+    ),
+    path(
+        "applied/business/suggested/edit/",
+        apply.suggest_edit_bus_form_view,
+        name="edit-suggest-applied-bus",
     ),
 ]

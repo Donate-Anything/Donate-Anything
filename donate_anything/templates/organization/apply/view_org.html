@@ -59,6 +59,7 @@
       </div><br>
       <p class="font-italic"><u>Extras (in JSON)</u></p>
       <p>{{ obj.extra|escape }}</p>
+      <button class="btn btn-primary text-center" onclick="$('#suggestEditModal').modal('show');configAddSuggestion({{ obj.id }});">Add Suggestion</button>
     </div>
   {% endif %}
 {% endblock %}
@@ -86,14 +87,18 @@
     </div>
   </div>
 
-  <div id="suggestEdit" class="modal fade">
+  <div id="suggestEditModal" class="modal fade">
+  <!-- For editing suggestions AND adding suggestions -->
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">Cancel X</button>
         </div>
         <div class="modal-body">
-          <!-- TODO Form Waiting for sidebar completion -->
+          <form id="add-suggestion-form" class="login" method="post" action="{% url 'charity:edit-suggest-applied-org' %}">
+            {{ suggest_form|crispy }}
+            <button class="primaryAction btn btn-primary" type="submit">{% trans "Post" %}</button>
+          </form>
         </div>
       </div>
     </div>

@@ -58,7 +58,7 @@ function loadMore(unseen_only = true, page = "1") {
                 add_to_sidebar(data[i][0], data[i][1], data[i][2], data[i][3], data[i][4]);
             }
         },
-        fail: function(_) {
+        error: function(_) {
             let elem = document.getElementById("load-more-button");
             elem.parentNode.removeChild(elem);
         }
