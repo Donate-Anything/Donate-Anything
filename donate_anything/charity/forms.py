@@ -4,8 +4,6 @@ from django.utils.translation import gettext_lazy as _
 from donate_anything.charity.models.apply import (
     BusinessApplication,
     OrganizationApplication,
-    ProposedBusinessItem,
-    ProposedOrganizationItem,
 )
 
 
@@ -86,8 +84,6 @@ class OrganizationForm(forms.ModelForm):
         instance.extra = extras
         if commit:
             instance.save()
-            if create_proposed:
-                ProposedOrganizationItem.objects.create(entity=instance, item=[])
         return instance
 
     def clean_social_media(self):
@@ -125,8 +121,6 @@ class BusinessForm(forms.ModelForm):
         instance.applier = self.applier
         if commit:
             instance.save()
-            if create_proposed:
-                ProposedBusinessItem.objects.create(entity=instance, item=[])
         return instance
 
 

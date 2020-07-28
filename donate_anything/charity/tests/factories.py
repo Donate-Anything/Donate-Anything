@@ -6,8 +6,6 @@ from donate_anything.charity.models import (
     BusinessApplication,
     Charity,
     OrganizationApplication,
-    ProposedBusinessItem,
-    ProposedOrganizationItem,
 )
 from donate_anything.users.tests.factories import UserFactory
 
@@ -72,19 +70,3 @@ class AppliedOrganizationEditFactory(DjangoModelFactory):
 
     class Meta:
         model = AppliedOrganizationEdit
-
-
-class ProposedBusinessItemFactory(DjangoModelFactory):
-    item = Faker("pylist", value_types=int)
-    entity = SubFactory(BusinessApplicationFactory)
-
-    class Meta:
-        model = ProposedBusinessItem
-
-
-class ProposedOrganizationItemFactory(DjangoModelFactory):
-    item = Faker("pylist", value_types=int)
-    entity = SubFactory(OrganizationApplicationFactory)
-
-    class Meta:
-        model = ProposedOrganizationItem

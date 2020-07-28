@@ -114,62 +114,6 @@ class Migration(migrations.Migration):
             options={"abstract": False,},
         ),
         migrations.CreateModel(
-            name="ProposedOrganizationItem",
-            fields=[
-                (
-                    "id",
-                    models.UUIDField(
-                        default=uuid.uuid4,
-                        editable=False,
-                        primary_key=True,
-                        serialize=False,
-                    ),
-                ),
-                (
-                    "item",
-                    django.contrib.postgres.fields.ArrayField(
-                        base_field=models.BigIntegerField(), size=10000
-                    ),
-                ),
-                (
-                    "entity",
-                    models.OneToOneField(
-                        on_delete=django.db.models.deletion.CASCADE,
-                        to="charity.OrganizationApplication",
-                    ),
-                ),
-            ],
-            options={"abstract": False,},
-        ),
-        migrations.CreateModel(
-            name="ProposedBusinessItem",
-            fields=[
-                (
-                    "id",
-                    models.UUIDField(
-                        default=uuid.uuid4,
-                        editable=False,
-                        primary_key=True,
-                        serialize=False,
-                    ),
-                ),
-                (
-                    "item",
-                    django.contrib.postgres.fields.ArrayField(
-                        base_field=models.BigIntegerField(), size=10000
-                    ),
-                ),
-                (
-                    "entity",
-                    models.OneToOneField(
-                        on_delete=django.db.models.deletion.CASCADE,
-                        to="charity.BusinessApplication",
-                    ),
-                ),
-            ],
-            options={"abstract": False,},
-        ),
-        migrations.CreateModel(
             name="AppliedOrganizationEdit",
             fields=[
                 ("id", models.BigAutoField(primary_key=True, serialize=False)),

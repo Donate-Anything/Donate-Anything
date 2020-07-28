@@ -1,7 +1,5 @@
-from uuid import uuid4
-
 from django.conf import settings
-from django.contrib.postgres.fields import ArrayField, JSONField
+from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -88,25 +86,3 @@ class AppliedBusinessEdit(Edits):
     proposed_entity = models.ForeignKey(
         BusinessApplication, on_delete=models.SET_NULL, null=True
     )
-
-
-class ProposedItem(models.Model):
-    """This will go into the WantedItem table.
-
-    Non-existent items are not permitted as of yet.
-    If application is closed, then delete.
-    """
-
-    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    item = ArrayField(models.BigIntegerField(), size=10000)
-
-    class Meta:
-        abstract = True
-
-
-class ProposedOrganizationItem(ProposedItem):
-    entity = models.OneToOneField(OrganizationApplication, on_delete=models.CASCADE)
-
-
-class ProposedBusinessItem(ProposedItem):
-    entity = models.OneToOneField(BusinessApplication, on_delete=models.CASCADE)
