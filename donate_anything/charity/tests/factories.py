@@ -31,7 +31,7 @@ class BusinessApplicationFactory(DjangoModelFactory):
     link = Faker("url")
     description = Faker("text", max_nb_chars=1000)
     how_to_donate = Faker("text", max_nb_chars=300)
-    specific_destination = Faker("country")
+    specific_destination = Faker("country_code")
     applier = SubFactory(UserFactory)
     years_of_service = Faker("pyint")
     reason = Faker("bs")
@@ -46,7 +46,7 @@ class OrganizationApplicationFactory(DjangoModelFactory):
     link = Faker("url")
     description = Faker("text", max_nb_chars=1000)
     how_to_donate = Faker("text", max_nb_chars=300)
-    specific_destination = Faker("country")
+    specific_destination = Faker("country_code")
     applier = SubFactory(UserFactory)
     chapter_filing = Faker("text", max_nb_chars=2000)
 
