@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load crispy_forms_tags i18n static compress %}
 
 {% block title %}{{ object_list.0.thread.title }}{% endblock %}
 
@@ -13,6 +14,15 @@
       <div class="card-footer"><small>Last Updated: {{ message.updated }}</small></div>
     </div>
   {% endfor %}
+  {% if request.user.is_authenticated %}
+    <div>
+      <form method="post" action="{% url 'forum:thread-form' object_list.0.thread.id %}">
+        {% csrf_token %}
+        {{ thread_forum_form|crispy }}
+        <button class="primaryAction btn btn-primary" type="submit">{% trans "Post" %}</button>
+      </form>
+    </div>
+  {% endif %}
 {% endblock %}
 
 {% block javascript %}
@@ -27,4 +37,7 @@
       });
     })
   </script>
+  {% compress js %}
+    <script src="{% static 'js/markdown_editor.js' %}"></script>
+  {% endcompress %}
 {% endblock %}
