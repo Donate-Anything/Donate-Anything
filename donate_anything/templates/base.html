@@ -50,6 +50,9 @@
                   <a class="nav-link" href="{% url 'about' %}">About</a>
                 </li>
                 <li class="nav-item">
+                  <a class="nav-link" href="{% url 'forum:home' %}">Community</a>
+                </li>
+                <li class="nav-item">
                   <a class="nav-link" href="{% url 'charity:apply' %}">Apply</a>
                 </li>
                 {% if request.user.is_authenticated %}

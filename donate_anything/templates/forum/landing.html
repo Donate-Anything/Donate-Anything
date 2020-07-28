@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Community | Donate Anything{% endblock %}
+
+{% block content %}
+  <div class="row pt-3 pb-3">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <div class="row">
+            <div class="col-md-7 font-weight-bold">Latest</div>
+            <div class="col-md-5">Replies Views Last Post</div>
+          </div>
+        </div>
+        <ul class="list-group list-group-flush">
+          {% for obj in object_list %}
+            <li class="list-group-item">
+              <div class="row">
+                <div class="col-md-7">
+                  <div class="row"><a href="{% url 'forum:thread' obj.id %}">{{ obj.title|escape }}</a></div>
+                  {% with first_msg=obj.message_set.first %}
+                    <div class="row"><small>
+                      By: <a href="{% url 'users:detail' first_msg.user %}">{{ first_msg.user.username }}</a> on {{ obj.created }}
+                    </small></div>
+                  {% endwith %}
+                </div>
+                <div class="col-md-1">{{ obj.num_posts }}</div>
+                <div class="col-md-1">{{ obj.views }}</div>
+                {% with last_message=obj.message_set.last %}
+                  <div class="col-md-3 font-small">
+                    By: <a href="{% url 'users:detail' last_message.user %}">{{ last_message.user.username }}</a> on {{ last_message.created }}
+                  </div>
+                {% endwith %}
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+{% endblock %}

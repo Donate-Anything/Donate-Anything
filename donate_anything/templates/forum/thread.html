@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ object_list.0.thread.title }}{% endblock %}
+
+{% block content %}
+  <h3 class="p-3">{{ object_list.0.thread.title }}</h3>
+  {% for message in object_list %}
+    <div class="card mb-3">
+      <div class="card-header">
+        <small>By: <a href="{% url 'users:detail' message.user %}">{{ message.user.get_username }}</a> on {{ message.created }}</small>
+      </div>
+      <div class="card-body markdown-marker">{{ message.message|escape }}</div>
+      <div class="card-footer"><small>Last Updated: {{ message.updated }}</small></div>
+    </div>
+  {% endfor %}
+{% endblock %}
+
+{% block javascript %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js" integrity="sha512-L03kznCrNOfVxOUovR6ESfCz9Gfny7gihUX/huVbQB9zjODtYpxaVtIaAkpetoiyV2eqWbvxMH9fiSv5enX7bw==" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      converter = new showdown.Converter();
+      converter.setFlavor('github');
+      const elements = document.querySelectorAll('.markdown-marker');
+      Array.from(elements).forEach((element, _) => {
+        element.innerHTML = converter.makeHtml(element.innerHTML);
+      });
+    })
+  </script>
+{% endblock %}

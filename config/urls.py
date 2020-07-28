@@ -19,6 +19,7 @@ urlpatterns = [
     # Custom urls includes go here
     path("item/", include("donate_anything.item.urls", namespace="item")),
     path("organization/", include("donate_anything.charity.urls", namespace="charity")),
+    path("forum/", include("donate_anything.forum.urls", namespace="forum")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
