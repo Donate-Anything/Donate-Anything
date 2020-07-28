@@ -4,6 +4,7 @@ from . import models
 
 
 admin.site.register(models.Charity)
+admin.site.register(models.ProposedEdit)
 
 admin.site.register(models.OrganizationApplication)
 admin.site.register(models.BusinessApplication)

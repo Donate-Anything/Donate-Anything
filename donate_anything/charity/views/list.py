@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 from donate_anything.charity.forms import (
     BusinessForm,
+    ExistingSuggestEditForm,
     OrganizationForm,
     SuggestedEditForm,
 )
@@ -21,10 +22,15 @@ from donate_anything.charity.models import (
 def organization(request, pk):
     charity = get_object_or_404(Charity, id=pk)
     context = {
+        "id": charity.id,
         "name": charity.name,
         "description": charity.description,
         "how_to_donate": charity.how_to_donate,
     }
+    if request.user.is_authenticated:
+        context["suggest_edit_form"] = ExistingSuggestEditForm(
+            initial={**context, "link": charity.link}
+        )
     return render(request, "organization/organization.html", context)
 
 

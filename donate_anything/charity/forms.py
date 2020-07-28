@@ -1,9 +1,12 @@
 from django import forms
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-from donate_anything.charity.models.apply import (
+from donate_anything.charity.models import (
     BusinessApplication,
+    Charity,
     OrganizationApplication,
+    ProposedEdit,
 )
 
 
@@ -135,3 +138,61 @@ class SuggestedEditForm(forms.Form):
     )
     # Not sure why this can't be BooleanField...
     create = forms.CharField(widget=forms.HiddenInput())
+
+
+class ExistingSuggestEditForm(forms.ModelForm):
+    """Suggesting edits for active/existing organizations in the db
+    """
+
+    class Meta:
+        model = ProposedEdit
+        fields = (
+            "link",
+            "description",
+            "how_to_donate",
+            "commit_message",
+        )
+        widgets = {
+            **_default_widgets,
+            "commit_message": MDWidget(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop("user", None)
+        self.entity: int = kwargs.pop("entity", None)
+        super(ExistingSuggestEditForm, self).__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned_data = super(ExistingSuggestEditForm, self).clean()
+        entity = Charity.objects.get(id=self.entity)
+        link = cleaned_data["link"]
+        description = cleaned_data["description"]
+        how_to_donate = cleaned_data["how_to_donate"]
+        if link in (entity.link, None, ""):
+            link = None
+        if description in (entity.description, None, ""):
+            description = None
+        if how_to_donate in (entity.how_to_donate, None, ""):
+            how_to_donate = None
+
+        data = {
+            False if link is None else True,
+            False if description is None else True,
+            False if how_to_donate is None else True,
+        }
+        if True not in data:
+            raise ValidationError(
+                _(
+                    "One of the fields must be filled out: link, description, how_to_donate."
+                )
+            )
+        self.entity = entity
+        return cleaned_data
+
+    def save(self, commit=True):
+        instance = super(ExistingSuggestEditForm, self).save(commit=False)
+        instance.user = self.user
+        instance.entity = self.entity
+        if commit:
+            instance.save()
+        return instance

@@ -4,4 +4,4 @@ from .apply import (
     BusinessApplication,
     OrganizationApplication,
 )
-from .charity import Charity
+from .charity import Charity, ProposedEdit

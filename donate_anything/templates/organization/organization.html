@@ -1,7 +1,11 @@
 {% extends "base.html" %}
+{% load crispy_forms_tags i18n static compress %}
 
 {% block css %}
-<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css"/>
+  {% compress css %}
+    <link rel="stylesheet" href="{% static 'css/project.css' %}">
+  {% endcompress %}
 {% endblock %}
 
 {% block content %}
@@ -15,6 +19,17 @@
       <p id="org-instructions">{{ how_to_donate|escape }}</p>
     </div><br>
   </div>
+  {% if request.user.is_authenticated %}
+    <div data-aos="fade-up">
+      <hr>
+      <h4 class="text-center">Suggest Edit</h4>
+      <form action="{% url 'charity:suggest-active-org' id %}" method="post">
+        {% csrf_token %}
+        {{ suggest_edit_form|crispy }}
+        <button class="primaryAction btn btn-primary" type="submit">{% trans "Suggest Edit" %}</button>
+      </form>
+    </div>
+  {% endif %}
 {% endblock %}
 
 {% block javascript %}
@@ -26,6 +41,9 @@
   $("#org-description").html(converter.makeHtml(document.getElementById("org-description").innerHTML));
   $("#org-instructions").html(converter.makeHtml(document.getElementById("org-instructions").innerHTML));
   </script>
+  {% compress js %}
+    <script src="{% static 'js/markdown_editor.js' %}"></script>
+  {% endcompress %}
   <!-- Animate on scroll -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js" integrity="sha512-A7AYk1fGKX6S2SsHywmPkrnzTZHrgiVT7GcQkLGDe2ev0aWb8zejytzS8wjo7PGEXKqJOrjQ4oORtnimIRZBtw==" crossorigin="anonymous"></script>
   <script type="text/javascript">

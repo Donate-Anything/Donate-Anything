@@ -9,6 +9,7 @@ from donate_anything.charity.tests.factories import (
     BusinessApplicationFactory,
     CharityFactory,
     OrganizationApplicationFactory,
+    ProposedEditFactory,
 )
 
 
@@ -25,7 +26,11 @@ class Command(BaseCommand):
         print("Creating Charity app data.")
 
         # Create some charities
-        CharityFactory.create_batch(5)
+        active_org = CharityFactory.create_batch(5)
+        # Add some edits
+        for org in active_org[:3]:
+            ProposedEditFactory.create_batch(randint(3, 10), entity=org)
+
         # Create applications
         org_apps = OrganizationApplicationFactory.create_batch(5)
         bus_apps = BusinessApplicationFactory.create_batch(5)

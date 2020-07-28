@@ -1,12 +1,17 @@
 from django.urls import path
 from django.views.generic import TemplateView
 
-from donate_anything.charity.views import apply, list
+from donate_anything.charity.views import apply, list, suggest
 
 
 app_name = "charity"
 urlpatterns = [
     path("<int:pk>/", list.organization, name="organization"),
+    path(
+        "<int:pk>/suggest/",
+        suggest.suggest_active_org_edit_view,
+        name="suggest-active-org",
+    ),
     path(
         "apply/",
         TemplateView.as_view(template_name="organization/apply/apply.html"),

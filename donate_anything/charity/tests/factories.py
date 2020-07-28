@@ -6,6 +6,7 @@ from donate_anything.charity.models import (
     BusinessApplication,
     Charity,
     OrganizationApplication,
+    ProposedEdit,
 )
 from donate_anything.users.tests.factories import UserFactory
 
@@ -70,3 +71,12 @@ class AppliedOrganizationEditFactory(DjangoModelFactory):
 
     class Meta:
         model = AppliedOrganizationEdit
+
+
+class ProposedEditFactory(DjangoModelFactory):
+    entity = SubFactory(CharityFactory)
+    user = SubFactory(UserFactory)
+
+    class Meta:
+        model = ProposedEdit
+        django_get_or_create = ["entity", "user"]

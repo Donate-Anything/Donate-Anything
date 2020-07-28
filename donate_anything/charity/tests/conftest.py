@@ -9,6 +9,8 @@ from donate_anything.charity.tests.factories import (
     BusinessApplicationFactory,
     OrganizationApplication,
     OrganizationApplicationFactory,
+    ProposedEdit,
+    ProposedEditFactory,
 )
 
 
@@ -30,3 +32,8 @@ def organization_application_suggested_edit() -> AppliedOrganizationEdit:
 @pytest.fixture
 def business_application_suggested_edit() -> AppliedBusinessEdit:
     return AppliedBusinessEditFactory()
+
+
+@pytest.fixture
+def entity_proposed_edit() -> ProposedEdit:
+    return ProposedEditFactory()

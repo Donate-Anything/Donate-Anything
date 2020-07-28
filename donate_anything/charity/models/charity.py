@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 
@@ -21,3 +22,16 @@ class Charity(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class ProposedEdit(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    created = models.DateTimeField(auto_now_add=True, editable=False)
+    commit_message = models.TextField(max_length=300)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True
+    )
+    entity = models.ForeignKey(Charity, on_delete=models.CASCADE)
+    link = models.URLField(blank=True, null=True)
+    description = models.TextField(max_length=1000, blank=True, null=True)
+    how_to_donate = models.TextField(max_length=300, blank=True, null=True)
