@@ -63,10 +63,11 @@ def _paginate_and_return_json(qs, request) -> JsonResponse:
     # Already ordered by time since AutoField
     try:
         paginator = Paginator(qs, 25, allow_empty_first_page=False)
-        page_obj = paginator.get_page(request.GET.get("page", 1))
-    except EmptyPage:
-        raise Http404()
-    if len(page_obj.object_list) == 0:
+        page = request.GET.get("page", 1)
+        if int(page) > paginator.num_pages:
+            raise EmptyPage
+        page_obj = paginator.get_page(page)
+    except (EmptyPage, ValueError, TypeError):
         raise Http404()
     if unseen == "1":
         data = {
