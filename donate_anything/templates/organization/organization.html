@@ -7,12 +7,12 @@
 {% block content %}
   <div class="landing text-center" style="padding-top: 70px">
     <h1 data-aos="fade-up">{{ name }}</h1><br>
-    <div id="org-description" data-aos="fade-up">
-      <p>{{ description|escape }}</p>
+    <div data-aos="fade-up">
+      <p id="org-description">{{ description|escape }}</p>
     </div><br>
-    <div id="org-instructions" class="pb-4" data-aos="fade-up">
+    <div class="pb-4" data-aos="fade-up">
       <p class="font-italic"><u>How to Donate</u></p>
-      <p>{{ how_to_donate|escape }}</p>
+      <p id="org-instructions">{{ how_to_donate|escape }}</p>
     </div><br>
   </div>
 {% endblock %}
