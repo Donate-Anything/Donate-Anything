@@ -13,6 +13,11 @@ def test_organization_view(charity):
     assert resolve(f"/organization/{charity.id}/").view_name == "charity:organization"
 
 
+def test_all_organization_list():
+    assert reverse("charity:all-list") == "/organization/all/"
+    assert resolve("/organization/all/").view_name == "charity:all-list"
+
+
 def test_suggest_edit_view(charity):
     assert (
         reverse("charity:suggest-active-org", kwargs={"pk": charity.id})

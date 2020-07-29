@@ -3,6 +3,7 @@ from django.core.paginator import EmptyPage, Paginator
 from django.http import Http404, HttpResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import ListView
 
 from donate_anything.charity.forms import (
     BusinessForm,
@@ -144,3 +145,15 @@ def viewed_bus_edit(request, edit_pk: int):
     """
     obj = get_object_or_404(AppliedBusinessEdit, id=edit_pk)
     return _mark_view(request.user.id, obj)
+
+
+class CommunityListView(ListView):
+    model = Charity
+    paginate_by = 100
+    template_name = "organization/list.html"
+
+    def get_queryset(self):
+        return Charity.objects.only("id", "name").all()
+
+
+all_entities_list_view = CommunityListView.as_view()

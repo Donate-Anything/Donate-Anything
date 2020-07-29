@@ -126,4 +126,4 @@ def search_multiple_items(request):
         "page_obj": page_obj,
     }
 
-    return render(request, "pages/multiple_orgs.html", context=context)
+    return render(request, "organization/multiple_orgs.html", context=context)

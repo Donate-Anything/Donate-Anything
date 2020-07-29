@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 from urllib import parse
 
 from django import template
@@ -20,12 +20,15 @@ def paginate(val, num_pages) -> List[Tuple[str, int]]:
     :return list of url paths for next pagination list.
     """
     # First grab the query parameters
-    query = parse.parse_qs(parse.urlsplit(val).query, keep_blank_values=False)
-    other_queries: str = parse.urlencode({"q": query["q"]}, True)
+    query: Dict[str, List[str]] = parse.parse_qs(
+        parse.urlsplit(val).query, keep_blank_values=False
+    )
+    other_queries: str = parse.urlencode({"q": query.get("q")}, True)
     try:
         page = int(query["page"][0])
     except (TypeError, ValueError, KeyError):
-        return [(f"?page=1&{other_queries}", 1)]
+        # Assume page 1
+        return [(f"?page={i}&{other_queries}", i) for i in range(1, num_pages + 1)]
     # Deciding which pages to show
     if page <= 5 or num_pages <= 10:
         # Show first 10 if first 5 (e.g. 1-5/10) or if there're only 10

@@ -7,6 +7,7 @@ from donate_anything.charity.views import apply, list, suggest
 app_name = "charity"
 urlpatterns = [
     path("<int:pk>/", list.organization, name="organization"),
+    path("all/", list.all_entities_list_view, name="all-list"),
     path(
         "<int:pk>/suggest/",
         suggest.suggest_active_org_edit_view,

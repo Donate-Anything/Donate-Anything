@@ -6,7 +6,7 @@ from donate_anything.users.tests.factories import UserFactory
 
 class ThreadFactory(DjangoModelFactory):
     title = Faker("bs")
-    type = Faker("random_int", min=0, max=1)
+    type = 0
 
     class Meta:
         model = Thread

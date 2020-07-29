@@ -1,8 +1,17 @@
 {% extends 'base.html' %}
+{% load paginate %}
 
 {% block title %}Community | Donate Anything{% endblock %}
 
 {% block content %}
+  <h1>Welcome to our</h1>
+  <ul>
+    <li><a href="{% url 'charity:all-list' %}">Community</a></li>
+    <li><a href="https://discord.gg/ePZMrKN">Chat on Discord</a></li>
+    <li><a href="https://www.reddit.com/r/DonateAnything/">SubReddit</a></li>
+    <li>And our:</li>
+  </ul>
+  <h3>Forum</h3>
   <div class="row pt-3 pb-3">
     <div class="col-md-12">
       <div class="card">
@@ -16,7 +25,7 @@
           {% for obj in object_list %}
             <li class="list-group-item">
               <div class="row">
-                <div class="col-md-7">
+                <div class="col-md-7 pl-4">
                   <div class="row"><a href="{% url 'forum:thread' obj.id %}">{{ obj.title|escape }}</a></div>
                   {% with first_msg=obj.message_set.first %}
                     <div class="row"><small>
@@ -27,9 +36,9 @@
                 <div class="col-md-1">{{ obj.num_posts }}</div>
                 <div class="col-md-1">{{ obj.views }}</div>
                 {% with last_message=obj.message_set.last %}
-                  <div class="col-md-3 font-small">
+                  <div class="col-md-3"><small>
                     By: <a href="{% url 'users:detail' last_message.user %}">{{ last_message.user.username }}</a> on {{ last_message.created }}
-                  </div>
+                  </small></div>
                 {% endwith %}
               </div>
             </li>
@@ -38,4 +47,19 @@
       </div>
     </div>
   </div>
+  <nav>
+    <ul class="pagination">
+      <li class="page-item{% if not page_obj.has_previous %} disabled{% endif %}">
+        <a class="page-link" href="?page={% if page_obj.has_previous %}{{ page_obj.previous_page_number }}{% endif %}" tabindex="-1">Previous</a>
+      </li>
+      {% for link, value in request.get_full_path|paginate:page_obj.paginator.num_pages %}
+        <li class="page-item{% if page_obj.number == value %} active{% endif %}">
+          <a class="page-link" href="{{ link }}">{{ value }}</a>
+        </li>
+      {% endfor %}
+      <li class="page-item{% if not page_obj.has_next %} disabled{% endif %}">
+        <a class="page-link" href="?page={% if page_obj.has_next %}{{ page_obj.next_page_number }}{% endif %}">Next</a>
+      </li>
+    </ul>
+  </nav>
 {% endblock %}

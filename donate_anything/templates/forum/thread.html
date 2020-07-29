@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
-{% load crispy_forms_tags i18n static compress %}
+{% load crispy_forms_tags i18n static compress paginate %}
 
-{% block title %}{{ object_list.0.thread.title }}{% endblock %}
+{% block title %}{{ object_list.0.thread.title }} | Donate Anything{% endblock %}
 
 {% block content %}
   <h3 class="p-3">{{ object_list.0.thread.title }}</h3>
@@ -14,7 +14,24 @@
       <div class="card-footer"><small>Last Updated: {{ message.updated }}</small></div>
     </div>
   {% endfor %}
+  <nav>
+    <ul class="pagination">
+      <li class="page-item{% if not page_obj.has_previous %} disabled{% endif %}">
+        <a class="page-link" href="?page={% if page_obj.has_previous %}{{ page_obj.previous_page_number }}{% endif %}" tabindex="-1">Previous</a>
+      </li>
+      {% for link, value in request.get_full_path|paginate:page_obj.paginator.num_pages %}
+        <li class="page-item{% if page_obj.number == value %} active{% endif %}">
+          <a class="page-link" href="{{ link }}">{{ value }}</a>
+        </li>
+      {% endfor %}
+      <li class="page-item{% if not page_obj.has_next %} disabled{% endif %}">
+        <a class="page-link" href="?page={% if page_obj.has_next %}{{ page_obj.next_page_number }}{% endif %}">Next</a>
+      </li>
+    </ul>
+  </nav>
   {% if request.user.is_authenticated %}
+    <hr>
+    <h4 class="text-center">{% trans 'Post Message' %}</h4>
     <div>
       <form method="post" action="{% url 'forum:thread-form' object_list.0.thread.id %}">
         {% csrf_token %}

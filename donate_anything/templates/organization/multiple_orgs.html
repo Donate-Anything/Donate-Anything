@@ -5,10 +5,10 @@
 {# Quick setup if used create_item_data command http://localhost:8000/item/multi-lookup/?q=1&q=2&page=1 #}
 {% block content %}
   {% for org_id, value in data.items %}
-    <h2 id="item-count-{{ value|length|add:"-2" }}">{{ value|length|add:"-2" }} Items</h2>
+    <h2 id="item-count-{{ value|length|add:"-2" }}">{{ value|length|add:"-2" }} Item(s)</h2>
     <hr id="item-count-hr-{{ value|length|add:"-2" }}">
     <h3><a href="{% url 'charity:organization' org_id %}">{{ value|slice:"-2:-1"|first }}</a></h3>
-    <p>{{ value|last }}</p>
+    <p>{{ value|last }}...</p>
     <p><i class="item-data-treasure" item-data="{{ value|slice:":-2" }}"></i></p>
   {% empty %}
     <h2>Whoops!</h2>
