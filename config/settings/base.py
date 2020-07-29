@@ -71,6 +71,8 @@ THIRD_PARTY_APPS = [
     "allauth.socialaccount",
     # "django_celery_beat",
     # "django_elasticsearch_dsl",
+    "captcha",
+    "axes",
 ]
 
 LOCAL_APPS = [
@@ -91,6 +93,7 @@ MIGRATION_MODULES = {"sites": "donate_anything.contrib.sites.migrations"}
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#authentication-backends
 AUTHENTICATION_BACKENDS = [
+    "axes.backends.AxesBackend",
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
@@ -134,6 +137,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.common.BrokenLinkEmailsMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "axes.middleware.AxesMiddleware",  # Must be last
 ]
 
 # STATIC
@@ -289,11 +293,22 @@ ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_ADAPTER = "donate_anything.users.adapters.AccountAdapter"
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
 SOCIALACCOUNT_ADAPTER = "donate_anything.users.adapters.SocialAccountAdapter"
+# https://django-allauth.readthedocs.io/en/latest/configuration.html
+ACCOUNT_FORMS = {"signup": "donate_anything.users.forms.UserCreationForm"}
 # django-compressor
 # ------------------------------------------------------------------------------
 # https://django-compressor.readthedocs.io/en/latest/quickstart/#installation
 INSTALLED_APPS += ["compressor"]
 STATICFILES_FINDERS += ["compressor.finders.CompressorFinder"]
+
+# Django Axes and Ratelimit
+# ------------------------------------------------------------------------------
+# https://django-axes.readthedocs.io/en/latest/6_integration.html#integration-with-django-allauth
+AXES_USERNAME_FORM_FIELD = "login"
+AXES_LOCKOUT_URL = "/users/~locked-out"
+# https://django-ratelimit.readthedocs.io/en/stable/settings.html
+RATELIMIT_ENABLE = True
+RATELIMIT_VIEW = "donate_anything.users.views.locked_out"
 
 # Elasticsearch
 # ------------------------------------------------------------------------------

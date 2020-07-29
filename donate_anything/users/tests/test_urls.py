@@ -23,3 +23,8 @@ def test_update():
 def test_redirect():
     assert reverse("users:redirect") == "/users/~redirect/"
     assert resolve("/users/~redirect/").view_name == "users:redirect"
+
+
+def test_locked_out():
+    assert reverse("users:person-throttled") == "/users/~locked-out/"
+    assert resolve("/users/~locked-out/").view_name == "users:person-throttled"

@@ -1,9 +1,18 @@
+from allauth.account.views import LoginView
+from axes.decorators import axes_dispatch, axes_form_invalid
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
+from django.utils.decorators import method_decorator
 from django.views import defaults as default_views
 from django.views.generic import TemplateView
+
+from donate_anything.users.forms import AxesLoginForm
+
+
+LoginView.dispatch = method_decorator(axes_dispatch)(LoginView.dispatch)
+LoginView.form_invalid = method_decorator(axes_form_invalid)(LoginView.form_invalid)
 
 
 urlpatterns = [
@@ -15,6 +24,11 @@ urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
     # User management
     path("users/", include("donate_anything.users.urls", namespace="users")),
+    path(
+        "accounts/login/",
+        LoginView.as_view(form_class=AxesLoginForm),
+        name="account_login",
+    ),
     path("accounts/", include("allauth.urls")),
     # Custom urls includes go here
     path("item/", include("donate_anything.item.urls", namespace="item")),

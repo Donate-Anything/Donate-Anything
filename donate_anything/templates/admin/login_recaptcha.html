@@ -1,0 +1,15 @@
+{# https://github.com/praekelt/django-recaptcha/pull/132/files #}
+{% extends 'admin/login.html' %}
+{% block content %}
+  {{ block.super }}
+  <div class="form-row" id="captcha-row">
+    {{ form.captcha.errors }}
+    {{ form.captcha.label_tag }} {{ form.captcha }}
+  </div>
+  <script type="application/javascript">
+    (function() {let form = document.getElementById('login-form')
+      let submitRow = form.getElementsByClassName('submit-row')[0]
+      let captchaRow = document.getElementById('captcha-row')
+      form.insertBefore(captchaRow, submitRow)})()
+  </script>
+{% endblock %}

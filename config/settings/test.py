@@ -50,3 +50,4 @@ EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 
 # Your stuff...
 # ------------------------------------------------------------------------------
+SILENCED_SYSTEM_CHECKS = ["captcha.recaptcha_test_key_error"]
