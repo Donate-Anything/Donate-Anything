@@ -80,7 +80,7 @@ class TestPaginateViaCharity:
     Every view that utilizes this is tested here, except for multi-lookup.
     """
 
-    def test_filter_by_category(self, rf, category):
+    def test_filter_by_category(self, rf):
         category_type = CATEGORY_TYPES[0][0]
         # Created a random category just to make sure it wasn't jumbled in
         CategoryFactory.create(category=category_type + 1)

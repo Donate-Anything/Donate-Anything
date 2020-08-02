@@ -1,9 +1,11 @@
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from factory import Faker
 
 from donate_anything.charity.models import Charity
-from donate_anything.item.models import Item, WantedItem
-from donate_anything.item.tests.factories import WantedItemFactory
+from donate_anything.item.models import Item, ProposedItem, WantedItem
+from donate_anything.item.tests.factories import ItemFactory, WantedItemFactory
+from donate_anything.users.tests.factories import UserFactory
 
 
 class Command(BaseCommand):
@@ -51,6 +53,19 @@ class Command(BaseCommand):
         WantedItem.objects.create(item=item_2, charity=org_2)
         WantedItem.objects.create(item=item_1, charity=org_3)
         WantedItem.objects.create(item=item_3, charity=org_3)
+
+        ProposedItem.objects.create(
+            entity=org_1,
+            user=UserFactory.create(),
+            item=[item_1.id] + [x.id for x in ItemFactory.create_batch(10)],
+            names=[Faker("bs") for _ in range(50)],
+        )
+        ProposedItem.objects.create(
+            entity=org_2,
+            user=UserFactory.create(),
+            item=[item_3.id] + [x.id for x in ItemFactory.create_batch(10)],
+            names=[Faker("bs") for _ in range(50)],
+        )
 
         # For testing pagination - change to 1 in paginating
         WantedItemFactory.create_batch(25, item=item_1)

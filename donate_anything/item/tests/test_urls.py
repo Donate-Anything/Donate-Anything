@@ -1,6 +1,8 @@
 import pytest
 from django.urls import resolve, reverse
 
+from donate_anything.item.models import ProposedItem
+
 
 pytestmark = pytest.mark.django_db
 
@@ -35,3 +37,48 @@ def test_search_item(item):
 def test_search_multiple_items():
     assert reverse("item:lookup-multi-item") == "/item/multi-lookup/"
     assert resolve("/item/multi-lookup/").view_name == "item:lookup-multi-item"
+
+
+def test_list_item_template(charity):
+    assert (
+        reverse("item:list-item-template", kwargs={"entity_id": charity.id})
+        == f"/item/list/{charity.id}/"
+    )
+    assert resolve(f"/item/list/{charity.id}/").view_name == "item:list-item-template"
+
+
+def test_list_item_api(charity):
+    assert (
+        reverse("item:list-item", kwargs={"charity_id": charity.id})
+        == f"/item/api/v1/list/{charity.id}/"
+    )
+    assert resolve(f"/item/api/v1/list/{charity.id}/").view_name == "item:list-item"
+
+
+def test_list_proposed_item_template(charity, user):
+    proposed = ProposedItem.objects.create(entity=charity, user=user)
+    assert (
+        reverse("item:list-proposed-template", kwargs={"proposed_item_pk": proposed.id})
+        == f"/item/list/proposed/{proposed.id}/"
+    )
+    assert (
+        resolve(f"/item/list/proposed/{proposed.id}/").view_name
+        == "item:list-proposed-template"
+    )
+
+
+def test_list_proposed_existing_item_api(charity, user):
+    proposed = ProposedItem.objects.create(entity=charity, user=user)
+    assert (
+        reverse("item:list-proposed-item", kwargs={"proposed_item_pk": proposed.id})
+        == f"/item/api/v1/proposed/{proposed.id}/exist/"
+    )
+    assert (
+        resolve(f"/item/api/v1/proposed/{proposed.id}/exist/").view_name
+        == "item:list-proposed-item"
+    )
+
+
+def test_list_proposed_item_form():
+    assert reverse("item:proposed-item-form") == "/item/proposed/form/"
+    assert resolve("/item/proposed/form/").view_name == "item:proposed-item-form"

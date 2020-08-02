@@ -1,13 +1,16 @@
 from typing import Iterable
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
-from django.http import Http404, JsonResponse
-from django.shortcuts import render
+from django.http import Http404, HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, render
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import FormView
 
 from donate_anything.charity.models.charity import Charity
+from donate_anything.item.forms import ModifyItemsForm
 from donate_anything.item.models.category import CATEGORY_TYPES, Category
-from donate_anything.item.models.item import Item, WantedItem
+from donate_anything.item.models.item import Item, ProposedItem, WantedItem
 
 
 # TODO Add django-ratelimit and develop debounce method
@@ -127,3 +130,97 @@ def search_multiple_items(request):
     }
 
     return render(request, "organization/multiple_orgs.html", context=context)
+
+
+def list_active_entity_items(request, charity_id):
+    """Lists the items that an active entity can fulfill.
+    Returns item names, paginated.
+    """
+    # Using an index on both entity and item FKs makes
+    # the query slightly faster. But negligent.
+    """
+    QS Timing: 0.07431996694600161 w/ Select related + name
+    QS Timing: 0.0004472580919982647 w/ sr + id
+    QS Timing: 0.000249934839003231 w/o sr + name
+    QS Timing: 0.00010671574200080158 w/o sr + id
+    QS Timing: 1.2065899000049285e-05 w/ index on entity and item field
+    QS Timing: 2.615080998225494e-06
+    QS Timing: 2.5512770001796523e-06
+    QS Timing: 3.3379649991047698e-06
+    """
+    if Charity.objects.filter(id=charity_id).exists():
+        # Apparently using select/prefetch_related("item") makes it 10x slower
+        qs = (
+            WantedItem.objects.only("item__name")
+            .filter(charity_id=charity_id)
+            .order_by("item__name")
+            .values_list("item__name", flat=True)
+        )
+    else:
+        raise Http404
+    paginator = Paginator(qs, 50)
+    page_obj = paginator.get_page(request.GET.get("page"))
+    return JsonResponse({"data": list(page_obj.object_list)})
+
+
+def list_org_items_view(request, entity_id):
+    """View that renders the initial items list
+    """
+    obj = get_object_or_404(Charity, id=entity_id)
+    return render(
+        request, "organization/list_item.html", {"id": entity_id, "name": obj.name}
+    )
+
+
+def list_proposed_existing_item(request, proposed_item_pk):
+    proposed_item_obj = get_object_or_404(ProposedItem, id=proposed_item_pk)
+    paginator = Paginator(proposed_item_obj.item, 50)
+    qs = (
+        Item.objects.only("id", "name")
+        .filter(id__in=paginator.object_list, is_appropriate=True)
+        .order_by("id")
+    )
+    return JsonResponse({"data": [(x.id, x.name) for x in qs]})
+
+
+def list_org_proposed_item_view(request, proposed_item_pk):
+    """View that renders the initial proposed items list
+    Lists all names and item IDs along with entity ID and name
+    """
+    obj = get_object_or_404(
+        ProposedItem.objects.select_related("entity"), id=proposed_item_pk
+    )
+    return render(
+        request, "organization/suggest/list_proposed_item.html", {"proposed_item": obj},
+    )
+
+
+class ProposedItemFormView(LoginRequiredMixin, FormView):
+    """Form view for proposed item fill out."""
+
+    form_class = ModifyItemsForm
+
+    def form_valid(self, form):
+        # Prepare data:
+        item = form.cleaned_data["item"]
+        names = form.cleaned_data["names"]
+
+        # Determine if create or update
+        if form.cleaned_data["id"] is None:
+            ProposedItem.objects.create(
+                user=self.request.user,
+                entity_id=form.cleaned_data["entity"],
+                item=item,
+                names=names,
+            )
+        else:
+            ProposedItem.objects.filter(
+                id=form.cleaned_data["id"], user=self.request.user
+            ).update(item=item, names=names)
+        return HttpResponse()
+
+    def form_invalid(self, form):
+        return JsonResponse({"errors": form.errors}, status=400)
+
+
+proposed_item_form_view = ProposedItemFormView.as_view()

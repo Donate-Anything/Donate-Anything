@@ -1,14 +1,19 @@
+from django.conf import settings
+from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.indexes import BrinIndex, GinIndex
 from django.db import models
 
 from donate_anything.charity.models import Charity
 
 
+_item_max_length = 100
+
+
 class Item(models.Model):
     id = models.BigAutoField(primary_key=True)
     # TODO Some items need to be the same, e.g. pants + jeans or tshirt + t-shirt
-    # This requires a self FK and a little rewriting of views
-    name = models.CharField(max_length=100, unique=True, db_index=False)
+    #  This requires a self FK and a little rewriting of views
+    name = models.CharField(max_length=_item_max_length, unique=True, db_index=True)
     image = models.ImageField(blank=True, null=True)
     is_appropriate = models.BooleanField(default=True)
 
@@ -31,7 +36,7 @@ class Item(models.Model):
 
 class WantedItem(models.Model):
     id = models.BigAutoField(primary_key=True)
-    # TODO Add condition
+    # TODO Add condition of item: good, ok, bad
     item = models.ForeignKey(Item, on_delete=models.CASCADE, db_index=False)
     charity = models.ForeignKey(Charity, on_delete=models.CASCADE)
     # TODO Add geolocation for charity for filtering
@@ -50,3 +55,19 @@ class WantedItem(models.Model):
 
     def __str__(self):
         return f"{self.charity} wants {self.item}"
+
+
+class ProposedItem(models.Model):
+    """User inputted items that can be merged.
+    """
+
+    id = models.BigAutoField(primary_key=True)
+    entity = models.ForeignKey(Charity, on_delete=models.SET_NULL, null=True)
+    # Delete user in case of spam
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    # Actual items
+    item = ArrayField(models.BigIntegerField(), size=10000, default=list)
+    names = ArrayField(
+        models.CharField(max_length=_item_max_length), size=1000, default=list
+    )
+    closed = models.BooleanField(default=False)
