@@ -8,6 +8,8 @@ class User(AbstractUser):
     """Default user for Donate Anything.
     """
 
+    id = models.BigAutoField(_("ID"), primary_key=True)
+
     email = models.EmailField(_("email address"))
     #: First and last name do not cover name patterns around the globe
     name = models.CharField(_("Name of User"), blank=True, max_length=255)
