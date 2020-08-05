@@ -1,3 +1,5 @@
+from django.utils.html import escape
+
 from donate_anything.charity.models import Charity
 from donate_anything.item.models import Item, ProposedItem, WantedItem
 
@@ -16,7 +18,7 @@ def merge(entity: Charity, proposed: ProposedItem):
     # Check for any existing items in "proposed new items"
     # Can happen when a new item shows up from a different merge but didn't update the array here
     try:
-        proposed_names = set(proposed.names)
+        proposed_names = {escape(x) for x in proposed.names}
     except TypeError:
         proposed_names = set()
     existing_name_item_objs = Item.objects.filter(name__in=proposed_names)

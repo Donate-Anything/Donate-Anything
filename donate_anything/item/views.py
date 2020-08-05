@@ -1,10 +1,13 @@
 from typing import Iterable
 
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.paginator import Paginator
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
+from django.views.decorators.csrf import csrf_protect
 from django.views.generic import FormView
 
 from donate_anything.charity.models.charity import Charity
@@ -159,7 +162,11 @@ def list_active_entity_items(request, charity_id):
     else:
         raise Http404
     paginator = Paginator(qs, 50)
-    page_obj = paginator.get_page(request.GET.get("page"))
+    try:
+        num = paginator.validate_number(request.GET.get("page", 1))
+    except (EmptyPage, PageNotAnInteger):
+        raise Http404
+    page_obj = paginator.page(num)
     return JsonResponse({"data": list(page_obj.object_list)})
 
 
@@ -175,9 +182,14 @@ def list_org_items_view(request, entity_id):
 def list_proposed_existing_item(request, proposed_item_pk):
     proposed_item_obj = get_object_or_404(ProposedItem, id=proposed_item_pk)
     paginator = Paginator(proposed_item_obj.item, 50)
+    try:
+        num = paginator.validate_number(request.GET.get("page", 1))
+    except (EmptyPage, PageNotAnInteger):
+        raise Http404
+    page_obj = paginator.page(num)
     qs = (
         Item.objects.only("id", "name")
-        .filter(id__in=paginator.object_list, is_appropriate=True)
+        .filter(id__in=page_obj.object_list, is_appropriate=True)
         .order_by("id")
     )
     return JsonResponse({"data": [(x.id, x.name) for x in qs]})
@@ -191,10 +203,17 @@ def list_org_proposed_item_view(request, proposed_item_pk):
         ProposedItem.objects.select_related("entity"), id=proposed_item_pk
     )
     return render(
-        request, "organization/suggest/list_proposed_item.html", {"proposed_item": obj},
+        request,
+        "organization/suggest/list_proposed_item.html",
+        {
+            "proposed_item": obj,
+            "can_edit": (request.user == obj.user and not obj.closed),
+        },
     )
 
 
+# Only need requires_csrf_token when it's a form in template view
+@method_decorator(csrf_protect, name="dispatch")
 class ProposedItemFormView(LoginRequiredMixin, FormView):
     """Form view for proposed item fill out."""
 
@@ -207,11 +226,22 @@ class ProposedItemFormView(LoginRequiredMixin, FormView):
 
         # Determine if create or update
         if form.cleaned_data["id"] is None:
+            # User is redirected to forum
             ProposedItem.objects.create(
                 user=self.request.user,
                 entity_id=form.cleaned_data["entity"],
                 item=item,
                 names=names,
+            )
+            messages.add_message(
+                self.request,
+                messages.INFO,
+                _(
+                    "Your proposed items have been posted! You can "
+                    "enter the link in the forum to check out others' "
+                    "opinions on the proposition. You can follow the "
+                    "link to edit your proposition later on."
+                ),
             )
         else:
             ProposedItem.objects.filter(

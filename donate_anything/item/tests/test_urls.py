@@ -79,6 +79,13 @@ def test_list_proposed_existing_item_api(charity, user):
     )
 
 
+def test_initial_proposed_template_view():
+    assert reverse("item:initial-proposed-template") == "/item/proposed/initial/"
+    assert (
+        resolve("/item/proposed/initial/").view_name == "item:initial-proposed-template"
+    )
+
+
 def test_list_proposed_item_form():
     assert reverse("item:proposed-item-form") == "/item/proposed/form/"
     assert resolve("/item/proposed/form/").view_name == "item:proposed-item-form"

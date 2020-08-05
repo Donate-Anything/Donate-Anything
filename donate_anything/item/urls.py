@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.generic import TemplateView
 
 from donate_anything.item import views
 
@@ -33,6 +34,13 @@ urlpatterns = [
         "api/v1/proposed/<int:proposed_item_pk>/exist/",
         views.list_proposed_existing_item,
         name="list-proposed-item",
+    ),
+    path(
+        "proposed/initial/",
+        TemplateView.as_view(
+            template_name="organization/suggest/initial_propose_item.html"
+        ),
+        name="initial-proposed-template",
     ),
     path("proposed/form/", views.proposed_item_form_view, name="proposed-item-form"),
 ]

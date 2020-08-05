@@ -59,6 +59,18 @@ class TestViewEntityItemList:
             views.list_org_items_view(request, 123)
 
 
+def _shortcut_test_proposed_template_test(
+    proposed: ProposedItem, client, can_edit: bool = False, user=None
+):
+    client.force_login(proposed.user if user is None else user)
+    response = client.get(
+        reverse("item:list-proposed-template", kwargs={"proposed_item_pk": proposed.id})
+    )
+    assert response.status_code == 200
+    assert response.context["proposed_item"] == proposed
+    assert response.context["can_edit"] is can_edit
+
+
 class TestViewEntityProposedItemList:
     def test_list_proposed_existing_item(self, rf, user, charity):
         items = sorted(ItemFactory.create_batch(10), key=lambda x: x.id)
@@ -91,13 +103,27 @@ class TestViewEntityProposedItemList:
 
     def test_list_proposed_item_template(self, client, user, charity):
         proposed = ProposedItem.objects.create(entity=charity, user=user)
-        response = client.get(
-            reverse(
-                "item:list-proposed-template", kwargs={"proposed_item_pk": proposed.id}
-            )
+        _shortcut_test_proposed_template_test(proposed, client, can_edit=True)
+
+    def test_list_proposed_item_template_cant_edit_not_owner(
+        self, client, user, charity
+    ):
+        proposed = ProposedItem.objects.create(
+            entity=charity, user=UserFactory.create()
         )
-        assert response.status_code == 200
-        assert response.context["proposed_item"] == proposed
+        _shortcut_test_proposed_template_test(proposed, client, user=user)
+
+    def test_list_proposed_item_template_cant_edit_closed(self, client, user, charity):
+        proposed = ProposedItem.objects.create(entity=charity, user=user, closed=True)
+        _shortcut_test_proposed_template_test(proposed, client)
+
+    def test_list_proposed_item_template_cant_edit_closed_and_not_owner(
+        self, client, user, charity
+    ):
+        proposed = ProposedItem.objects.create(
+            entity=charity, user=UserFactory.create(), closed=True
+        )
+        _shortcut_test_proposed_template_test(proposed, client, user=user)
 
     def test_list_proposed_item_template_missing_obj(self, rf):
         with pytest.raises(Http404):
@@ -105,9 +131,7 @@ class TestViewEntityProposedItemList:
             views.list_org_proposed_item_view(request, 123)
 
 
-def _assert_response_form_create_update(request, user, charity, item, name):
-    request.user = user
-    response = views.proposed_item_form_view(request)
+def _assert_response_form_create_update(response, user, charity, item, name):
     assert response.status_code == 200
     assert ProposedItem.objects.count() == 1
     obj = ProposedItem.objects.first()
@@ -126,90 +150,109 @@ def _random_string() -> str:
 
 
 class TestProposedItemForm:
-    def test_proposed_item_form_create(self, rf, user, charity):
+    # Use client since it uses middleware
+    # and it also allows for ignoring csrf stuff
+    # Review csrf decorators: https://docs.djangoproject.com/en/3.0/ref/csrf/#django.views.decorators.csrf.csrf_protect
+    view_url = reverse("item:proposed-item-form")
+
+    def test_proposed_item_form_create(self, client, user, charity):
         item = [x.id for x in ItemFactory.create_batch(3)]
         name = [_random_string() for _ in range(3)]
-        request = rf.post(
-            "blah",
+        client.force_login(user)
+        response = client.post(
+            self.view_url,
             data={
                 "entity": charity.id,
                 "item": _format_list_to_str(item),
                 "names": _format_list_to_str(name),
             },
         )
-        _assert_response_form_create_update(request, user, charity, item, name)
+        _assert_response_form_create_update(response, user, charity, item, name)
 
-    def test_proposed_item_form_update(self, rf, user, charity):
+    def test_proposed_item_form_update(self, client, user, charity):
         """The updating of the form"""
         item = [x.id for x in ItemFactory.create_batch(10)]
         name = [_random_string() for _ in range(10)]
         obj = ProposedItem.objects.create(
             user=user, entity=charity, item=item[:5], names=name[:5]
         )
-        request = rf.post(
-            "blah",
+        client.force_login(user)
+        response = client.post(
+            self.view_url,
             data={
                 "id": obj.id,
                 "item": _format_list_to_str(item),
                 "names": _format_list_to_str(name),
             },
         )
-        _assert_response_form_create_update(request, user, charity, item, name)
+        _assert_response_form_create_update(response, user, charity, item, name)
 
-    def test_form_not_update_for_wrong_user(self, rf, user, charity):
+    def test_form_not_update_for_wrong_user(self, client, user, charity):
         item = [x.id for x in ItemFactory.create_batch(3)]
         name = [_random_string() for _ in range(3)]
         obj = ProposedItem.objects.create(
             user=user, entity=charity, item=item[:2], names=name[:2]
         )
-        request = rf.post(
-            "blah",
+        client.force_login(UserFactory.create())
+        response = client.post(
+            self.view_url,
             data={
                 "id": obj.id,
                 "item": _format_list_to_str(item),
                 "names": _format_list_to_str(name),
             },
         )
-        request.user = UserFactory.create()
-        response = views.proposed_item_form_view(request)
         assert response.status_code == 200
-        assert ProposedItem.objects.first()
+        assert ProposedItem.objects.count() == 1
+        obj = ProposedItem.objects.first()
         assert obj.item == item[:2]
         assert obj.names == name[:2]
 
-    def test_proposed_item_form_id_and_entity_not_filled(self, rf, user):
-        request = rf.post("blah", data={"item": [1], "name": ["bs"]})
-        request.user = user
-        response = views.proposed_item_form_view(request)
+    def test_proposed_item_form_id_and_entity_not_filled(self, client, user):
+        client.force_login(user)
+        response = client.post(self.view_url, data={"item": [1], "name": ["bs"]})
         assert response.status_code == 400
         errors = json.loads(response.content)["errors"]
         assert "entity" in errors
 
-    def test_entity_does_not_exist(self, rf, user):
-        request = rf.post("blah", data={"entity": 123, "item": [1], "names": ["bs"]})
-        request.user = user
-        response = views.proposed_item_form_view(request)
+    def test_entity_does_not_exist(self, client, user):
+        client.force_login(user)
+        response = client.post(
+            self.view_url, data={"entity": 123, "item": [1], "names": ["bs"]}
+        )
         assert response.status_code == 400
         errors = json.loads(response.content)["errors"]
         assert "entity" in errors
 
-    def test_proposed_item_form_empty_item(self, rf, user, charity):
-        request = rf.post("blah", data={"entity": charity.id, "item": [1]})
-        request.user = user
-        response = views.proposed_item_form_view(request)
+    def test_proposed_item_form_empty_item(self, client, user, charity):
+        client.force_login(user)
+        response = client.post(self.view_url, data={"entity": charity.id, "item": [1]})
         assert response.status_code == 200
 
-    def test_proposed_item_form_empty_name(self, rf, user, charity):
-        request = rf.post("blah", data={"entity": charity.id, "names": ["bs"]})
-        request.user = user
-        response = views.proposed_item_form_view(request)
+    def test_escape(self, client, user, charity):
+        client.force_login(user)
+        response = client.post(
+            self.view_url, data={"entity": charity.id, "names": ["<p>hi</p>"]}
+        )
+        assert response.status_code == 200
+        assert ProposedItem.objects.count() == 1
+        obj = ProposedItem.objects.first()
+        assert len(obj.names) == 1
+        assert obj.names[0] == "&lt;p&gt;hi&lt;/p&gt;"
+
+    def test_proposed_item_form_empty_name(self, client, user, charity):
+        client.force_login(user)
+        response = client.post(
+            self.view_url, data={"entity": charity.id, "names": ["bs"]}
+        )
         assert response.status_code == 200
 
-    def test_not_appropriate_raise(self, rf, user, charity):
+    def test_not_appropriate_raise(self, client, user, charity):
         item = ItemFactory.create(is_appropriate=False)
-        request = rf.post("blah", data={"entity": charity.id, "item": str(item.id)})
-        request.user = user
-        response = views.proposed_item_form_view(request)
+        client.force_login(user)
+        response = client.post(
+            self.view_url, data={"entity": charity.id, "item": str(item.id)}
+        )
         assert response.status_code == 400
         errors = json.loads(response.content)["errors"]
         assert "item" in errors

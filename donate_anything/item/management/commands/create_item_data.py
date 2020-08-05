@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from factory import Faker
+from faker import Faker
 
 from donate_anything.charity.models import Charity
 from donate_anything.item.models import Item, ProposedItem, WantedItem
@@ -58,13 +58,13 @@ class Command(BaseCommand):
             entity=org_1,
             user=UserFactory.create(),
             item=[item_1.id] + [x.id for x in ItemFactory.create_batch(10)],
-            names=[Faker("bs") for _ in range(50)],
+            names=[Faker().bs() for _ in range(50)],
         )
         ProposedItem.objects.create(
             entity=org_2,
             user=UserFactory.create(),
             item=[item_3.id] + [x.id for x in ItemFactory.create_batch(10)],
-            names=[Faker("bs") for _ in range(50)],
+            names=[Faker().bs() for _ in range(50)],
         )
 
         # For testing pagination - change to 1 in paginating

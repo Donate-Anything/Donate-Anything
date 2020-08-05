@@ -1,1 +1,17 @@
 {% extends 'base.html' %}
+{% load static compress %}
+{# Shows org's currently active items #}
+
+{% block content %}
+  <h2 data-paging-url="{% url 'item:list-item' id %}" id="heading-with-data">
+    Items that <a href="{% url 'charity:organization' id %}">{{ name }}</a> can fulfill
+  </h2>
+  <p><small>Note: this list is in alphabetical order.</small></p>
+  <div id="items-list"></div>
+{% endblock %}
+
+{% block javascript %}
+  {% compress js %}
+    <script src="{% static 'js/item/active.js' %}" type="application/javascript"></script>
+  {% endcompress %}
+{% endblock %}

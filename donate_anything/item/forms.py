@@ -2,6 +2,7 @@ from typing import List, Type
 
 from django import forms
 from django.contrib.postgres.forms import SimpleArrayField
+from django.utils.html import escape
 from django.utils.translation import gettext_lazy as _
 
 from donate_anything.charity.models import Charity
@@ -39,6 +40,8 @@ class ModifyItemsForm(forms.Form):
         names = self.cleaned_data["names"]
         if names is []:
             names = list
+        else:
+            names = [escape(name) for name in names]
         return names
 
     def clean_entity(self):

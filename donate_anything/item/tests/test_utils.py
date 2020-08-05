@@ -117,3 +117,12 @@ class TestMergeProposedItemToActive:
         assert Item.objects.count() == 1
         assert WantedItem.objects.count() == 1
         assert WantedItem.objects.filter(charity=charity)[0].item == item
+
+    def test_escape(self, charity, user):
+        proposed = ProposedItem.objects.create(
+            entity=charity, user=user, names=["<p>hi</p>"]
+        )
+        merge(charity, proposed)
+        assert Item.objects.count() == 1
+        assert WantedItem.objects.count() == 1
+        assert WantedItem.objects.first().item.name == "&lt;p&gt;hi&lt;/p&gt;"
