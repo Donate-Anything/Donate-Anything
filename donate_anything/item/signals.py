@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db.models.signals import post_save
 from django.urls import reverse
 
@@ -5,7 +6,10 @@ from donate_anything.forum.models import Message, Thread
 from donate_anything.item.models import ProposedItem
 
 
-current_domain = "https://donate-anything.org"
+if settings.DEBUG:
+    current_domain = "http://localhost:8000"
+else:
+    current_domain = "https://donate-anything.org"
 
 
 def create_thread_proposed_item(instance: ProposedItem, created, **kwargs):
