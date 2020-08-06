@@ -24,6 +24,7 @@ from donate_anything.charity.models import (
 )
 
 
+@method_decorator(requires_csrf_token, name="dispatch")
 class ApplyView(LoginRequiredMixin, FormView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -68,7 +69,6 @@ apply_business_view = ApplyBusinessFormView.as_view()
 
 
 @method_decorator(csrf_protect, name="dispatch")
-@method_decorator(requires_csrf_token, name="dispatch")
 class AppliedBaseUpdateView(LoginRequiredMixin, UpdateView):
     def form_valid(self, form):
         if self.object.applier != self.request.user:
