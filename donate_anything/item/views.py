@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404, render
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_protect, requires_csrf_token
-from django.views.generic import FormView
+from django.views.generic import FormView, TemplateView
 
 from donate_anything.charity.models.charity import Charity
 from donate_anything.item.forms import ModifyItemsForm
@@ -171,7 +171,7 @@ def list_active_entity_items(request, charity_id):
 
 
 def list_org_items_view(request, entity_id):
-    """View that renders the org's currently active items list
+    """View that renders the initial items list
     """
     obj = get_object_or_404(Charity, id=entity_id)
     return render(
@@ -195,7 +195,6 @@ def list_proposed_existing_item(request, proposed_item_pk):
     return JsonResponse({"data": [(x.id, x.name) for x in qs]})
 
 
-@requires_csrf_token
 def list_org_proposed_item_view(request, proposed_item_pk):
     """View that renders the initial proposed items list
     Lists all names and item IDs along with entity ID and name
@@ -211,6 +210,14 @@ def list_org_proposed_item_view(request, proposed_item_pk):
             "can_edit": (request.user == obj.user and not obj.closed),
         },
     )
+
+
+@method_decorator(requires_csrf_token, name="dispatch")
+class InitialProposedItemTemplate(LoginRequiredMixin, TemplateView):
+    template_name = "organization/suggest/initial_propose_item.html"
+
+
+initial_proposed_item_template = InitialProposedItemTemplate.as_view()
 
 
 # Only need requires_csrf_token when it's a form in template view

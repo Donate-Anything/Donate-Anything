@@ -37,9 +37,7 @@ urlpatterns = [
     ),
     path(
         "proposed/initial/",
-        TemplateView.as_view(
-            template_name="organization/suggest/initial_propose_item.html"
-        ),
+        views.initial_proposed_item_template,
         name="initial-proposed-template",
     ),
     path("proposed/form/", views.proposed_item_form_view, name="proposed-item-form"),
