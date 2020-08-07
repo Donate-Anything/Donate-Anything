@@ -21,6 +21,7 @@ def create_thread_on_apply(sender, instance, created, **kwargs):
         thread = Thread.objects.create(
             title=f"New Application: {instance.name}",
             type=1 if sender == OrganizationApplication else 2,
+            extra={"OP_id": instance.applier_id},
         )
         url = current_domain
         if sender == BusinessApplication:
@@ -39,13 +40,15 @@ post_save.connect(create_thread_on_apply, BusinessApplication)
 post_save.connect(create_thread_on_apply, OrganizationApplication)
 
 
-def create_thread_on_suggest(instance, created, **kwargs):
+def create_thread_on_suggest(instance: ProposedEdit, created, **kwargs):
     """Creates a new thread in the community forum when a suggestion
     for an ACTIVE organization/entity is created.
     """
     if created:
         thread = Thread.objects.create(
-            title=f"New Suggestion for {instance.entity.name}", type=3
+            title=f"New Suggestion for {instance.entity.name}",
+            type=3,
+            extra={"OP_id": instance.user_id},
         )
         Message.objects.create(
             user=instance.user,

@@ -15,7 +15,13 @@ else:
 def create_thread_proposed_item(instance: ProposedItem, created, **kwargs):
     if created:
         thread = Thread.objects.create(
-            title=f"New Proposed Items for {instance.entity.name}", type=4
+            title=f"New Proposed Items for {instance.entity.name}",
+            type=4,
+            extra={
+                "OP_id": instance.user_id,
+                "entity_id": instance.entity_id,
+                "proposed_item_id": instance.id,
+            },
         )
         Message.objects.create(
             user=instance.user,

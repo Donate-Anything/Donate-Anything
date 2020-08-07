@@ -10,6 +10,11 @@ from donate_anything.forum.models.forum import THREAD_TYPE_CHOICES, VOTABLE_THRE
 pytestmark = pytest.mark.django_db
 
 
+def not_votable_threads() -> List[int]:
+    thread_types = [x[0] for x in THREAD_TYPE_CHOICES]
+    return list(set(thread_types).difference(VOTABLE_THREADS))
+
+
 class TestForumView:
     def test_landing_page(self, client):
         response = client.get(reverse("forum:home"))
@@ -22,10 +27,32 @@ class TestForumView:
         obj = Thread.objects.get(id=thread.id)
         assert obj.views == current_view_count + 1
 
-
-def not_votable_threads() -> List[int]:
-    thread_types = [x[0] for x in THREAD_TYPE_CHOICES]
-    return list(set(thread_types).difference(VOTABLE_THREADS))
+    @pytest.mark.parametrize("is_votable", [True, False])
+    @pytest.mark.parametrize("authenticated", [True, False])
+    @pytest.mark.parametrize("op_id_is_user", [True, False])
+    @pytest.mark.parametrize("thread_accepted", [True, False])
+    def test_show_vote_context(
+        self,
+        thread,
+        client,
+        user,
+        is_votable,
+        authenticated,
+        op_id_is_user,
+        thread_accepted,
+    ):
+        thread.type = VOTABLE_THREADS[0] if is_votable else not_votable_threads()[0]
+        if authenticated:
+            client.force_login(user)
+        thread.extra["OP_id"] = user.id if op_id_is_user else 123456789987654321
+        thread.accepted = True if thread_accepted else False
+        thread.save()
+        response = client.get(reverse("forum:thread", kwargs={"thread": thread.id}))
+        assert response.status_code == 200
+        assertion = (
+            is_votable and authenticated and not op_id_is_user and not thread_accepted
+        )
+        assert response.context["show_vote"] is assertion
 
 
 class TestVote:

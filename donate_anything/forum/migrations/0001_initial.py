@@ -34,6 +34,7 @@ class Migration(migrations.Migration):
                 ),
                 ("views", models.BigIntegerField(default=0)),
                 ("accepted", models.BooleanField(default=False)),
+                ("extra", models.JSONField(default=dict)),
             ],
         ),
         migrations.CreateModel(

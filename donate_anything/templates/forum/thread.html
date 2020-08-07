@@ -16,27 +16,24 @@
       as a contribution to the community (you must be signed in):
     </p>
   {% endblocktranslate %}
-  {% if thread_obj.is_votable_thread and request.user.is_authenticated %}
-    {% if not thread_obj.accepted %}
-      <div class="pb-3 pl-4">
-        {% csrf_token %}
-        <div class="row">
-          <a style="cursor: pointer">
-            <i id="upvote" data-vote-url="{% url 'forum:thread-vote' thread_obj.id 1 %}" class="fas fa-lg fa-arrow-up pr-2{% if user_vote == 1 %} text-danger{% endif %}" aria-hidden="true"></i>
-          </a>
-          <p id="upvote-count" style="float: left">{{ upvotes }} upvotes</p>
-        </div>
-        <div class="row pt-2">
-          <a style="cursor: pointer">
-            <i id="downvote" data-vote-url="{% url 'forum:thread-vote' thread_obj.id 0 %}" class="fas fa-lg fa-arrow-down pr-2{% if user_vote == 0 %} text-danger{% endif %}" aria-hidden="true"></i>
-          </a>
-          <p id="downvote-count" style="float: left">{{ downvotes }} downvotes</p>
-        </div>
-      </div>
-    {% else %}
-      <h5>This proposed edit has already been merged.</h5>
-    {% endif %}
+  {% if thread_obj.accepted %}
+    <h5>{% translate 'This proposed edit has already been merged.' %}</h5>
   {% endif %}
+  <div class="pb-3 pl-4">
+    {% if show_vote %}{% csrf_token %}{% endif %}
+    <div class="row">
+      <a style="cursor: pointer">
+        <i id="upvote" data-vote-url="{% url 'forum:thread-vote' thread_obj.id 1 %}" class="fas fa-lg fa-arrow-up pr-2{% if user_vote == 1 %} text-danger{% endif %}" aria-hidden="true"></i>
+      </a>
+      <p id="upvote-count" style="float: left">{{ upvotes }} upvotes</p>
+    </div>
+    <div class="row pt-2">
+      <a style="cursor: pointer">
+        <i id="downvote" data-vote-url="{% url 'forum:thread-vote' thread_obj.id 0 %}" class="fas fa-lg fa-arrow-down pr-2{% if user_vote == 0 %} text-danger{% endif %}" aria-hidden="true"></i>
+      </a>
+      <p id="downvote-count" style="float: left">{{ downvotes }} downvotes</p>
+    </div>
+  </div>
   {% for message in object_list %}
     <div class="card mb-3">
       <div class="card-header">
@@ -80,6 +77,8 @@
     <script src="{% static 'js/forum/thread.js' %}"></script>
     {% if request.user.is_authenticated %}
       <script src="{% static 'js/markdown_editor.js' %}"></script>
+    {% endif %}
+    {% if show_vote %}
       <script src="{% static 'js/forum/vote.js' %}"></script>
     {% endif %}
   {% endcompress %}
