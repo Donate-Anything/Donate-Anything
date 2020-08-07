@@ -1,10 +1,42 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags i18n static compress paginate %}
 
-{% block title %}{{ object_list.0.thread.title }} | Donate Anything{% endblock %}
+{% block title %}{{ thread_obj.title }} | Donate Anything{% endblock %}
+
+{% block css %}
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.14.0/css/all.css">
+{% endblock %}
 
 {% block content %}
-  <h3 class="p-3">{{ object_list.0.thread.title }}</h3>
+  <h3 class="p-3">{{ thread_obj.title }}</h3>
+  <p class="font-italic">Thread type: {{ thread_obj.get_type_display }}</p>
+  {% blocktranslate %}
+    <p class="font-italic">
+      This thread type asks for votes. You can <i>carefully</i> vote on this merge
+      as a contribution to the community (you must be signed in):
+    </p>
+  {% endblocktranslate %}
+  {% if thread_obj.is_votable_thread and request.user.is_authenticated %}
+    {% if not thread_obj.accepted %}
+      <div class="pb-3 pl-4">
+        {% csrf_token %}
+        <div class="row">
+          <a style="cursor: pointer">
+            <i id="upvote" data-vote-url="{% url 'forum:thread-vote' thread_obj.id 1 %}" class="fas fa-lg fa-arrow-up pr-2{% if user_vote == 1 %} text-danger{% endif %}" aria-hidden="true"></i>
+          </a>
+          <p id="upvote-count" style="float: left">{{ upvotes }} upvotes</p>
+        </div>
+        <div class="row pt-2">
+          <a style="cursor: pointer">
+            <i id="downvote" data-vote-url="{% url 'forum:thread-vote' thread_obj.id 0 %}" class="fas fa-lg fa-arrow-down pr-2{% if user_vote == 0 %} text-danger{% endif %}" aria-hidden="true"></i>
+          </a>
+          <p id="downvote-count" style="float: left">{{ downvotes }} downvotes</p>
+        </div>
+      </div>
+    {% else %}
+      <h5>This proposed edit has already been merged.</h5>
+    {% endif %}
+  {% endif %}
   {% for message in object_list %}
     <div class="card mb-3">
       <div class="card-header">
@@ -31,12 +63,12 @@
   </nav>
   {% if request.user.is_authenticated %}
     <hr>
-    <h4 class="text-center">{% trans 'Post Message' %}</h4>
+    <h4 class="text-center">{% translate 'Post Message' %}</h4>
     <div>
-      <form method="post" action="{% url 'forum:thread-form' object_list.0.thread.id %}">
+      <form method="post" action="{% url 'forum:thread-form' thread_obj.id %}">
         {% csrf_token %}
         {{ thread_forum_form|crispy }}
-        <button class="primaryAction btn btn-primary" type="submit">{% trans "Post" %}</button>
+        <button class="primaryAction btn btn-primary" type="submit">{% translate "Post" %}</button>
       </form>
     </div>
   {% endif %}
@@ -44,17 +76,11 @@
 
 {% block javascript %}
   <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js" integrity="sha512-L03kznCrNOfVxOUovR6ESfCz9Gfny7gihUX/huVbQB9zjODtYpxaVtIaAkpetoiyV2eqWbvxMH9fiSv5enX7bw==" crossorigin="anonymous"></script>
-  <script type="text/javascript">
-    $(document).ready(function() {
-      converter = new showdown.Converter();
-      converter.setFlavor('github');
-      const elements = document.querySelectorAll('.markdown-marker');
-      Array.from(elements).forEach((element, _) => {
-        element.innerHTML = converter.makeHtml(element.innerHTML);
-      });
-    })
-  </script>
   {% compress js %}
-    <script src="{% static 'js/markdown_editor.js' %}"></script>
+    <script src="{% static 'js/forum/thread.js' %}"></script>
+    {% if request.user.is_authenticated %}
+      <script src="{% static 'js/markdown_editor.js' %}"></script>
+      <script src="{% static 'js/forum/vote.js' %}"></script>
+    {% endif %}
   {% endcompress %}
 {% endblock %}

@@ -1,12 +1,12 @@
 from django.contrib import messages
 from django.db.models import Count, F
-from django.http import HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView, ListView
 
 from donate_anything.forum.forms import ForumForm
-from donate_anything.forum.models import Message, Thread
+from donate_anything.forum.models import Message, Thread, UserVote
 
 
 class ForumView(ListView):
@@ -48,6 +48,25 @@ class ThreadView(ListView):
     def get_context_data(self, **kwargs):
         context = super(ThreadView, self).get_context_data(**kwargs)
         context["thread_forum_form"] = ForumForm()
+        try:
+            thread = Thread.objects.get(id=self.kwargs["thread"])
+        except Thread.DoesNotExist:
+            raise Http404
+        context["thread_obj"] = thread
+        if self.request.user.is_authenticated:
+            try:
+                user_vote = UserVote.objects.only("direction").get(
+                    thread=thread, user=self.request.user
+                )
+                context["user_vote"] = 1 if user_vote.direction else 0
+            except UserVote.DoesNotExist:
+                pass
+        context["upvotes"] = UserVote.objects.filter(
+            thread=thread, direction=True
+        ).count()
+        context["downvotes"] = UserVote.objects.filter(
+            thread=thread, direction=False
+        ).count()
         return context
 
 

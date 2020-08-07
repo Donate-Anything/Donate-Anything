@@ -23,6 +23,10 @@ class Thread(models.Model):
     def __str__(self):
         return self.title
 
+    @property
+    def is_votable_thread(self) -> bool:
+        return self.type in VOTABLE_THREADS
+
 
 class Message(models.Model):
     """A message in a thread is a simple message. Nothing special.
