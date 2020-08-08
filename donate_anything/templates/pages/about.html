@@ -1,1 +1,64 @@
 {% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}About | Donate Anything{% endblock %}
+
+{% block css %}
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+  {% blocktranslate %}
+  <h2 class="text-center pt-3" data-aos="fade-up">About</h2>
+  <blockquote class="blockquote text-center" data-aos="fade-up">
+    Our goal is not to change people's perspective.
+    In business, the general rule is to not change
+    consumer's perspective but follow them or build
+    upon them. Life is, sometimes unfortunately, business.
+    <footer class="blockquote-footer"><cite title="Source Title">Andrew C. Wang</cite></footer>
+  </blockquote>
+  <p data-aos="fade-up">
+    Donate Anything started off on a wall full of sticky notes.
+    <!-- Easter egg :) -->
+    It was an idea that came up during the COVID-19 pandemic when
+    I realized how terrible my disposal habits have become. Not
+    only because of the face masks (which you <b>should</b> be disposing)
+    and one-use items (including food!), but the lack of consciousness
+    about wasteful habits.
+  </p>
+  <p data-aos="fade-up">
+    Besides the usual plastic cartons that I had to wash and uncap,
+    I really didn't know <i>how much and which items</i> I should
+    be recycling. I grew too tolerant to the mindset of "someone
+    else will take care of it," so to the recycling bin ya' go.
+    Same with Blue Cross donations. People keep tossing old, dirty
+    textiles into the "Donation" bin, expecting Blue Cross to just
+    accept such <i>blessings</i>.
+  </p>
+  <hr data-aos="fade-up">
+  <p class="font-italic" data-aos="fade-up">
+    So... this website tries to solve this problem?
+  </p>
+  <p data-aos="fade-up">
+    After that entire talk, the answer is "no." Unlike the past, people
+    express their freedom vibrantly in <strong>words and inaction</strong>.
+    For me, the only societal solution that came to mind was "re-routing" the problem.
+  </p>
+  <p data-aos="fade-up">
+    How can you make someone feel good? The act of kindness through indirect,
+    materialistic givings, of course.<!--Sigh, the sarcasm is real but truthful for many cases-->
+    The problem we're re-routing is waste disposal, mostly the "mindset" of
+    disposal. In the U.S., a large grey truck appears every week, grabs your trash,
+    and everything magically disappears. Worries gone, right?
+  </p>
+  <p data-aos="fade-up">
+    People are not good at long term thinking, and we're not aiming to change
+    everyone's wasteful habits.
+  </p>
+  {% endblocktranslate %}
+{% endblock %}
+
+{% block javascript %}
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>AOS.init();</script>
+{% endblock %}
