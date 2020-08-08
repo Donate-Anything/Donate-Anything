@@ -10,9 +10,10 @@ Welcome to Donate Anything's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   howto
-   pycharm/configuration
    users
+   organizations
+   forum
+   howto
 
 
 

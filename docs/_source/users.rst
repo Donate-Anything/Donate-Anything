@@ -3,11 +3,15 @@
 Users
 ======================================================================
 
-Starting a new project, it’s highly recommended to set up a custom user model,
-even if the default User model is sufficient for you.
+Anyone can be a user to collect points by the number
+of donations sent (depending on the items),
+maintain organizations that don't have a verified owner
+account or are in hybrid mode, gain points for
+maintenance and voting in the community, and report content.
 
-This model behaves identically to the default user model,
-but you’ll be able to customize it in the future if the need arises.
+Maintaining an organization, if there is no verified
+account, is highly likely. Users will be a part of a
+community that maintains all aspects of the website.
 
 .. automodule:: donate_anything.users.models
    :members:
