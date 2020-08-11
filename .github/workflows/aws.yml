@@ -1,0 +1,86 @@
+# This workflow will build and push a new container image to Amazon ECR,
+# and then will deploy a new task definition to Amazon ECS, when a release is created
+#
+# For more configuration, check the action out here:
+# https://github.com/aws-actions/amazon-ecs-deploy-task-definition
+# From there, you can add an appspec.yaml and other stuff AWS GH Action offers.
+
+name: Deploy to Amazon ECS
+
+# TODO Add repo_dispatch from Travis to here for automatic
+# Although highly unlikely for awhile to manage security/control
+on: [workflow_dispatch]
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    # Fill task definition with nginx
+    # -------------------------------------------------------
+    # The image ID is latest since we don't know if nginx was actually built
+    # but we fill this in anyways since Django image takes awhile to build.
+    - name: Build nginx image tag
+      id: create-nginx-image-tag
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: donate-anything-nginx-reverse-proxy
+        IMAGE_TAG: latest
+      run: echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+    - name: Fill in the nginx image ID in the Amazon ECS task definition
+      id: fill-nginx-image
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: aws-task-definition.json
+        container-name: nginx
+        image: ${{ steps.create-nginx-image-tag.outputs.image }}
+
+    # Build Django app
+    # -------------------------------------------------------
+    - name: Build, tag, and push Django image to Amazon ECR
+      id: build-django-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: donate-anything-django-app
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        # Build a docker container and
+        # push it to ECR so that it can
+        # be deployed to ECS.
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+    - name: Fill in the new Django image ID in Amazon ECS task definition
+      id: fill-django-image
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: ${{ steps.fill-nginx-image.outputs.task-definition }}
+        container-name: django-app
+        image: ${{ steps.build-django-image.outputs.image }}
+
+    # Deploy
+    # -------------------------------------------------------
+    - name: Deploy Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.fill-django-image.outputs.task-definition }}
+        service: donate-anything-service
+        cluster: donate-anything-cluster
+        wait-for-service-stability: true

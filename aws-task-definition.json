@@ -1,0 +1,90 @@
+{
+  "containerDefinitions": [
+     {
+       "name": "nginx",
+       "image": "filled-in-by-gh-action",
+       "memory": "128",
+       "cpu": "256",
+       "essential": true,
+       "portMappings": [
+         {
+           "containerPort": "80",
+           "protocol": "tcp"
+         }
+       ],
+       "links": [
+         "django-app"
+       ]
+     },
+     {
+       "name": "django-app",
+       "image": "filled-in-by-gh-action",
+       "secrets": [
+         {
+           "name": "DATABASE_URL",
+           "valueFrom": "/donate-anything/DATABASE_URL"
+         },
+         {
+           "name": "DJANGO_ACCOUNT_ALLOW_REGISTRATION",
+           "valueFrom": "/donate-anything/DJANGO_ACCOUNT_ALLOW_REGISTRATION"
+         },
+         {
+           "name": "DJANGO_ADMIN_URL",
+           "valueFrom": "/donate-anything/DJANGO_ADMIN_URL"
+         },
+         {
+           "name": "DJANGO_ALLOWED_HOSTS",
+           "valueFrom": "/donate-anything/DJANGO_ALLOWED_HOSTS"
+         },
+         {
+           "name": "DJANGO_AWS_S3_REGION_NAME",
+           "valueFrom": "/donate-anything/DJANGO_AWS_S3_REGION_NAME"
+         },
+         {
+           "name": "DJANGO_AWS_STORAGE_BUCKET_NAME",
+           "valueFrom": "/donate-anything/DJANGO_AWS_STORAGE_BUCKET_NAME"
+         },
+         {
+           "name": "DJANGO_SECRET_KEY",
+           "valueFrom": "/donate-anything/DJANGO_SECRET_KEY"
+         },
+         {
+           "name": "DJANGO_SECURE_SSL_REDIRECT",
+           "valueFrom": "/donate-anything/DJANGO_SECURE_SSL_REDIRECT"
+         },
+         {
+           "name": "DJANGO_SETTINGS_MODULE",
+           "valueFrom": "/donate-anything/DJANGO_SETTINGS_MODULE"
+         },
+         {
+           "name": "RECAPTCHA_PUBLIC_KEY",
+           "valueFrom": "/donate-anything/RECAPTCHA_PUBLIC_KEY"
+         },
+         {
+           "name": "RECAPTCHA_PRIVATE_KEY",
+           "valueFrom": "/donate-anything/RECAPTCHA_PRIVATE_KEY"
+         },
+         {
+           "name": "REDIS_URL",
+           "valueFrom": "/donate-anything/REDIS_URL"
+         },
+         {
+           "name": "SENTRY_DSN",
+           "valueFrom": "/donate-anything/SENTRY_DSN"
+         },
+         {
+           "name": "WEB_CONCURRENCY",
+           "valueFrom": "/donate-anything/WEB_CONCURRENCY"
+         }
+       ],
+       "memory": "512",
+       "cpu": "512",
+       "essential": true
+     }
+  ],
+  "executionRoleArn": "donateAnythingEC2InstanceRole",
+  "volumes": [],
+  "networkMode": "bridge",
+  "placementConstraints": [],
+  "family": "donate-anything-application-stack"
+}
