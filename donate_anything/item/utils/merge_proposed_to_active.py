@@ -18,7 +18,7 @@ def merge(entity: Charity, proposed: ProposedItem):
     # Check for any existing items in "proposed new items"
     # Can happen when a new item shows up from a different merge but didn't update the array here
     try:
-        proposed_names = {escape(x) for x in proposed.names}
+        proposed_names = {escape(x).lower() for x in proposed.names}
     except TypeError:
         proposed_names = set()
     existing_name_item_objs = Item.objects.filter(name__in=proposed_names)

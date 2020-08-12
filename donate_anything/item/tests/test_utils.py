@@ -15,7 +15,7 @@ class TestMergeProposedItemToActive:
     def test_merge(self, charity, user):
         # Assuming names attribute are of names that aren't in Item list already.
         items = ItemFactory.create_batch(10)
-        names = ["".join(sample(ascii_letters, 50)) for _ in range(10)]
+        names = [("".join(sample(ascii_letters, 50))).lower() for _ in range(10)]
         proposed = ProposedItem.objects.create(
             entity=charity, user=user, item=[item.id for item in items], names=names
         )
@@ -58,7 +58,7 @@ class TestMergeProposedItemToActive:
             [WantedItem(charity=charity, item=item) for item in items]
         )
         proposed = ProposedItem.objects.create(
-            entity=charity, user=user, names=[item.name for item in items]
+            entity=charity, user=user, names=[item.name.lower() for item in items]
         )
         merge(charity, proposed)
         assert Item.objects.count() == 9
@@ -72,7 +72,7 @@ class TestMergeProposedItemToActive:
         items = ItemFactory.create_batch(9)
         assert Item.objects.count() == 9
         proposed = ProposedItem.objects.create(
-            entity=charity, user=user, names=[item.name for item in items]
+            entity=charity, user=user, names=[item.name.lower() for item in items]
         )
         merge(charity, proposed)
         assert Item.objects.count() == 9
@@ -97,7 +97,7 @@ class TestMergeProposedItemToActive:
         assert WantedItem.objects.count() == 1
 
     def test_remove_duplicate_names(self, charity, user):
-        random_string = "".join(sample(ascii_letters, 10))
+        random_string = ("".join(sample(ascii_letters, 10))).lower()
         proposed = ProposedItem.objects.create(
             entity=charity, user=user, names=[random_string, random_string]
         )
@@ -111,7 +111,7 @@ class TestMergeProposedItemToActive:
         """
         item = ItemFactory.create()
         proposed = ProposedItem.objects.create(
-            entity=charity, user=user, item=[item.id], names=[item.name]
+            entity=charity, user=user, item=[item.id], names=[item.name.lower()]
         )
         merge(charity, proposed)
         assert Item.objects.count() == 1
