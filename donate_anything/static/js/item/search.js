@@ -79,6 +79,8 @@ function addToTable() {
         tableID = "non-existent-table";
         // selectedName would be null, as well
         name = $(typeAheadID).val();
+        // Delete commas to prevent users from adding a list to one item
+        name = name.replaceAll(",", "")
     } else {
         tableID = "existent-table";
         name = selectedName;
