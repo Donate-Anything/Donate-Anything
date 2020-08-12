@@ -137,7 +137,9 @@ ANYMAIL = {"AMAZON_SES_CLIENT_PARAMS": {"region_name": AWS_S3_REGION_NAME}}
 # https://django-compressor.readthedocs.io/en/latest/settings/#django.conf.settings.COMPRESS_ENABLED
 COMPRESS_ENABLED = env.bool("COMPRESS_ENABLED", default=True)
 # https://django-compressor.readthedocs.io/en/latest/settings/#django.conf.settings.COMPRESS_STORAGE
-COMPRESS_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+# https://django-compressor.readthedocs.io/en/latest/remote-storages/#using-staticfiles
+COMPRESS_STORAGE = STATICFILES_STORAGE
+COMPRESS_ROOT = STATIC_ROOT
 # https://django-compressor.readthedocs.io/en/latest/settings/#django.conf.settings.COMPRESS_URL
 COMPRESS_URL = STATIC_URL
 # https://django-compressor.readthedocs.io/en/latest/settings/#django.conf.settings.COMPRESS_FILTERS
