@@ -16,7 +16,6 @@ function selectOne(id, value, page) {
         type: "GET",
         success: function(data) {
             // returned data is list_of(charity id, name, description[:150]) and has_next bool
-            // TODO Maybe add branding description field? Kind of loses the lure though with people writing single line quotes.
             let html;
             if (page.toString() === "1") {
                 html = ""
@@ -133,8 +132,47 @@ $('#typeahead-input-field').typeahead({
 ).bind("typeahead:select", function(ev, suggestion) {
     selectOne(suggestion.id, suggestion.value, 1);
     // For multi-items, we set attributes in sessionStorage for searching multi later on.
+    // I really wish I knew about JSON.stringify before...
     sessionStorage.setItem(multiItemArrayKey, sessionStorage.getItem(multiItemArrayKey) + suggestion.id + ",")
     sessionStorage.setItem(multiItemStrArrayKey, sessionStorage.getItem(multiItemStrArrayKey) + suggestion.value + ",")
+}
+).on("keypress", function(e) {
+    // https://github.com/twitter/typeahead.js/issues/332#issuecomment-379579385
+    if (e.which === 13 /* ENTER */) {
+        const typeahead = $(this).data().ttTypeahead;
+        const menu = typeahead.menu;
+        const sel = menu.getActiveSelectable() || menu.getTopSelectable();
+        if (menu.isOpen()) {
+            menu.trigger('selectableClicked', sel);
+            e.preventDefault();
+        }
+    }
+}
+).on("keydown", function(e) {
+    // https://github.com/twitter/typeahead.js/issues/332#issuecomment-379579385
+    if (e.which === 13 /* ENTER */) {
+        const typeahead = $(this).data().ttTypeahead;
+        const menu = typeahead.menu;
+        const sel = menu.getActiveSelectable() || menu.getTopSelectable();
+        if (menu.isOpen()) {
+            menu.trigger('selectableClicked', sel);
+            e.preventDefault();
+        }
+    } else if (e.which === 8 /* Backspace pressed */) {
+        /* This is mainly used if a user goes back and deletes typeahead value.
+        Since the typeahead value is always second-to last in the list
+        we only check that value. (Last is a space) */
+        let nameArray = Array.from(sessionStorage.getItem(multiItemStrArrayKey).split(","));
+        if (nameArray[nameArray.length - 2] === $(this).val()) {
+            let idArray = Array.from(sessionStorage.getItem(multiItemArrayKey).split(","));
+            idArray.splice(-2); // deletes last space which gives the last comma
+            idArray.push(""); // Adds a comma at the end
+            nameArray.splice(-2);
+            nameArray.push("");
+            sessionStorage.setItem(multiItemStrArrayKey, nameArray.toString());
+            sessionStorage.setItem(multiItemArrayKey, idArray.toString());
+        }
+    }
 });
 
 $(document).ready(function() {
@@ -182,8 +220,10 @@ $(document).ready(function() {
         let idArray = Array.from(sessionStorage.getItem(multiItemArrayKey).split(","));
         const index = nameArray.indexOf($(this).siblings('.typeahead').val());
         if (index > -1) {
-          sessionStorage.setItem(multiItemStrArrayKey, nameArray.splice(index, 1).toString());
-          sessionStorage.setItem(multiItemArrayKey, idArray.splice(index, 1).toString());
+            nameArray.splice(index, 1);
+            idArray.splice(index, 1)
+            sessionStorage.setItem(multiItemStrArrayKey, nameArray.toString());
+            sessionStorage.setItem(multiItemArrayKey, idArray.toString());
         }
 
         // Remove element
