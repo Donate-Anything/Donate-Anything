@@ -130,11 +130,7 @@ INSTALLED_APPS += ["anymail"]  # noqa F405
 # https://anymail.readthedocs.io/en/stable/installation/#anymail-settings-reference
 # https://anymail.readthedocs.io/en/stable/esps/mailgun/
 EMAIL_BACKEND = "anymail.backends.amazon_ses.EmailBackend"
-ANYMAIL = {
-    "AMAZON_SES_CLIENT_PARAMS": {
-        "region_name": AWS_S3_REGION_NAME
-    }
-}
+ANYMAIL = {"AMAZON_SES_CLIENT_PARAMS": {"region_name": AWS_S3_REGION_NAME}}
 
 # django-compressor
 # ------------------------------------------------------------------------------
@@ -212,6 +208,6 @@ RECAPTCHA_PUBLIC_KEY = env("RECAPTCHA_PUBLIC_KEY")
 RECAPTCHA_PRIVATE_KEY = env("RECAPTCHA_PRIVATE_KEY")
 
 AXES_META_PRECEDENCE_ORDER = [
-   'HTTP_X_FORWARDED_FOR',
-   'REMOTE_ADDR',
+    "HTTP_X_FORWARDED_FOR",
+    "REMOTE_ADDR",
 ]
