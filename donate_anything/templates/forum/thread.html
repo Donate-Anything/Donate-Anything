@@ -20,7 +20,6 @@
     <h5>{% translate 'This proposed edit has already been merged.' %}</h5>
   {% endif %}
   <div class="pb-3 pl-4">
-    {% if show_vote %}{% csrf_token %}{% endif %}
     <div class="row">
       <a style="cursor: pointer">
         <i id="upvote" data-vote-url="{% url 'forum:thread-vote' thread_obj.id 1 %}" class="fas fa-lg fa-arrow-up pr-2{% if user_vote == 1 %} text-danger{% endif %}" aria-hidden="true"></i>

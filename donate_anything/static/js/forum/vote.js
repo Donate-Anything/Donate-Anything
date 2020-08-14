@@ -1,5 +1,3 @@
-const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-
 $("#upvote").click(function(e) {
     let target = e.target;
     if (!(target.classList.contains("text-danger"))) {
@@ -46,7 +44,7 @@ function csrfSafeMethod(method) {
 $.ajaxSetup({
     beforeSend: function(xhr, settings) {
         if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            xhr.setRequestHeader("X-CSRFToken", document.querySelector('[name=csrfmiddlewaretoken]').value);
         }
     }
 })

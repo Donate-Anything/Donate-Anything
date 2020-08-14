@@ -1,5 +1,4 @@
 // Code for viewing application and editing/suggesting
-const ncsrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
 $(document).ready(function() {
     let converter = new showdown.Converter();
@@ -50,7 +49,7 @@ function csrfSafeMethod(method) {
 $.ajaxSetup({
     beforeSend: function(xhr, settings) {
         if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-            xhr.setRequestHeader("X-CSRFToken", ncsrftoken);
+            xhr.setRequestHeader("X-CSRFToken", document.querySelector('[name=csrfmiddlewaretoken]').value);
         }
     }
 })

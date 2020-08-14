@@ -18,13 +18,14 @@
     <!-- Latest compiled and minified Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
-    {% block css %}
-
-    {% compress css %}
-    <!-- This file stores project-specific CSS -->
-    <link href="{% static 'css/project.css' %}" rel="stylesheet">
-    {% endcompress %}
+    {% block corecss %}
+      {% compress css %}
+      <!-- This file stores site-wide CSS -->
+      <link href="{% static 'css/project.css' %}" rel="stylesheet">
+      {% endcompress %}
     {% endblock %}
+
+    {% block css %}{% endblock %}
   </head>
 
   <body>
@@ -35,7 +36,7 @@
       <div id="page-content-wrapper">
         <!-- Navbar -->
         <div class="mb-1">
-          <nav id="top-main-nav-bar" class="navbar navbar-expand-md navbar-light bg-light">
+          <nav id="top-main-nav-bar" class="navbar navbar-expand-md navbar-custom shadow navbar-light">
             <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
               <span class="navbar-toggler-icon"></span>
             </button>
@@ -85,6 +86,7 @@
                 <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>
             {% endfor %}
           {% endif %}
+          {% block tempalert %}{% endblock %}
 
           {% block content %}
             <p>Use this document as a way to quick start any new project.</p>
@@ -95,7 +97,17 @@
 
     {% block modal %}{% endblock modal %}
     {% block sidebar %}{% endblock %}
+    <div class="push-footer">{# Pushes content up to show footer #}</div>
     </div>
+
+    {% block footer %}
+    <footer class="page-footer navbar-custom">
+      <div class="pt-2 pl-3">
+        <a href="https://github.com/Donate-Anything/Donate-Anything">GitHub</a>
+        <a class="pl-2" href="{% url 'about' %}">About</a>
+      </div>
+    </footer>
+    {% endblock %}
 
     <!-- Le javascript
     ================================================== -->

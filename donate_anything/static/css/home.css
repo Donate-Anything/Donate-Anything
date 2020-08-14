@@ -7,9 +7,9 @@
   font-size: 24px;
   line-height: 30px;
   border: 2px solid #ccc;
-  -webkit-border-radius: 8px;
-     -moz-border-radius: 8px;
-          border-radius: 8px;
+  -webkit-border-radius: 100px;
+     -moz-border-radius: 100px;
+          border-radius: 100px;
   outline: none;
 }
 
@@ -32,7 +32,7 @@
 }
 
 .tt-menu {
-  width: 422px;
+  width: 396px;
   margin: -12px 0;
   padding: 8px 0;
   background-color: #fff;
@@ -44,6 +44,15 @@
   -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
      -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
           box-shadow: 0 5px 10px rgba(0,0,0,.2);
+}
+
+@media screen and (max-device-width: 480px) {
+  .typeahead,
+  .tt-query,
+  .tt-hint,
+  .tt-menu {
+    width: 240px;
+  }
 }
 
 .tt-suggestion {

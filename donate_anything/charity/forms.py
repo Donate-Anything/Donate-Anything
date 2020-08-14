@@ -90,7 +90,7 @@ class OrganizationForm(forms.ModelForm):
         return instance
 
     def clean_social_media(self):
-        self.social_media_value = self.cleaned_data["social_media"]
+        self.social_media_value = self.cleaned_data.get("social_media", "")
 
 
 class BusinessForm(forms.ModelForm):

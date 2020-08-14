@@ -18,7 +18,7 @@ function selectOne(id, value, page) {
             // returned data is list_of(charity id, name, description[:150]) and has_next bool
             let html;
             if (page.toString() === "1") {
-                html = ""
+                html = "<h4>Showing organizations for: " + value + "</h4><hr>"
             } else {
                 html = document.getElementById("organizations").innerHTML;
             }
@@ -61,7 +61,7 @@ $("#more-organizations-button").click(function() {
   selectOne(
       searchParams["q_id"],
       searchParams["q"],
-      searchParams["page"]
+      (parseInt(searchParams["page"], 10) + 1).toString()
   )
 });
 
@@ -136,18 +136,6 @@ $('#typeahead-input-field').typeahead({
     sessionStorage.setItem(multiItemArrayKey, sessionStorage.getItem(multiItemArrayKey) + suggestion.id + ",")
     sessionStorage.setItem(multiItemStrArrayKey, sessionStorage.getItem(multiItemStrArrayKey) + suggestion.value + ",")
 }
-).on("keypress", function(e) {
-    // https://github.com/twitter/typeahead.js/issues/332#issuecomment-379579385
-    if (e.which === 13 /* ENTER */) {
-        const typeahead = $(this).data().ttTypeahead;
-        const menu = typeahead.menu;
-        const sel = menu.getActiveSelectable() || menu.getTopSelectable();
-        if (menu.isOpen()) {
-            menu.trigger('selectableClicked', sel);
-            e.preventDefault();
-        }
-    }
-}
 ).on("keydown", function(e) {
     // https://github.com/twitter/typeahead.js/issues/332#issuecomment-379579385
     if (e.which === 13 /* ENTER */) {
@@ -175,7 +163,24 @@ $('#typeahead-input-field').typeahead({
     }
 });
 
+function cantEditHomeAlert() {
+    document.getElementById("cant-edit-alert").style.visibility = "visible";
+    $("#cant-edit-alert").fadeTo(2000, 500).delay(3500).slideUp(500, function() {
+        $("#cant-edit-alert").slideUp(500);
+    });
+}
+
+function noValueHomeAlert() {
+    document.getElementById("no-value-alert").style.visibility = "visible";
+    $("#no-value-alert").fadeTo(2000, 500).delay(3500).slideUp(500, function() {
+        $("#no-value-alert").slideUp(500);
+    });
+}
+
 $(document).ready(function() {
+    // Hide so they don't take up space
+    $("#cant-edit-alert").hide();
+    $("#no-value-alert").hide();
     /* Allow for multiple input fields. Not all are Typeahead.
     * Only some because */
     let inputWrapper = $("#main-scrollable-dropdown-menu");
@@ -187,25 +192,27 @@ $(document).ready(function() {
     if (fieldCount === 1 && $(typeAheadID).val() === "") {
         sessionStorage.setItem(multiItemArrayKey, "");
         sessionStorage.setItem(multiItemStrArrayKey, "");
-        $('#search-multi-button').css('visibility', 'hidden');
+        $('#search-multi-button').hide();
     }
 
     // add custom input box, not typeahead
     $(addButton).click(function(e) {
         e.preventDefault();
-        if (fieldCount < maxFields) {
+        // Grab the typeahead input and insert into new custom random field.
+        let typeaheadVal = $(typeAheadID).val();
+        if (typeaheadVal === "") {
+            noValueHomeAlert()
+        } else if (fieldCount < maxFields) {
             fieldCount++;
-            // Grab the typeahead input and insert into new custom random field.
-            let typeaheadVal = $(typeAheadID).val();
             $(inputWrapper).append(
                 '<div><input class="typeahead" readonly style="margin-bottom: 25px"' +
-                ' value="' + typeaheadVal + '" data-toggle="modal" href="#readonlyModal">' +
+                ' value="' + typeaheadVal + '" onclick="cantEditHomeAlert()">' +
                 '<a href="#" style="padding-left: 9px" class="delete-input">Delete</a></div>'
             );
             // Remove typeahead input.
             $(typeAheadID).val("");
             if (fieldCount > 1) {
-                $('#search-multi-button').css('visibility', 'visible');
+                $('#search-multi-button').show();
             }
         } else {
             alert('You can only search ' + maxFields + ' items at a time.');
@@ -230,7 +237,7 @@ $(document).ready(function() {
         $(this).parent('div').remove();
         fieldCount--;
         if (fieldCount === 1) {
-            $('#search-multi-button').css('visibility', 'hidden');
+            $('#search-multi-button').hide();
         }
     })
 })

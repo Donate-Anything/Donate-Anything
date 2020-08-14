@@ -3,6 +3,19 @@
 
 {% block title %}Community | Donate Anything{% endblock %}
 
+{% block css %}
+  <style>
+  .mobile-viz {
+    visibility: visible;
+  }
+  @media only screen and (max-width: 767px) {
+    .mobile-viz {
+      visibility: hidden;
+    }
+  }
+  </style>
+{% endblock %}
+
 {% block content %}
   <h1>Welcome to our</h1>
   <ul>
@@ -18,7 +31,7 @@
         <div class="card-header">
           <div class="row">
             <div class="col-md-7 font-weight-bold">Latest</div>
-            <div class="col-md-5">Replies Views Last Post</div>
+            <div class="col-md-5 mobile-viz">Replies Views Last Post</div>
           </div>
         </div>
         <ul class="list-group list-group-flush">
@@ -33,13 +46,17 @@
                     </small></div>
                   {% endwith %}
                 </div>
-                <div class="col-md-1">{{ obj.num_posts }}</div>
-                <div class="col-md-1">{{ obj.views }}</div>
-                {% with last_message=obj.message_set.last %}
-                  <div class="col-md-3"><small>
-                    By: <a href="{% url 'users:detail' last_message.user %}">{{ last_message.user.username }}</a> on {{ last_message.created }}
-                  </small></div>
-                {% endwith %}
+                <div class="col-md-5 mobile-viz">
+                  <div class="row">
+                    <div class="col-md-2">{{ obj.num_posts }}</div>
+                    <div class="col-md-2">{{ obj.views }}</div>
+                    {% with last_message=obj.message_set.last %}
+                      <div class="col-md-8"><small>
+                        By: <a href="{% url 'users:detail' last_message.user %}">{{ last_message.user.username }}</a> on {{ last_message.created }}
+                      </small></div>
+                    {% endwith %}
+                  </div>
+                </div>
               </div>
             </li>
           {% endfor %}

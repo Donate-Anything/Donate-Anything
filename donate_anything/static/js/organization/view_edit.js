@@ -1,5 +1,4 @@
 // Code for viewing application and editing/suggesting
-const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
 function handleFormSuccess(data, textStatus, jqXHR) {
     console.log(data) // nothing
@@ -41,13 +40,13 @@ function csrfSafeMethod(method) {
 $.ajaxSetup({
     beforeSend: function(xhr, settings) {
         if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            xhr.setRequestHeader("X-CSRFToken", document.querySelector('[name=csrfmiddlewaretoken]').value);
         }
     }
 })
 
 $(document).ready(function() {
-    converter = new showdown.Converter();
+    let converter = new showdown.Converter();
     converter.setFlavor('github');
     $('*[id*="-showdown"]').each(function() {
         const text = document.getElementById(this.id.slice(0, -9)).value;

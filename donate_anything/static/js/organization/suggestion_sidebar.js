@@ -1,12 +1,10 @@
-const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-
 $("#menu-toggle").click(function(e) {
     e.preventDefault();
     $("#full-body-wrapper").toggleClass("toggled");
 });
 
 function add_to_sidebar(edit_id, username, edit, created, updated) {
-    converter = new showdown.Converter();
+    let converter = new showdown.Converter();
     converter.setFlavor('github');
     let date;
     if (created === updated) {
@@ -61,6 +59,7 @@ function loadMore(unseen_only = true, page = "1") {
         error: function(_) {
             let elem = document.getElementById("load-more-button");
             elem.parentNode.removeChild(elem);
+            console.log("End of suggestion sidebar")
         }
     });
 }
@@ -84,7 +83,7 @@ function csrfSafeMethod(method) {
 $.ajaxSetup({
     beforeSend: function(xhr, settings) {
         if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            xhr.setRequestHeader("X-CSRFToken", document.querySelector('[name=csrfmiddlewaretoken]').value);
         }
     }
 })

@@ -9,10 +9,25 @@
 
 {% endblock %}
 
+{% block tempalert %}
+  <div class="alert alert-danger" id="cant-edit-alert" style="visibility: hidden">
+    <button type="button" class="close" data-dismiss="alert">x</button>
+    <strong>
+      You can only read these inputs. To edit, delete
+      the input and retype it in.
+    </strong>
+  </div>
+  <div class="alert alert-danger" id="no-value-alert" style="visibility: hidden">
+    <button type="button" class="close" data-dismiss="alert">x</button>
+    <strong>You must select an item first (or press enter to autocomplete).</strong>
+  </div>
+{% endblock %}
+
 {% block content %}
   <div id="home-container">
+    <h1 class="da-text-color">Donate Anything!</h1>
     <div django-media-url="{% get_media_prefix %}" id="main-scrollable-dropdown-menu">
-      <input id="typeahead-input-field" class="typeahead" type="text"
+      <input id="typeahead-input-field" class="typeahead shadow-sm" type="text"
              placeholder="Can I donate a(n)..." style="margin-bottom: 25px">
     </div>
     <div id="add-multi-button" class="rounded-button">
@@ -26,22 +41,6 @@
     <div id="more-organizations-button" class="rounded-button">
       <i class="down-arrow"></i>
       <b>More results</b>
-    </div>
-  </div>
-{% endblock %}
-
-{% block modal %}
-  <div id="readonlyModal" class="modal fade">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-        </div>
-        <div class="modal-body">
-          You can only read these inputs. To edit, delete
-          the input and retype it in.
-        </div>
-      </div>
     </div>
   </div>
 {% endblock %}

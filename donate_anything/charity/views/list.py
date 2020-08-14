@@ -41,7 +41,7 @@ def applied_organization(request, pk):
     context = {"obj": obj}
     if request.user == obj.applier:
         context["form"] = OrganizationForm(
-            instance=obj, initial={"social_media": obj.extra["social_media"]}
+            instance=obj, initial={"social_media": obj.extra.get("social_media", "")}
         )
     else:
         context["suggest_form"] = SuggestedEditForm()
