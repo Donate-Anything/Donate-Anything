@@ -28,3 +28,8 @@ def test_redirect():
 def test_locked_out():
     assert reverse("users:person-throttled") == "/users/~locked-out/"
     assert resolve("/users/~locked-out/").view_name == "users:person-throttled"
+
+
+def test_ses_bounce():
+    assert reverse("users:ses-bounce") == "/users/~ses/bounce/"
+    assert resolve("/users/~ses/bounce/").view_name == "users:ses-bounce"

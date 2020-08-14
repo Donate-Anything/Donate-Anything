@@ -22,3 +22,7 @@ class User(AbstractUser):
 
         """
         return reverse("users:detail", kwargs={"username": self.username})
+
+
+class BlacklistedEmail(models.Model):
+    email = models.EmailField(primary_key=True)

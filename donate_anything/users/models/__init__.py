@@ -1,2 +1,2 @@
 from .report import BanReason, Report
-from .user import User
+from .user import BlacklistedEmail, User

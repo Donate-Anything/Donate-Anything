@@ -122,7 +122,7 @@ EMAIL_SUBJECT_PREFIX = env("DJANGO_EMAIL_SUBJECT_PREFIX", default="[Donate Anyth
 # Django Admin URL regex.
 ADMIN_URL = env("DJANGO_ADMIN_URL")
 
-# Anymail
+# Anymail + Django SES
 # ------------------------------------------------------------------------------
 # https://anymail.readthedocs.io/en/stable/installation/#installing-anymail
 INSTALLED_APPS += ["anymail"]  # noqa F405
@@ -131,6 +131,10 @@ INSTALLED_APPS += ["anymail"]  # noqa F405
 # https://anymail.readthedocs.io/en/stable/esps/mailgun/
 EMAIL_BACKEND = "anymail.backends.amazon_ses.EmailBackend"
 ANYMAIL = {"AMAZON_SES_CLIENT_PARAMS": {"region_name": AWS_S3_REGION_NAME}}
+
+# https://github.com/django-ses/django-ses
+AWS_SES_CONFIGURATION_SET = "donate-anything"
+AWS_SES_VERIFY_BOUNCE_SIGNATURES = True
 
 # django-compressor
 # ------------------------------------------------------------------------------

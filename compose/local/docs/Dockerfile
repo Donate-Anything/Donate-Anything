@@ -8,6 +8,8 @@ RUN apt-get update \
     && apt-get install -y build-essential \
     # psycopg2 dependencies
     && apt-get install -y libpq-dev \
+    # SES Needed: M2Crypto
+    && apt-get install -y libssl-dev swig \
     # Translations dependencies
     && apt-get install -y gettext \
     # Uncomment below lines to enable Sphinx output to latex and pdf

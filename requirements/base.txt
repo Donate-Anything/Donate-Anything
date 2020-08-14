@@ -4,7 +4,7 @@ Pillow==7.2.0  # https://github.com/python-pillow/Pillow
 rcssmin==1.0.6  # https://github.com/ndparker/rcssmin
 argon2-cffi==20.1.0  # https://github.com/hynek/argon2_cffi
 redis==3.5.3  # https://github.com/andymccurdy/redis-py
-hiredis==1.0.1  # https://github.com/redis/hiredis-py
+hiredis==1.1.0  # https://github.com/redis/hiredis-py
 celery==4.4.6  # pyup: < 5.0  # https://github.com/celery/celery
 django-celery-beat==2.0.0  # https://github.com/celery/django-celery-beat
 flower==0.9.5  # https://github.com/mher/flower
@@ -15,12 +15,18 @@ django==3.1  # https://www.djangoproject.com/
 django-environ==0.4.5  # https://github.com/joke2k/django-environ
 django-model-utils==4.0.0  # https://github.com/jazzband/django-model-utils
 django-allauth==0.42.0  # https://github.com/pennersr/django-allauth
-django-crispy-forms==1.9.1  # https://github.com/django-crispy-forms/django-crispy-forms
+django-crispy-forms==1.9.2  # https://github.com/django-crispy-forms/django-crispy-forms
 django-compressor==2.4  # https://github.com/django-compressor/django-compressor
 django-redis==4.12.1  # https://github.com/jazzband/django-redis
 django-axes==5.4.2  # https://github.com/jazzband/django-axes
 django-recaptcha==2.0.6  # https://github.com/praekelt/django-recaptcha
 django-ratelimit==3.0.1  # https://github.com/jsocol/django-ratelimit
+
+# AWS
+# ------------------------------------------------------------------------------
+boto3==1.14.42  # https://github.com/boto/boto3
+django-anymail[amazon_ses]==7.2.1  # https://github.com/anymail/django-anymail
+django-ses[bounce]==1.0.2  # https://github.com/django-ses/django-ses
 
 # Elasticsearch
 # ------------------------------------------------------------------------------
