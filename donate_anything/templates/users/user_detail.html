@@ -1,15 +1,29 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static i18n %}
 
 {% block title %}User: {{ object.username }} | Donate Anything{% endblock %}
+
+{% block css %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+{% endblock %}
 
 {% block content %}
 <div class="container">
 
-  <div class="row">
+  <div class="row pt-4">
     <div class="col-sm-12">
 
-      <h2>{{ object.username }}</h2>
+      <div class="row">
+        <h2>Username: {{ object.username }}</h2>
+        {% if object.is_verified %}
+        <div class="pl-3">
+          <span class="fa fa-stack fa-lg" data-toggle="tooltip" title="Verified Account">
+            <i class="fa fa-certificate fa-stack-2x text-primary"></i>
+            <i class="fa fa-check fa-stack-1x fa-inverse fa-slash"></i>
+          </span>
+        </div>
+        {% endif %}
+      </div>
       {% if object.name %}
         <p>{{ object.name }}</p>
       {% endif %}
@@ -19,6 +33,7 @@
 {% if object == request.user %}
 <!-- Action buttons -->
 <div class="row">
+  <p>{% blocktranslate %}If you're looking to create a Verified Account for your organization, then please <a href="https://forms.gle/6zYvcysuNJXqRbGB6">fill out this Google form.</a>{% endblocktranslate %}</p>
 
   <div class="col-sm-12">
     <a class="btn btn-primary" href="{% url 'users:update' %}" role="button">My Info</a>
@@ -33,3 +48,11 @@
 
 </div>
 {% endblock content %}
+
+{% block javascript %}
+<script type="application/javascript">
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+{% endblock %}

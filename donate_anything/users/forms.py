@@ -4,7 +4,8 @@ from captcha.widgets import ReCaptchaV2Checkbox
 from django.contrib.admin.forms import AdminAuthenticationForm
 from django.contrib.auth import forms, get_user_model
 from django.core.exceptions import ValidationError
-from django.forms import EmailField, Form
+from django.forms import BooleanField, EmailField, Form
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 
@@ -17,7 +18,19 @@ class UserChangeForm(forms.UserChangeForm):
 
 
 class UserCreationForm(forms.UserCreationForm):
-    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox)
+    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox, required=True)
+    # Forced True to be valid
+    terms = BooleanField(
+        label=mark_safe(
+            _(
+                'By signing up, you agree to our <a href="'
+                "https://legal.donate-anything.org/2020-08-15/terms-of-service.html"
+                '">Terms and Conditions of Use</a> and <a href='
+                '"https://legal.donate-anything.org/2020-08-15/privacy-policy.html">Privacy Policy</a>'
+            )
+        ),
+        required=True,
+    )
 
     error_message = forms.UserCreationForm.error_messages.update(
         {"duplicate_username": _("This username has already been taken.")}

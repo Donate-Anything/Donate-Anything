@@ -30,15 +30,15 @@ html, body {
 }
 
 .alert-debug {
-  color: black;
-  background-color: white;
+  color: $black;
+  background-color: $white;
   border-color: #d6e9c6;
 }
 
 .alert-error {
-  color: #b94a48;
-  background-color: #f2dede;
-  border-color: #eed3d7;
+  color: $red;
+  background-color: $pink;
+  border-color: $dark-pink;
 }
 
 .da-text-color {

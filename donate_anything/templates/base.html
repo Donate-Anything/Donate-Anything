@@ -48,7 +48,7 @@
                   <a class="nav-link" href="{% url 'home' %}">Home <span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="{% url 'about' %}">About</a>
+                  <a class="nav-link" href="{% url 'roadmap' %}">Roadmap</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="{% url 'forum:home' %}">Community</a>
@@ -80,7 +80,7 @@
           </nav>
         </div>
 
-        <div class="container">
+        <div class="container pt-2">
           {% if messages %}
             {% for message in messages %}
                 <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>
@@ -105,6 +105,7 @@
       <div class="pt-2 pl-3">
         <a href="https://github.com/Donate-Anything/Donate-Anything">GitHub</a>
         <a class="pl-2" href="{% url 'about' %}">About</a>
+        <a class="pl-2" href="{% url 'roadmap' %}">Roadmap</a>
       </div>
     </footer>
     {% endblock %}

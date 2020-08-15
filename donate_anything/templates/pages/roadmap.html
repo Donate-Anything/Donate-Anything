@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Roadmap | Donate Anything{% endblock %}
+
+{% block content %}
+  <h2>Roadmap</h2>
+  <p>
+    {% translate "Donate Anything's roadmap is very complex as we seek several specific goals for one generic mission: reduce, reuse, and recycle." %}
+  </p>
+  <p><a href="https://github.com/Donate-Anything/Donate-Anything">You can visit our GitHub page for lengthy explanations of each goal.</a></p>
+  <div class="form-check">
+    <input type="checkbox" class="form-check-input" id="materialUnchecked">
+    <label class="form-check-label" for="materialUnchecked">Allowing organizations to list their wanted items’ conditions (e.g. recycling centers want ragged textiles vs homeless shelters want decent clothes)</label>
+  </div>
+  <div class="form-check">
+    <input type="checkbox" class="form-check-input" id="materialUnchecked">
+    <label class="form-check-label" for="materialUnchecked">Game-like point-based system for donors.</label>
+  </div>
+  <div class="form-check">
+    <input type="checkbox" class="form-check-input" id="materialUnchecked">
+    <label class="form-check-label" for="materialUnchecked">Identifying the condition of an item through a picture (using machine learning)</label>
+  </div>
+  <div class="form-check">
+    <input type="checkbox" class="form-check-input" id="materialUnchecked">
+    <label class="form-check-label" for="materialUnchecked">Geolocation-based recommendations (e.g local food banks and homeless shelters)</label>
+  </div>
+{% endblock %}
