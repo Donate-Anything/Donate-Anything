@@ -13,10 +13,6 @@ Maintaining an organization, if there is no verified
 account, is highly likely. Users will be a part of a
 community that maintains all aspects of the website.
 
-.. automodule:: donate_anything.users.models
-   :members:
-   :noindex:
-
 Emails
 ------
 
@@ -33,7 +29,21 @@ as follows (`based on their sample documentation`_) and other
 - If we receive a soft/transient bounce, raise a validation error. The email won't be blacklisted.
 - If we receive a complaint, we blacklist them so no emails are further sent via a blacklist.
 - If a user accidentally "complained," then they can fill out a Google Form to be un-blacklisted.
-- I didn't add an SNS topic for delivery.
 
 .. _based on their sample documentation: https://aws.amazon.com/blogs/messaging-and-targeting/handling-bounces-and-complaints/
 .. _best practices: https://postmarkapp.com/guides/transactional-email-bounce-handling-best-practices
+
+Django Models
+---------------
+
+.. automodule:: donate_anything.users.models.user
+   :members:
+   :noindex:
+
+.. automodule:: donate_anything.users.models.charity
+   :members:
+   :noindex:
+
+.. automodule:: donate_anything.users.models.report
+   :members:
+   :noindex:

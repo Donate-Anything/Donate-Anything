@@ -11,6 +11,9 @@ Created on 11 July 2020
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
      :target: https://github.com/ambv/black
      :alt: Black code style
+.. image:: https://readthedocs.org/projects/donate-anything/badge/?version=latest
+    :target: https://donate-anything.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
 
 
 :License: Apache 2.0

@@ -6,15 +6,18 @@ Organizations
 Organizations are typically 501(c)3's that can fulfill
 donations for a meaningful purpose or cause. Some
 organizations that are not 501(c)3's are allowed to be
-listed as one - for example, a school or fire department.
+listed as one - for example, a school, recycling center,
+or fire department.
 
 All charities will be posted by a user of this website
 first. All charities go through a human verification
 cycle that checks for a few things:
 
-1. A website to the organization's donation page. If there is no website, the link should show a page of 501(c)3 filing from the `irs.gov <https://www.irs.gov/charities-non-profits/tax-exempt-organization-search>` website.
+1. A website to the organization's donation page. If there is no website, the link should show a page of 501(c)3 filing from the `irs.gov`_ website.
 2. In the description, it is required to fill out where the donations are going and why it is necessary.
 3. Finally, fill out how a person can donate.
+
+.. _irs.gov:https://www.irs.gov/charities-non-profits/tax-exempt-organization-search
 
 Typically, humans will verify each one. However, at peak periods,
 the user community can collaborate to verify an organization.
