@@ -59,7 +59,7 @@ jobs:
         rm -rf docs/ README.rst HACKING.rst CONTRIBUTORS.rst CODE_OF_CONDUCT.md
         find . -name tests -exec echo {} \;
         find . -name tests -exec ls {} \;
-        find . -name tests -type d -exec rm -rf {} \;
+        find . -name tests -type d -exec rm -rf {} \; || echo "Deleted test files"
 
     - name: Build, tag, and push Django image to Docker Hub
       uses: docker/build-push-action@v1
