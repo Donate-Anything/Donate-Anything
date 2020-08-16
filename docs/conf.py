@@ -12,14 +12,22 @@
 
 import os
 import sys
-
+import sphinx_rtd_theme
 import django
 
 
-sys.path.insert(0, os.path.abspath("/app"))
-os.environ.setdefault("DATABASE_URL", "")
+if os.getenv("READTHEDOCS", default=False) == "True":
+    sys.path.insert(0, os.path.abspath(".."))
+    os.environ["DJANGO_READ_DOT_ENV_FILE"] = "True"
+    os.environ["CELERY_BROKER_URL"] = os.getenv("REDIS_URL", "redis://redis:6379")
+    os.environ["USE_DOCKER"] = "no"
+    master_doc = "_source/index"
+else:
+    sys.path.insert(0, os.path.abspath("/app"))
 
+os.environ.setdefault("DATABASE_URL", "")
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
+
 django.setup()
 
 # -- Project information -----------------------------------------------------
@@ -37,6 +45,7 @@ author = "Andrew Chen Wang"
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
+    "sphinx_rtd_theme",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -52,7 +61,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "alabaster"
+html_theme = "sphinx_rtd_theme"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

@@ -1,38 +1,71 @@
-How To - Project Documentation
+.. _how-to:
+
+How To - Website Documentation
 ======================================================================
 
-Get Started
-----------------------------------------------------------------------
+To use the website, simply go to the `home page <https://donate-anything.org>`_
+and search up an item that you'd like to donate. You will get organizations
+that will accept your donation as search results.
 
-Documentation can be written as rst files in the `donate_anything/docs/_source`.
+If you'd like, you can press "Add more items" to add another item to your
+donation list. A new search button will appear with a magnifying glass.
+Once you've completed listing all the items you'd like to donate, you will
+be redirected to a new page with organizations that can fulfill the most
+items to the least number of items that an organization can fulfill.
 
+That's it! Hint, we'll be adding a leaderboard soon for the most fulfilled
+donations. `You can check out our roadmap by clicking here`_.
 
-To build and serve docs, use the commands:
-    ::
+.. _You can check out our roadmap by clicking here: https://donate-anything.org/roadmap/
 
-        docker-compose -f local.yml up docs
+Process of Adding an Organization
+------------------------------------------------
 
+The workflow for authenticating an organization is as follows:
 
-Changes to files in `docs/_source` will be picked up and reloaded automatically.
+#. Create a personal account, unrelated to your organization.
+#. Sign in and press "Apply" at the top navigation bar.
+#. Apply for either as an organization/charity (e.g. American Red Cross) or as a business (e.g. recycling center). You can use GitHub flavored `Markdown`_ for rich text editing (like Google Docs or Microsoft Word).
+#. Fill out the application and wait for approval by the community and/or admins
+#. Once approved, find your organization in the list organizations (you can find this in the community tab)
+#. Click into the link. Click on the button for creating new items.
+#. A new tab will open. Now you are able to create new items for your organization. **MAKE SURE YOU ADD EVERYTHING you can fulfill. Donate Anything implies practically Anything can be searched up. Make sure you have enough items to be found in any search result made by the user.**
 
-`Sphinx <https://www.sphinx-doc.org/>`_ is the tool used to build documentation.
+Note: the approval of new items is done through superuser admins, admins
+and the community, and/or verified accounts.
 
-Docstrings to Documentation
-----------------------------------------------------------------------
+.. _Markdown: https://www.markdownguide.org
 
-The sphinx extension `apidoc <https://www.sphinx-doc.org/en/master/man/sphinx-apidoc.html/>`_ is used to automatically document code using signatures and docstrings.
+Managing Organizations
+------------------------------------------------
 
-Numpy or Google style docstrings will be picked up from project files and availble for documentation. See the `Napoleon <https://sphinxcontrib-napoleon.readthedocs.io/en/latest/>`_ extension for details.
+For the most part, due to the sheer number of organizations in the world, the
+community will be maintaining most organizations on the website. This means
+the organizations' descriptions, methods of donation, and fulfilled items
+will be managed by the community via a republic-style of voting and communication
+through our forums and threads.
 
-For an in-use example, see the `page source <_sources/users.rst.txt>`_ for :ref:`users`.
+In the near future, we will be adding a game-like point system, similar to Wikipedia,
+for contributing in some form to maintaining the website.
 
-To compile all docstrings automatically into documentation source files, use the command:
-    ::
+Verified Accounts
+------------------------------------------------
 
-        make apidocs
+If you are responsible for managing public content of your organization,
+then you may want to apply for a verified account.
 
+Verified accounts are able to process items that they'd like rather than what
+the community would like to add, giving you more fine grained control over the
+description of your organization, methods of donating to your organization, and
+acting as an official support role in the community on behalf of your organization.
 
-This can be done in the docker container:
-    ::
+You should NOT create a new account for this. Admins will create an account
+for you. To apply, please fill out `this form`_: https://forms.gle/6zYvcysuNJXqRbGB6
 
-        docker run --rm docs make apidocs
+.. _this form: https://forms.gle/6zYvcysuNJXqRbGB6
+
+Once we've processed your application, we will send you your preferred username
+and temporary password. You can change and add multiple email accounts and
+you can change your password once you login. These are NOT time-sensitive
+credentials, but we encourage you to quickly change several parameters.
+You will not be able to change your username.
