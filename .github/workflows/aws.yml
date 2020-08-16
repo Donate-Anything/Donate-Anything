@@ -35,13 +35,14 @@ jobs:
     # -------------------------------------------------------
     # The image ID is latest since we don't know if nginx was actually built
     # but we fill this in anyways since Django image takes awhile to build.
+    # FIXME Figure out last image tag and input that rather than always using latest
     - name: Build nginx image tag
       id: create-nginx-image-tag
       env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: donate-anything-nginx-reverse-proxy
+        DOCKER_ORGANIZATION: donateanything
+        DOCKER_REPOSITORY: nginx-reverse-proxy
         IMAGE_TAG: latest
-      run: echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+      run: echo "::set-output name=image::$DOCKER_ORGANIZATION/$DOCKER_REPOSITORY:$IMAGE_TAG"
 
     - name: Fill in the nginx image ID in the Amazon ECS task definition
       id: fill-nginx-image
@@ -53,19 +54,20 @@ jobs:
 
     # Build Django app
     # -------------------------------------------------------
-    - name: Build, tag, and push Django image to Amazon ECR
-      id: build-django-image
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: donate-anything-django-app
-        IMAGE_TAG: ${{ github.sha }}
+    - name: Remove unnecessary files
       run: |
-        # Build a docker container and
-        # push it to ECR so that it can
-        # be deployed to ECS.
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+        rm -rf docs/ README.rst HACKING.rst CONTRIBUTORS.rst CODE_OF_CONDUCT.md
+        find . -name tests -exec echo {} \;
+        find . -name tests -exec ls {} \;
+        find . -name tests -type d -exec rm -rf {} \;
+
+    - name: Build, tag, and push Django image to Docker Hub
+      uses: docker/build-push-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        repository: donateanything/django-app
+        tags: ${{ github.sha }},latest
 
     - name: Fill in the new Django image ID in Amazon ECS task definition
       id: fill-django-image
@@ -73,7 +75,7 @@ jobs:
       with:
         task-definition: ${{ steps.fill-nginx-image.outputs.task-definition }}
         container-name: django-app
-        image: ${{ steps.build-django-image.outputs.image }}
+        image: donateanything/django-app:${{ github.sha }}
 
     # Deploy
     # -------------------------------------------------------

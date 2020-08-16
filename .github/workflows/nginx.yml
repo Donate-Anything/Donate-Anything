@@ -7,7 +7,7 @@
 # doesn't change too often.
 
 name: Build and Push NGINX Image
-# TODO Delete previous nginx versions
+
 on:
   workflow_dispatch:
   push:
@@ -27,28 +27,13 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ secrets.AWS_REGION }}
-
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
-
     # Build nginx
     # -------------------------------------------------------
-    - name: Build, tag, and push nginx image to Amazon ECR
-      id: build-nginx-image
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: donate-anything-nginx-reverse-proxy
-        IMAGE_TAG: latest
-      run: |
-        # Build a docker container and
-        # push it to ECR so that it can
-        # be deployed to ECS.
-        docker build -f compose/production/ecs/nginx/Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+    - name: Build and push Docker images
+      uses: docker/build-push-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        repository: donateanything/nginx-reverse-proxy
+        tags: ${{ github.sha }},latest
+        dockerfile: compose/production/ecs/nginx/Dockerfile
