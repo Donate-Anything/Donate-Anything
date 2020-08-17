@@ -3,16 +3,21 @@ from axes.decorators import axes_dispatch, axes_form_invalid
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.contrib.sitemaps.views import sitemap
 from django.urls import include, path
 from django.utils.decorators import method_decorator
 from django.views import defaults as default_views
 from django.views.generic import TemplateView
 
 from donate_anything.users.forms import AxesLoginForm
+from donate_anything.users.sitemaps import StaticViewSitemap
 
 
 LoginView.dispatch = method_decorator(axes_dispatch)(LoginView.dispatch)
 LoginView.form_invalid = method_decorator(axes_form_invalid)(LoginView.form_invalid)
+sitemaps = {
+    "static": StaticViewSitemap,
+}
 
 
 urlpatterns = [
@@ -25,6 +30,12 @@ urlpatterns = [
         TemplateView.as_view(template_name="pages/roadmap.html"),
         name="roadmap",
     ),
+    path(
+        "sitemap.xml",
+        sitemap,
+        {"sitemaps": sitemaps},
+        name="django.contrib.sitemaps.views.sitemap",
+    ),
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
     # User management
@@ -34,7 +45,7 @@ urlpatterns = [
         LoginView.as_view(form_class=AxesLoginForm),
         name="account_login",
     ),
-    path("accounts/", include("allauth.urls")),
+    path("accounts/", include("allauth.urls"), name="allauth"),
     # Custom urls includes go here
     path("item/", include("donate_anything.item.urls", namespace="item")),
     path("organization/", include("donate_anything.charity.urls", namespace="charity")),
