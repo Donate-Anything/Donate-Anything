@@ -12,7 +12,7 @@ Created on 11 July 2020
      :target: https://github.com/ambv/black
      :alt: Black code style
 .. image:: https://readthedocs.org/projects/donate-anything/badge/?version=latest
-    :target: https://donate-anything.readthedocs.io/en/latest/?badge=latest
+    :target: https://donate-anything.readthedocs.io/en/latest/_source/?badge=latest
     :alt: Documentation Status
 
 

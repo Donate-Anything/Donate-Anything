@@ -7,7 +7,10 @@ Welcome to Donate Anything's documentation!
 ======================================================================
 
 A website that shows charities by filtering on the items you want to donate,
-maintained completely open-source and moderated voluntarily.
+maintained completely open-source and moderated voluntarily. Our website
+is located at: `donate-anything.org`_
+
+.. _donate-anything.org: https://donate-anything.org/
 
 If you're confused on how this website works, see :ref:`how-to`.
 
