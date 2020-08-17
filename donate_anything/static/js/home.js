@@ -18,7 +18,11 @@ function selectOne(id, value, page) {
             // returned data is list_of(charity id, name, description[:150]) and has_next bool
             let html;
             if (page.toString() === "1") {
-                html = "<h4>Showing organizations for: " + value + "</h4><hr>"
+                if (data.data.length === 0) {
+                    html = "<h4>No results for: " + value + "</h4><hr>";
+                } else {
+                    html = "<h4>Showing organizations that accept: " + value + "</h4><hr>"
+                }
             } else {
                 html = document.getElementById("organizations").innerHTML;
             }
@@ -37,8 +41,7 @@ function selectOne(id, value, page) {
             }
         },
         fail: function(_) {
-            // TODO Show as an error message
-            console.log({"error": "Listed charities don't support this."});
+            $('#organizations').html("<h4 class='text-danger'>Listed charities don't supported this.</h4><hr>")
         }
     })
 }
