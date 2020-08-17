@@ -7,7 +7,7 @@ const multiItemStrArrayKey = "multiItemStrArrayKey"
 const maxFields = 50;
 const typeAheadID = "#typeahead-input-field.tt-input";
 
-function selectOne(id, value, page) {
+function selectOne(id, value, page, direct_link=false) {
     /* Get charities that support selected item
     * and fill them out in the template. */
     $.ajax({
@@ -32,16 +32,19 @@ function selectOne(id, value, page) {
             }
             $('#organizations').html(html);
             let refresh = window.location.protocol + "//" + window.location.host + window.location.pathname +
-                '?q=' + value + '&&page=' + page + '&&q_id=' + id + '';
+                '?q=' + value + '&page=' + page + '&q_id=' + id + '';
             window.history.pushState({path: refresh}, 'Donate Anything', refresh)
             if (data.has_next) {
                 $('#more-organizations-button').css("visibility", "visible");
             } else {
                 $('#more-organizations-button').css("visibility", "hidden");
             }
+            if (direct_link) {
+                $(typeAheadID).val(value);
+            }
         },
         fail: function(_) {
-            $('#organizations').html("<h4 class='text-danger'>Listed charities don't supported this.</h4><hr>")
+            $('#organizations').html("<h4 class='text-danger'>Listed charities don't supported this.</h4><hr>");
         }
     })
 }
@@ -65,7 +68,7 @@ $("#more-organizations-button").click(function() {
       searchParams["q_id"],
       searchParams["q"],
       (parseInt(searchParams["page"], 10) + 1).toString()
-  )
+  );
 });
 
 $("#search-multi-button").click(function() {
@@ -193,9 +196,45 @@ $(document).ready(function() {
     // If found, then it was "go backwards"
     let fieldCount = inputWrapper.length;
     if (fieldCount === 1 && $(typeAheadID).val() === "") {
+        // initial page load
         sessionStorage.setItem(multiItemArrayKey, "");
         sessionStorage.setItem(multiItemStrArrayKey, "");
         $('#search-multi-button').hide();
+        // For direct links to website
+        const searchParams = getParams(window.location.href);
+        if (searchParams["q_id"] && searchParams["q"]) {
+            selectOne(
+                searchParams["q_id"],
+                searchParams["q"],
+                "1",
+                true
+            );
+        } else if (searchParams["q"]) {
+            // For search bar in Google
+            const searchQuery = searchParams["q"];
+            $(typeAheadID).val(searchQuery);
+            $.ajax({
+                url: '/item/api/v1/item-autocomplete/',
+                data: { "q": searchQuery },
+                dataType: "json",
+                type: "GET",
+                success: function(data) {
+                    // id, value, item image
+                    for (let returnedItem of data.data) {
+                        if (returnedItem[1] === searchQuery) {
+                            selectOne(returnedItem[0].toString(), returnedItem[1], 1);
+                            return;
+                        }
+                    }
+                    document.getElementById("organizations").innerHTML =
+                        "<h4>No results for: " + searchQuery + "</h4><hr>";
+                    $('#more-organizations-button').css("visibility", "hidden");
+                },
+                fail: function() {
+                    $('#organizations').html("<h4 class='text-danger'>Listed charities don't supported this.</h4><hr>")
+                }
+            })
+        }
     }
 
     // add custom input box, not typeahead

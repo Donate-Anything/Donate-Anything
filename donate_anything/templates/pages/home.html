@@ -2,7 +2,19 @@
 {% load static compress %}
 {% block css %}
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "url": "https://donate-anything.org/",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://donate-anything.org/?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+  </script>
+  <link rel="canonical" href="https://donate-anything.org/">
   {% compress css %}
     <link href="{% static 'css/home.css' %}" rel="stylesheet">
   {% endcompress %}
