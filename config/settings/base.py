@@ -74,6 +74,7 @@ THIRD_PARTY_APPS = [
     # "django_elasticsearch_dsl",
     "captcha",
     "axes",
+    "cachalot",
 ]
 
 LOCAL_APPS = [
@@ -318,3 +319,8 @@ RATELIMIT_VIEW = "donate_anything.users.views.locked_out"
 # ELASTICSEARCH_DSL = {"default": {"hosts": "localhost:9200"}}
 # if env("USE_DOCKER") == "yes":
 #     ELASTICSEARCH_DSL["default"] = {"hosts": "es01:9200"}
+
+# Cachalot
+# ------------------------------------------------------------------------------
+CACHALOT_ENABLED = True
+CACHALOT_ONLY_CACHABLE_TABLES = ("item_item", "item_wanteditem")

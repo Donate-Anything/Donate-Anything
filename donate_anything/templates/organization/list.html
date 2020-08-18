@@ -1,13 +1,20 @@
 {% extends 'base.html' %}
-{% load i18n paginate %}
+{% load i18n paginate static compress %}
 
 {% block title %}Organizations | Donate Anything{% endblock %}
+
+{% block css %}
+  {% compress css %}
+    <link href="{% static 'css/organization_list.css' %}" rel="stylesheet">
+  {% endcompress %}
+{% endblock %}
 
 {% block content %}
   <h2 class="pt-4">Supported Organizations</h2>
   <p class="font-italic">
     {% trans 'Disclaimer: many of these organizations are listed here by volunteer users. These organizations and entities were voted in to this list to be shown to people who want to donate their items, either to a cause, for recycling, or simply not knowing what to do with material that pollute the earth.' %}
   </p>
+  <input id="typeahead-input-field" class="typeahead shadow-sm" type="text" placeholder="Organization Search" style="margin-bottom: 25px">
   <ul>
   {% for org in page_obj.object_list %}
     <li><a href="{% url 'charity:organization' org.id %}">{{ org.name }}</a></li>
@@ -28,4 +35,11 @@
       </li>
     </ul>
   </nav>
+{% endblock %}
+
+{% block javascript %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/corejs-typeahead/1.3.1/typeahead.jquery.min.js" crossorigin="anonymous"></script>
+  {% compress js %}
+    <script src="{% static 'js/organization/list.js' %}" type="application/javascript"></script>
+  {% endcompress %}
 {% endblock %}

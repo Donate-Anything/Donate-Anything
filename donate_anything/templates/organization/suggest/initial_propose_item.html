@@ -22,18 +22,26 @@
   </div>
   <!-- Content -->
   <h2 id="content-header">Propose Items to Merge</h2>
+  {% blocktranslate %}
   <p>The following items will be added to the item's list that an organization can fulfill.</p>
+  <p>
+    To make the process easier, you can write a generic item like "utensils," and all its
+    more specific items (e.g. plastic fork, metal fork, plastic spoon) will be automatically
+    added. You should still be specific, for example, "canned tomatoes" go under
+    "canned food" and "canned food" go under "food." If you only want canned foods,
+    you should only type in "canned food."
+  </p>
   <p><b>
     MAKE SURE YOU ADD EVERYTHING you can fulfill. Donate Anything implies practically Anything
     can be searched up. Make sure you have enough items to be found in any search result made
-    by the user
+    by the user.
   </b></p>
+  {% endblocktranslate %}
   <p>
     To view the organization's current items:
     <a id="current-items-a-anchor" href="{% url 'item:list-item-template' 0 %}">click here</a>
   </p>
   <p>Once you submit, you will be redirected to the forum where other users can vote on your proposed merge.</p>
-  <br>
   <div class="row">
     <div class="col-md-3">
       <button class="btn btn-primary" onclick="addToTable();">Add Item</button>

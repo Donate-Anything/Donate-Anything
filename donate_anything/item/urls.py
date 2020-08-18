@@ -1,16 +1,20 @@
 from django.urls import path
-from django.views.generic import TemplateView
 
 from donate_anything.item import views
 
 
 app_name = "item"
 urlpatterns = [
+    # Item information
     path(
         "api/v1/item-autocomplete/",
         views.search_item_autocomplete,
         name="item-autocomplete",
     ),
+    path(
+        "api/v1/item-children/<int:item_id>/", views.item_children, name="item-children"
+    ),
+    # Misc.
     path(
         "api/v1/category/<int:category_type>/",
         views.search_category,

@@ -18,6 +18,16 @@ def test_all_organization_list():
     assert resolve("/organization/all/").view_name == "charity:all-list"
 
 
+def test_search_item_autocomplete():
+    assert (
+        reverse("charity:org-autocomplete") == "/organization/api/v1/org-autocomplete/"
+    )
+    assert (
+        resolve("/organization/api/v1/org-autocomplete/").view_name
+        == "charity:org-autocomplete"
+    )
+
+
 def test_suggest_edit_view(charity):
     assert (
         reverse("charity:suggest-active-org", kwargs={"pk": charity.id})

@@ -157,3 +157,13 @@ class CommunityListView(ListView):
 
 
 all_entities_list_view = CommunityListView.as_view()
+
+
+def search_organization_autocomplete(request):
+    query = request.GET.get("q", None)
+    if query is None:
+        raise Http404(_("You must specify a query"))
+    queryset = Charity.objects.filter(name__icontains=str(query)).values_list(
+        "id", "name"
+    )[:15]
+    return JsonResponse(data={"data": list(queryset)})

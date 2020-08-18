@@ -2,6 +2,7 @@ import json
 from random import choice
 
 import pytest
+from django.contrib.auth.models import AnonymousUser
 from django.http.response import Http404
 
 from donate_anything.item.tests.factories import (
@@ -12,6 +13,7 @@ from donate_anything.item.tests.factories import (
     WantedItemFactory,
 )
 from donate_anything.item.views import (
+    item_children,
     search_category,
     search_item,
     search_item_autocomplete,
@@ -63,6 +65,69 @@ class TestItemAutocompleteView:
         data = json.loads(response.content)
         assert len(data["data"]) == 1
         assert data["data"][0] == [target.id, target.name, target.image]
+
+
+class TestItemInformation:
+    # Doesn't include parent since we assume it's already known
+    def test_get_item_children_authenticated_only(self, rf):
+        request = rf.get("blah/")
+        request.user = AnonymousUser()
+        with pytest.raises(Http404):
+            item_children(request, 1)
+
+    def test_children_level_1(self, rf, user):
+        parent = ItemFactory.create()
+        progeny = ItemFactory.create_batch(9, parent=parent)
+        request = rf.get("blah/")
+        request.user = user
+        response = item_children(request, parent.id)
+        assert response.status_code == 200
+        data = json.loads(response.content)
+        assert len(data["data"]) == 9
+        assert sorted(data["data"], key=lambda x: x[0]) == [
+            [x.id, x.name] for x in progeny
+        ]
+
+    def test_no_children(self, rf, user):
+        parent = ItemFactory.create()
+        progeny = ItemFactory.create_batch(9, parent=parent)
+        request = rf.get("blah/")
+        request.user = user
+        response = item_children(request, progeny[0].id)
+        assert response.status_code == 200
+        data = json.loads(response.content)
+        assert len(data["data"]) == 0
+        assert data["data"] == []
+
+    def test_children_multi_level(self, rf, user):
+        item1 = ItemFactory.create()
+        item2a = ItemFactory.create(parent=item1)
+        item3a = ItemFactory.create_batch(3, parent=item2a)
+        item2b = ItemFactory.create(parent=item1)
+        item3b = ItemFactory.create_batch(6, parent=item2b)
+        request = rf.get("blah/")
+        request.user = user
+        response = item_children(request, item1.id)
+        assert response.status_code == 200
+        data = json.loads(response.content)
+        assert len(data["data"]) == 11
+        assert sorted(data["data"], key=lambda x: x[0]) == [
+            [x.id, x.name]
+            for x in sorted((item2a, item2b, *item3a, *item3b), key=lambda x: x.id)
+        ]
+
+    def test_recursion(self, rf, user):
+        item1 = ItemFactory.create()
+        item2 = ItemFactory.create(parent=item1)
+        item1.parent = item2
+        item1.save(update_fields=["parent"])
+        request = rf.get("blah/")
+        request.user = user
+        response = item_children(request, item1.id)
+        assert response.status_code == 200
+        data = json.loads(response.content)
+        assert len(data["data"]) == 1
+        assert sorted(data["data"], key=lambda x: x[0]) == [[item2.id, item2.name]]
 
 
 def _assert_org_list_eq(response_data, inputted_data):

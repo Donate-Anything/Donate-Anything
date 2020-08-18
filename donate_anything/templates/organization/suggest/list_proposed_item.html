@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load compress static %}
+{% load compress static i18n %}
 
 {% block css %}
   {% compress css %}
@@ -17,12 +17,21 @@
   {% if proposed_item.closed %}
     <h3 class="text-danger">This merge is closed.</h3>
   {% endif %}
+  {% blocktranslate %}
   <p>The following items will be added to the item's list that an organization can fulfill.</p>
+  <p>
+    To make the process easier, you can write a generic item like "utensils," and all its
+    more specific items (e.g. plastic fork, metal fork, plastic spoon) will be automatically
+    added. You should still be specific, for example, "canned tomatoes" go under
+    "canned food" and "canned food" go under "food." If you only want canned foods,
+    you should only type in "canned food."
+  </p>
   <p><b>
     MAKE SURE YOU ADD EVERYTHING you can fulfill. Donate Anything implies practically Anything
     can be searched up. Make sure you have enough items to be found in any search result made
-    by the user
+    by the user.
   </b></p>
+  {% endblocktranslate %}
   <p>
     To view the organization's current items:
     <a href="{% url 'item:list-item-template' proposed_item.entity.id %}">click here</a>

@@ -14,6 +14,17 @@ def test_search_item_autocomplete():
     )
 
 
+def test_item_children(item):
+    assert (
+        reverse("item:item-children", kwargs={"item_id": item.id})
+        == f"/item/api/v1/item-children/{item.id}/"
+    )
+    assert (
+        resolve(f"/item/api/v1/item-children/{item.id}/").view_name
+        == "item:item-children"
+    )
+
+
 def test_search_category():
     category_type = 1
     assert (

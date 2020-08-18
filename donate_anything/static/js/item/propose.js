@@ -38,6 +38,9 @@ function paginateItem() {
                     }
                 }
                 page++
+                if (!(data.has_next)) {
+                    lockScroll = true;
+                }
             },
             error: function(_) {
                 lockScroll = true;

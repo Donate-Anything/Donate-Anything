@@ -69,4 +69,12 @@ class Command(BaseCommand):
 
         # For testing pagination - change to 1 in paginating
         WantedItemFactory.create_batch(25, item=item_1)
+
+        # For testing proposed item, if user selects a generic
+        # item, then all of its children are added as well.
+        # If no parent, then select that only. GH #3
+        parent = Item.objects.create(name="parent1")
+        [Item.objects.create(parent=parent, name=f"child{x}") for x in range(7)]
+        # Also, during searching, if a generic item appears
+        # we warn the user that they should check the list beforehand.
         print("Finished creating Item app data.")

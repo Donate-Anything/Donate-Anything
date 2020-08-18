@@ -45,6 +45,8 @@ class TestMergeProposedItemToActive:
         )
         merge(charity, proposed)
         assert WantedItem.objects.count() == 12, "Only one item should've been added"
+        assert WantedItem.objects.get(item=random_item)
+        assert WantedItem.objects.distinct("item", "charity").count() == 12
         assert WantedItem.objects.filter(charity=charity, item=random_item).exists()
 
     def test_non_existing_already_in_active_item(self, charity, user):
@@ -85,7 +87,7 @@ class TestMergeProposedItemToActive:
         )
         merge(charity, proposed)
         assert Item.objects.count() == 1
-        assert Item.objects.first().name == "hi there"
+        assert Item.objects.get(name="hi there")
         assert WantedItem.objects.count() == 1
 
     def test_remove_duplicate_items(self, charity, user):
@@ -102,7 +104,7 @@ class TestMergeProposedItemToActive:
             entity=charity, user=user, names=[random_string, random_string]
         )
         merge(charity, proposed)
-        assert Item.objects.count() == 1
+        assert Item.objects.get(name=random_string)
         assert WantedItem.objects.count() == 1
 
     def test_duplicate_name_and_item(self, charity, user):
@@ -114,7 +116,7 @@ class TestMergeProposedItemToActive:
             entity=charity, user=user, item=[item.id], names=[item.name.lower()]
         )
         merge(charity, proposed)
-        assert Item.objects.count() == 1
+        assert Item.objects.get(name=item.name)
         assert WantedItem.objects.count() == 1
         assert WantedItem.objects.filter(charity=charity)[0].item == item
 
@@ -126,3 +128,9 @@ class TestMergeProposedItemToActive:
         assert Item.objects.count() == 1
         assert WantedItem.objects.count() == 1
         assert WantedItem.objects.first().item.name == "&lt;p&gt;hi&lt;/p&gt;"
+
+    def test_item_not_real_item_so_ignore(self, charity, user):
+        proposed = ProposedItem.objects.create(entity=charity, user=user, item=[1])
+        merge(charity, proposed)
+        assert Item.objects.count() == 0
+        assert WantedItem.objects.count() == 0

@@ -9,6 +9,11 @@ urlpatterns = [
     path("<int:pk>/", list.organization, name="organization"),
     path("all/", list.all_entities_list_view, name="all-list"),
     path(
+        "api/v1/org-autocomplete/",
+        list.search_organization_autocomplete,
+        name="org-autocomplete",
+    ),
+    path(
         "<int:pk>/suggest/",
         suggest.suggest_active_org_edit_view,
         name="suggest-active-org",

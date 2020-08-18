@@ -18,6 +18,12 @@
       <p class="font-italic"><u>How to Donate</u></p>
       <p id="org-instructions">{{ how_to_donate|escape }}</p>
     </div><br>
+    <div class="pb-4">
+      <p>
+        To view the organization's current items:
+        <a href="{% url 'item:list-item-template' id %}">click here</a>
+      </p>
+    </div>
   </div>
   {% if request.user.is_authenticated %}
     <div data-aos="fade-up">

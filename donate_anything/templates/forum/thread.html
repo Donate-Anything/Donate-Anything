@@ -10,12 +10,14 @@
 {% block content %}
   <h3 class="p-3">{{ thread_obj.title }}</h3>
   <p class="font-italic">Thread type: {{ thread_obj.get_type_display }}</p>
-  {% blocktranslate %}
+  {% if show_vote %}
+    {% blocktranslate %}
     <p class="font-italic">
       This thread type asks for votes. You can <i>carefully</i> vote on this merge
       as a contribution to the community (you must be signed in):
     </p>
-  {% endblocktranslate %}
+    {% endblocktranslate %}
+  {% endif %}
   {% if thread_obj.accepted %}
     <h5>{% translate 'This proposed edit has already been merged.' %}</h5>
   {% endif %}

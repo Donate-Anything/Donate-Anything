@@ -33,6 +33,41 @@ def search_item_autocomplete(request):
     return JsonResponse(data={"data": list(queryset)})
 
 
+def item_children(request, item_id):
+    """Given an item, find all its child items, and their child items etc.
+    Doesn't include parent since we assume it's already known
+    """
+    if not request.user.is_authenticated:
+        raise Http404
+    children_ids = []
+    children_names = []
+    new_children = [
+        (x.id, x.name)
+        for x in Item.objects.only("id", "name").filter(
+            parent_id=item_id, is_appropriate=True
+        )
+    ]
+    while new_children:
+        try:
+            current_id = new_children[0][0]
+        except IndexError:
+            break
+        if current_id in children_ids or current_id == item_id:
+            new_children.pop(0)
+            continue
+        new_children += [
+            (x.id, x.name)
+            for x in Item.objects.only("id", "name").filter(
+                parent_id=current_id, is_appropriate=True
+            )
+        ]
+        children_ids.append(current_id)
+        children_names.append(new_children[0][1])
+        new_children.pop(0)
+
+    return JsonResponse(data={"data": tuple(zip(children_ids, children_names))})
+
+
 def _paginate_via_charity(
     queryset,
     page_number: int = 1,
@@ -192,7 +227,9 @@ def list_proposed_existing_item(request, proposed_item_pk):
         .filter(id__in=page_obj.object_list, is_appropriate=True)
         .order_by("id")
     )
-    return JsonResponse({"data": [(x.id, x.name) for x in qs]})
+    return JsonResponse(
+        {"data": [(x.id, x.name) for x in qs], "has_next": page_obj.has_next()}
+    )
 
 
 def list_org_proposed_item_view(request, proposed_item_pk):
