@@ -19,6 +19,7 @@
   {% if thread_obj.accepted %}
     <h5>{% translate 'This proposed edit has already been merged.' %}</h5>
   {% endif %}
+  {% if thread_obj.is_votable_thread %}
   <div class="pb-3 pl-4">
     <div class="row">
       <a style="cursor: pointer">
@@ -33,6 +34,7 @@
       <p id="downvote-count" style="float: left">{{ downvotes }} downvotes</p>
     </div>
   </div>
+  {% endif %}
   {% for message in object_list %}
     <div class="card mb-3">
       <div class="card-header">

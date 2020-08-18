@@ -70,7 +70,7 @@ class ThreadView(ListView):
         context["show_vote"] = (
             thread.is_votable_thread
             and self.request.user.is_authenticated
-            and thread.extra["OP_id"] != self.request.user.id
+            and thread.extra.get("OP_id", "") != self.request.user.id
             and not thread.accepted
         )
         return context

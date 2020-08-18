@@ -6,12 +6,15 @@ $("#upvote").click(function(e) {
             method: "POST",
             success: function() {
                 target.classList.add("text-danger");
-                $("#downvote").removeClass("text-danger");
+                let downVoteTick = $("#downvote");
+                if (downVoteTick.hasClass("text-danger")) {
+                    downVoteTick.removeClass("text-danger");
+                    let downE = document.getElementById("downvote-count");
+                    downE.innerText = (parseInt(downE.innerText.split(" ")[0], 10) - 1).toString() + " downvotes";
+                }
                 // Change texts
-                let downE = document.getElementById("downvote-count");
                 let upE = document.getElementById("upvote-count");
-                upE.innerText = (parseInt(upE.innerText.split(" ")[0], 10) + 1).toString() + " upvotes"
-                downE.innerText = (parseInt(downE.innerText.split(" ")[0], 10) - 1).toString() + " downvotes"
+                upE.innerText = (parseInt(upE.innerText.split(" ")[0], 10) + 1).toString() + " upvotes";
             },
         });
     }
@@ -25,12 +28,15 @@ $("#downvote").click(function(e) {
             method: "POST",
             success: function() {
                 target.classList.add("text-danger");
-                $("#upvote").removeClass("text-danger");
+                let upvoteTick = $("#upvote");
+                if (upvoteTick.hasClass("text-danger")) {
+                    upvoteTick.removeClass("text-danger");
+                    let upE = document.getElementById("upvote-count");
+                    upE.innerText = (parseInt(upE.innerText.split(" ")[0], 10) - 1).toString() + " upvotes";
+                }
                 // Change texts
                 let downE = document.getElementById("downvote-count");
-                let upE = document.getElementById("upvote-count");
-                downE.innerText = (parseInt(downE.innerText.split(" ")[0], 10) + 1).toString() + " downvotes"
-                upE.innerText = (parseInt(upE.innerText.split(" ")[0], 10) - 1).toString() + " upvotes"
+                downE.innerText = (parseInt(downE.innerText.split(" ")[0], 10) + 1).toString() + " downvotes";
             },
         });
     }
