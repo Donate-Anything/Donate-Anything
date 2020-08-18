@@ -1,6 +1,7 @@
 // Form for initial proposal of new items for an organization
 
 let _temp_org_id = null;
+const _DATA_ID_SINGLE_STRING = "data-item-id"
 
 $(document).ready(function() {
     $("#success-alert").hide();
