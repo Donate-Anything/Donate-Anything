@@ -1,3 +1,5 @@
+from typing import Union
+
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
@@ -156,10 +158,13 @@ class ExistingSuggestEditForm(forms.ModelForm):
             **_default_widgets,
             "commit_message": MDWidget(),
         }
+        help_texts = {
+            "commit_message": _("A commit message is your justification for this edit.")
+        }
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
-        self.entity: int = kwargs.pop("entity", None)
+        self.entity: Union[int, Charity] = kwargs.pop("entity", None)
         super(ExistingSuggestEditForm, self).__init__(*args, **kwargs)
 
     def clean(self):

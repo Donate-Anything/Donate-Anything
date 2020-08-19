@@ -8,6 +8,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.generic import FormView
 
 from donate_anything.charity.forms import ExistingSuggestEditForm
+from donate_anything.users.models.charity import VerifiedAccount
 
 
 @method_decorator(csrf_protect, name="dispatch")
@@ -32,13 +33,35 @@ class SuggestActiveEditView(LoginRequiredMixin, FormView):
 
     def form_valid(self, form):
         """If the form is valid, save the associated model."""
-        self.object = form.save()
-        messages.add_message(
-            self.request,
-            messages.INFO,
-            _("Successfully posted edit. Wait for community review."),
-        )
-        return super().form_valid(form)
+        if VerifiedAccount.objects.filter(
+            user=self.request.user, charity=form.entity
+        ).exists():
+            # form.entity is already set to Charity object
+            update_fields = []
+            if form.cleaned_data["description"]:
+                form.entity.description = form.cleaned_data["description"]
+                update_fields.append("description")
+            if form.cleaned_data["how_to_donate"]:
+                form.entity.how_to_donate = form.cleaned_data["how_to_donate"]
+                update_fields.append("how_to_donate")
+            if form.cleaned_data["link"]:
+                form.entity.link = form.cleaned_data["link"]
+                update_fields.append("link")
+            form.entity.save(update_fields=update_fields)
+            messages.add_message(
+                self.request, messages.INFO, _("Successfully updated."),
+            )
+            return HttpResponseRedirect(
+                reverse("charity:organization", kwargs={"pk": form.entity.id})
+            )
+        else:
+            self.object = form.save()
+            messages.add_message(
+                self.request,
+                messages.INFO,
+                _("Successfully posted edit. Wait for community review."),
+            )
+            return super().form_valid(form)
 
     def form_invalid(self, form):
         messages.add_message(

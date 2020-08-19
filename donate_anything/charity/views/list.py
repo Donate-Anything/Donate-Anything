@@ -18,6 +18,7 @@ from donate_anything.charity.models import (
     Charity,
     OrganizationApplication,
 )
+from donate_anything.users.models.charity import VerifiedAccount
 
 
 def organization(request, pk):
@@ -28,10 +29,14 @@ def organization(request, pk):
         "description": charity.description,
         "how_to_donate": charity.how_to_donate,
     }
-    if request.user.is_authenticated:
+    user = request.user
+    if user.is_authenticated:
         context["suggest_edit_form"] = ExistingSuggestEditForm(
             initial={**context, "link": charity.link}
         )
+        context["is_verified_account"] = VerifiedAccount.objects.filter(
+            charity=charity, user=user
+        ).exists()
     return render(request, "organization/organization.html", context)
 
 

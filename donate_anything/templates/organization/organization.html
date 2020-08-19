@@ -28,14 +28,14 @@
   {% if request.user.is_authenticated %}
     <div data-aos="fade-up">
       <hr>
-      <h4 class="text-center">Suggest Edit</h4>
+      <h4 class="text-center">{% if is_verified_account %}{% translate "Edit Here" %}{% else %}{% translate "Suggest Edit" %}{% endif %}</h4>
       <a class="btn btn-primary" target="_blank" onclick="goToProposeItemForm()" href="{% url 'item:initial-proposed-template' %}">
         To suggest new items, click here.
       </a>
       <form action="{% url 'charity:suggest-active-org' id %}" method="post">
         {% csrf_token %}
         {{ suggest_edit_form|crispy }}
-        <button class="primaryAction btn btn-primary" type="submit">{% trans "Suggest Edit" %}</button>
+        <button class="primaryAction btn btn-primary" type="submit">{% if is_verified_account %}{% translate "Save Edit" %}{% else %}{% trans "Suggest Edit" %}{% endif %}</button>
       </form>
     </div>
   {% endif %}
