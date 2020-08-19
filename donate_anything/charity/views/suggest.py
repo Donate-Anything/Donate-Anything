@@ -34,7 +34,7 @@ class SuggestActiveEditView(LoginRequiredMixin, FormView):
     def form_valid(self, form):
         """If the form is valid, save the associated model."""
         if VerifiedAccount.objects.filter(
-            user=self.request.user, charity=form.entity
+            user=self.request.user, charity=form.entity, accepted=True
         ).exists():
             # form.entity is already set to Charity object
             update_fields = []
