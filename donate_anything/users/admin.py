@@ -3,11 +3,7 @@ from django.contrib.auth import admin as auth_admin
 from django.contrib.auth import get_user_model
 
 from donate_anything.users import models
-from donate_anything.users.forms import (
-    ReCAPTCHAAdminAuthenticationForm,
-    UserChangeForm,
-    UserCreationForm,
-)
+from donate_anything.users.forms import ReCAPTCHAAdminAuthenticationForm, UserChangeForm
 
 
 User = get_user_model()
@@ -20,7 +16,6 @@ admin.site.login_template = "admin/login_recaptcha.html"
 class UserAdmin(auth_admin.UserAdmin):
 
     form = UserChangeForm
-    add_form = UserCreationForm
     fieldsets = (("User", {"fields": ("name",)}),) + auth_admin.UserAdmin.fieldsets
     list_display = ["username", "name", "is_superuser"]
     search_fields = (["username"],)

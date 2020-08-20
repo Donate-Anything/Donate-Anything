@@ -6,8 +6,20 @@ from donate_anything.item.utils.merge_proposed_to_active import merge
 
 
 admin.site.register(Category)
-admin.site.register(Item)
-admin.site.register(WantedItem)
+
+
+class ItemAdmin(admin.ModelAdmin):
+    search_fields = ["name"]
+
+
+admin.site.register(Item, ItemAdmin)
+
+
+class WantedItemAdmin(admin.ModelAdmin):
+    search_fields = ["item__name", "charity__name"]
+
+
+admin.site.register(WantedItem, WantedItemAdmin)
 
 
 class ProposedItemAdmin(admin.ModelAdmin):
