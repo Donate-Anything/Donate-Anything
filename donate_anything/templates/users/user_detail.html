@@ -33,7 +33,7 @@
 {% if object == request.user %}
 <!-- Action buttons -->
 <div class="row">
-  <p>{% blocktranslate %}If you're looking to create a Verified Account for your organization, then please <a href="https://forms.gle/6zYvcysuNJXqRbGB6">fill out this Google form.</a>{% endblocktranslate %}</p>
+  <p>{% blocktranslate %}If you're looking to create a Verified Account for your organization, then please <a href="https://forms.gle/6zYvcysuNJXqRbGB6">fill out this Google form</a> instead. Creating an account will be for your use only and will not be for a verified account. Admins will create the verified account based on your Google form input.{% endblocktranslate %}</p>
 
   <div class="col-sm-12">
     <a class="btn btn-primary" href="{% url 'users:update' %}" role="button">My Info</a>
