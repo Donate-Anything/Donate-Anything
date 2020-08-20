@@ -5,6 +5,7 @@ import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.http.response import Http404
 
+from donate_anything.item.models.item import WANTED_ITEM_CONDITIONS
 from donate_anything.item.tests.factories import (
     CATEGORY_TYPES,
     CategoryFactory,
@@ -12,6 +13,7 @@ from donate_anything.item.tests.factories import (
     WantedItem,
     WantedItemFactory,
 )
+from donate_anything.item.utils.base_converter import item_encode_b64
 from donate_anything.item.views import (
     item_children,
     search_category,
@@ -22,6 +24,7 @@ from donate_anything.item.views import (
 
 
 pytestmark = pytest.mark.django_db
+_wanted_items_condition_ids = [x[0] for x in WANTED_ITEM_CONDITIONS]
 
 
 class TestItemAutocompleteView:
@@ -140,6 +143,15 @@ def _assert_org_list_eq(response_data, inputted_data):
         assert x == y
 
 
+def _item_test_request(rf, encoded, wanted_items):
+    request = rf.get(f"item/lookup/{encoded}")
+    response = search_item(request, encoded)
+    assert response.status_code == 200
+    data = json.loads(response.content)
+    assert len(data["data"]) == 3
+    _assert_org_list_eq(data["data"], wanted_items)
+
+
 class TestPaginateViaCharity:
     """Tests the protected func that paginates organizations.
     Every view that utilizes this is tested here, except for multi-lookup.
@@ -182,12 +194,34 @@ class TestPaginateViaCharity:
 
     def test_search_item(self, rf, item):
         wanted_items = WantedItemFactory.create_batch(3, item=item)
-        request = rf.get(f"item/lookup/{item.id}")
-        response = search_item(request, item.id)
+        encoded = item_encode_b64(item.id)
+        _item_test_request(rf, encoded, wanted_items)
+
+    @pytest.mark.parametrize("num", [x for x in range(10)])
+    def test_search_item_single_digit_bad(self, rf, num):
+        request = rf.get(f"item/lookup/{num}")
+        response = search_item(request, str(num))
+        assert response.status_code == 400
+
+    def test_search_item_show_if_condition_is_better_than_wanted_item(self, rf, item):
+        condition = 2
+        wanted_items = WantedItemFactory.create_batch(3, item=item, condition=condition)
+        encoded = item_encode_b64(item.id, condition + 1)
+        _item_test_request(rf, encoded, wanted_items)
+
+    def test_search_item_dont_show_if_not_condition_well_enough(self, rf, item):
+        """Searching an item of brand new will show up for all organizations.
+        If you have a poor condition item, then only show WantedItem with 0
+        and below (which is none since 0 is the lowest).
+        """
+        condition = 2
+        WantedItemFactory.create_batch(3, item=item, condition=condition)
+        encoded = item_encode_b64(item.id, condition - 1)
+        request = rf.get(f"item/lookup/{encoded}")
+        response = search_item(request, encoded)
         assert response.status_code == 200
         data = json.loads(response.content)
-        assert len(data["data"]) == 3
-        _assert_org_list_eq(data["data"], wanted_items)
+        assert len(data["data"]) == 0
 
 
 class TestSearchMultipleItems:
@@ -197,6 +231,7 @@ class TestSearchMultipleItems:
         pan = ItemFactory.create(name="pan")
         jeans = ItemFactory.create(name="jeans")
         # Create items organizations wants
+        # All items are created with condition 3: Brand New
         WantedItemFactory.create_batch(3, item=chair)  # 3
         WantedItemFactory.create(item=chair, charity=charity)  # 4
         WantedItemFactory.create(item=pan, charity=charity)  # 4 since same charity
@@ -206,7 +241,10 @@ class TestSearchMultipleItems:
         WantedItemFactory.create_batch(25, item=jeans)
 
         response = client.get(
-            f"/item/multi-lookup/?q={chair.id}&&q={pan.id}&&q={jeans.id}"
+            f"/item/multi-lookup/?"
+            f"q={item_encode_b64(chair.id, 3)}&"
+            f"q={item_encode_b64(pan.id, 3)}&"
+            f"q={item_encode_b64(jeans.id, 3)}"
         )
         assert response.status_code == 200
         data: dict = response.context["data"]
@@ -235,10 +273,31 @@ class TestSearchMultipleItems:
             charities_seen.append(k)
             # Check the necessary information is there: name, description
 
+    def test_multiple_conditions(self):
+        """Ref these two tests which explains this one (it's a combo of both):
+        test_search_item_show_if_condition_is_better_than_wanted_item
+        test_search_item_dont_show_if_not_condition_well_enough
+        """
+
+    @pytest.mark.parametrize("condition", _wanted_items_condition_ids)
+    def test_search_multi_better_condition(self, client, charity, condition):
+        """Only filter by item of searched conditions(s) or better
+        """
+
     def test_search_multiple_items_with_page(self, rf):
-        request = rf.get(f"item/multi-lookup/", {"q": 1, "page": str(1)})
+        request = rf.get(f"item/multi-lookup/", {"q": item_encode_b64(1), "page": "1"})
         response = search_multiple_items(request)
         assert response.status_code == 200
+
+    @pytest.mark.parametrize("q", [x for x in range(10)])
+    def test_search_cannot_use_digits(self, rf, q):
+        """Using digits in q query parameter is not allowed since
+        our decoding formula reserves that no single digits can be made
+        an input (due to the item id + condition).
+        """
+        request = rf.get(f"item/multi-lookup/", {"q": str(q), "page": "1"})
+        response = search_multiple_items(request)
+        assert response.status_code == 400
 
     def test_invalid_search_multiple_item_input(self, rf):
         request = rf.get(f"item/multi-lookup/", {"page": "string"})

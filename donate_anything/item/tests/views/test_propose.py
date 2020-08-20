@@ -1,5 +1,5 @@
 import json
-from random import sample
+from random import randint, sample
 from string import ascii_letters
 from typing import List
 
@@ -23,22 +23,25 @@ class TestViewEntityItemList:
     ):
         # Create test data
         item_a = WantedItemFactory.create(
-            item=ItemFactory.create(name="a"), charity=charity
+            item=ItemFactory.create(name="a"), charity=charity, condition=randint(0, 3)
         )
         item_k = WantedItemFactory.create(
-            item=ItemFactory.create(name="k"), charity=charity
+            item=ItemFactory.create(name="k"), charity=charity, condition=randint(0, 3)
         )
         item_z = WantedItemFactory.create(
-            item=ItemFactory.create(name="z"), charity=charity
+            item=ItemFactory.create(name="z"), charity=charity, condition=randint(0, 3)
         )
         request = rf.get("blah/")
         with django_assert_max_num_queries(3):
             response = views.list_active_entity_items(request, charity_id=charity.id)
         assert response.status_code == 200
         data = json.loads(response.content)["data"]
-        assert data[0] == item_a.item.name
-        assert data[1] == item_k.item.name
-        assert data[2] == item_z.item.name
+        assert data[0][0] == item_a.item.name
+        assert data[0][1] == item_a.condition
+        assert data[1][0] == item_k.item.name
+        assert data[1][1] == item_k.condition
+        assert data[2][0] == item_z.item.name
+        assert data[2][1] == item_z.condition
 
     def test_list_active_entity_items_non_existent_entity(self, rf):
         with pytest.raises(Http404):

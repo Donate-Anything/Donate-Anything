@@ -1,9 +1,10 @@
+from string import digits
 from typing import Iterable
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.http import Http404, HttpResponse, JsonResponse
+from django.http import Http404, HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
@@ -14,6 +15,10 @@ from donate_anything.charity.models.charity import Charity
 from donate_anything.item.forms import ModifyItemsForm
 from donate_anything.item.models.category import CATEGORY_TYPES, Category
 from donate_anything.item.models.item import Item, ProposedItem, WantedItem
+from donate_anything.item.utils.base_converter import (
+    b64_to_wanted_item,
+    item_encode_b64,
+)
 
 
 # TODO Add django-ratelimit and develop debounce method
@@ -30,12 +35,21 @@ def search_item_autocomplete(request):
         .filter(name__icontains=str(query), is_appropriate=True)
         .values_list("id", "name", "image")[:15]
     )
-    return JsonResponse(data={"data": list(queryset)})
+    data = {"data": list(queryset)}
+    try:
+        # Give the item ID with condition appended
+        condition = int(request.GET.get("condition"))
+        for item in data["data"]:
+            item[0] = item_encode_b64(item[0], condition)
+    except (KeyError, ValueError, TypeError):
+        pass
+    return JsonResponse(data=data)
 
 
 def item_children(request, item_id):
     """Given an item, find all its child items, and their child items etc.
-    Doesn't include parent since we assume it's already known
+    Doesn't include parent since we assume it's already known.
+    Used mostly for inputting items.
     """
     if not request.user.is_authenticated:
         raise Http404
@@ -103,13 +117,20 @@ def search_category(request, category_type: int):
     )
 
 
-def search_item(request, pk: int):
+def search_item(request, pk: str):
     """Shows charities that can fulfill the selected items
     within the current page.
     """
+    try:
+        item_id, condition = b64_to_wanted_item(pk)
+    except ValueError:
+        return HttpResponseBadRequest(_("You must specify the condition and item ID."))
+    except AssertionError:
+        return HttpResponseBadRequest(_("The id cannot be a single digit."))
     return JsonResponse(
         _paginate_via_charity(
-            WantedItem.objects.filter(item_id=pk), request.GET.get("page"),
+            WantedItem.objects.filter(item_id=item_id, condition__lte=condition),
+            request.GET.get("page"),
         )
     )
 
@@ -125,9 +146,13 @@ def search_multiple_items(request):
     """
     try:
         page_number = int(request.GET.get("page", 1))
-        item_ids = set(int(x) for x in request.GET.getlist("q"))
+        queries = request.GET.getlist("q")
+        assert not any(x in digits for x in queries)
+        item_ids, conditions = zip(*set(b64_to_wanted_item(x) for x in queries))
     except (TypeError, ValueError):
         raise Http404(_("You must specify the item IDs."))
+    except AssertionError:
+        return HttpResponseBadRequest(_("An item cannot just be a number."))
 
     # Load all charities that can fulfill any item asked for.
     # FIXME Multi-search has to practically load an entire database
@@ -136,14 +161,25 @@ def search_multiple_items(request):
     #  Follow GH #3 https://github.com/Donate-Anything/Donate-Anything/issues/3
     # Or you can just find a better query :P
     queryset = WantedItem.objects.filter(item_id__in=item_ids).values_list(
-        "charity_id", "item_id"
+        "charity_id", "item_id", "condition"
     )
     charity_fulfillment: dict = {}
-    for obj in queryset:
+    for charity_id, item_id, item_condition in queryset:
         try:
-            charity_fulfillment[obj[0]].append(obj[1])
-        except KeyError:
-            charity_fulfillment[obj[0]] = [obj[1]]
+            i = item_ids.index(item_id)
+            try:
+                if conditions[i] >= item_condition:
+                    charity_fulfillment[charity_id].append(item_id)
+            except KeyError:
+                if conditions[i] >= item_condition:
+                    try:
+                        charity_fulfillment[charity_id] = [item_id]
+                    except KeyError:
+                        break
+            except IndexError:
+                break
+        except ValueError:
+            break
     charity_fulfillment = {
         k: v
         for k, v in sorted(
@@ -160,6 +196,9 @@ def search_multiple_items(request):
     for c_id, name, description in Charity.objects.filter(
         id__in=charity_fulfillment.keys()
     ).values_list("id", "name", "description"):
+        # The array context is currently the item IDs. The HTML strips the last
+        # two elements, name + description, and checks the length to find
+        # the number of items the charity can fulfill.
         charity_fulfillment[c_id].extend([name, description[:150]])
 
     context = {
@@ -189,10 +228,9 @@ def list_active_entity_items(request, charity_id):
     if Charity.objects.filter(id=charity_id).exists():
         # Apparently using select/prefetch_related("item") makes it 10x slower
         qs = (
-            WantedItem.objects.only("item__name")
-            .filter(charity_id=charity_id)
+            WantedItem.objects.filter(charity_id=charity_id)
             .order_by("item__name")
-            .values_list("item__name", flat=True)
+            .values_list("item__name", "condition")
         )
     else:
         raise Http404
@@ -202,7 +240,9 @@ def list_active_entity_items(request, charity_id):
     except (EmptyPage, PageNotAnInteger):
         raise Http404
     page_obj = paginator.page(num)
-    return JsonResponse({"data": list(page_obj.object_list)})
+    return JsonResponse(
+        {"data": list(page_obj.object_list), "has_next": page_obj.has_next()}
+    )
 
 
 def list_org_items_view(request, entity_id):

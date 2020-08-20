@@ -2,16 +2,30 @@
 
 // TODO Use cached results rather than always calling API.
 
-const multiItemArrayKey = "multiItemArrayKey"
-const multiItemStrArrayKey = "multiItemStrArrayKey"
-const maxFields = 50;
+const multiItemArrayKey = "multiItemArrayKey";
+const multiItemStrArrayKey = "multiItemStrArrayKey";
+const multiItemConditionArrayKey = "multiItemConditionArrayKey";
+const maxFields = 100;
 const typeAheadID = "#typeahead-input-field.tt-input";
+const base_order = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-";
 
-function selectOne(id, value, page, direct_link=false) {
+function base10_to_base64(num, condition="3") {
+    num = parseInt(num.toString() + condition.toString());
+    let str = "", r;
+    while (num) {
+        r = num % 64
+        num -= r;
+        num /= 64;
+        str = base_order.charAt(r) + str;
+    }
+    return str;
+}
+
+function selectOne(id, value, condition_int_id, page, direct_link=false) {
     /* Get charities that support selected item
     * and fill them out in the template. */
     $.ajax({
-        url: '/item/lookup/' + id + '/?page=' + page,
+        url: '/item/lookup/' + base10_to_base64(id, condition_int_id) + '/?page=' + page,
         dataType: "json",
         type: "GET",
         success: function(data) {
@@ -32,7 +46,7 @@ function selectOne(id, value, page, direct_link=false) {
             }
             $('#organizations').html(html);
             let refresh = window.location.protocol + "//" + window.location.host + window.location.pathname +
-                '?q=' + value + '&page=' + page + '&q_id=' + id + '';
+                '?q=' + value + '&page=' + page + '&q_id=' + id + '&condition=' + condition_int_id;
             window.history.pushState({path: refresh}, 'Donate Anything', refresh)
             if (data.has_next) {
                 $('#more-organizations-button').css("visibility", "visible");
@@ -41,6 +55,9 @@ function selectOne(id, value, page, direct_link=false) {
             }
             if (direct_link) {
                 $(typeAheadID).val(value);
+                sessionStorage.setItem(multiItemArrayKey, id + ",");
+                sessionStorage.setItem(multiItemStrArrayKey, value + ",");
+                sessionStorage.setItem(multiItemConditionArrayKey, condition_int_id + ",");
             }
         },
         fail: function(_) {
@@ -67,6 +84,7 @@ $("#more-organizations-button").click(function() {
   selectOne(
       searchParams["q_id"],
       searchParams["q"],
+      parseInt(searchParams["condition"]),
       (parseInt(searchParams["page"], 10) + 1).toString()
   );
 });
@@ -74,11 +92,16 @@ $("#more-organizations-button").click(function() {
 $("#search-multi-button").click(function() {
     let prefix = window.location.protocol + "//" + window.location.host + '/item/multi-lookup/?';
     let idArray = Array.from(sessionStorage.getItem(multiItemArrayKey).split(","));
-    for (let x of idArray) {
-        if (x === "") {
+    let conditionArray = Array.from(sessionStorage.getItem(multiItemConditionArrayKey).split(","));
+    for (let i = 0; i < idArray.length; i++) {
+        const itemID = idArray[i];
+        const cond = conditionArray[i];
+        if (itemID === "") {
             continue
         }
-        prefix += 'q=' + x + '&'
+        prefix += 'q=' + base10_to_base64(
+            parseInt(itemID, cond)
+        ) + '&';
     }
     window.location.href = prefix + 'page=1'
 })
@@ -122,7 +145,7 @@ $('#typeahead-input-field').typeahead({
             if (window.location.pathname === "/") {
                 // Show image only on landing page.
                 // Top right search bar shouldn't show.
-                const mediaURL = $("#main-scrollable-dropdown-menu").attr("django-media-url");
+                const mediaURL = $("#home-container").attr("django-media-url");
                 let imageHTML = '';
                 if (data.imageURL === mediaURL) {
                     imageHTML = '<img style="height: 1em; width: 1em; float: left;" src="' +
@@ -136,11 +159,13 @@ $('#typeahead-input-field').typeahead({
     }
 }
 ).bind("typeahead:select", function(ev, suggestion) {
-    selectOne(suggestion.id, suggestion.value, 1);
+    const currentCondition = document.getElementById("current-select").selectedIndex;
+    selectOne(suggestion.id, suggestion.value, currentCondition, 1);
     // For multi-items, we set attributes in sessionStorage for searching multi later on.
     // I really wish I knew about JSON.stringify before...
-    sessionStorage.setItem(multiItemArrayKey, sessionStorage.getItem(multiItemArrayKey) + suggestion.id + ",")
-    sessionStorage.setItem(multiItemStrArrayKey, sessionStorage.getItem(multiItemStrArrayKey) + suggestion.value + ",")
+    sessionStorage.setItem(multiItemArrayKey, sessionStorage.getItem(multiItemArrayKey) + suggestion.id + ",");
+    sessionStorage.setItem(multiItemStrArrayKey, sessionStorage.getItem(multiItemStrArrayKey) + suggestion.value + ",");
+    sessionStorage.setItem(multiItemConditionArrayKey, sessionStorage.getItem(multiItemConditionArrayKey) + currentCondition + ",");
 }
 ).on("keydown", function(e) {
     // https://github.com/twitter/typeahead.js/issues/332#issuecomment-379579385
@@ -152,19 +177,23 @@ $('#typeahead-input-field').typeahead({
             menu.trigger('selectableClicked', sel);
             e.preventDefault();
         }
-    } else if (e.which === 8 /* Backspace pressed */) {
+    } else if (e.which === 8 /* Backspace */) {
         /* This is mainly used if a user goes back and deletes typeahead value.
         Since the typeahead value is always second-to last in the list
         we only check that value. (Last is a space) */
         let nameArray = Array.from(sessionStorage.getItem(multiItemStrArrayKey).split(","));
         if (nameArray[nameArray.length - 2] === $(this).val()) {
             let idArray = Array.from(sessionStorage.getItem(multiItemArrayKey).split(","));
+            let conditionArray = Array.from(sessionStorage.getItem(multiItemConditionArrayKey).split(","));
             idArray.splice(-2); // deletes last space which gives the last comma
             idArray.push(""); // Adds a comma at the end
             nameArray.splice(-2);
             nameArray.push("");
+            conditionArray.splice(-2);
+            conditionArray.push("");
             sessionStorage.setItem(multiItemStrArrayKey, nameArray.toString());
             sessionStorage.setItem(multiItemArrayKey, idArray.toString());
+            sessionStorage.setItem(multiItemConditionArrayKey, conditionArray.toString());
         }
     }
 });
@@ -194,18 +223,23 @@ $(document).ready(function() {
 
     // Set blank on page load if no items found
     // If found, then it was "go backwards"
-    let fieldCount = inputWrapper.length;
-    if (fieldCount === 1 && $(typeAheadID).val() === "") {
+    // input has 2 typeahead classes
+    let fieldCount = document.getElementsByClassName("typeahead").length - 1;
+    if (sessionStorage.getItem(multiItemArrayKey) === null) {
         // initial page load
+        // if you check web dev console, you won't see it, but the values
+        // are there. They're not returning null but a blank string.
         sessionStorage.setItem(multiItemArrayKey, "");
         sessionStorage.setItem(multiItemStrArrayKey, "");
+        sessionStorage.setItem(multiItemConditionArrayKey, "");
         $('#search-multi-button').hide();
         // For direct links to website
         const searchParams = getParams(window.location.href);
-        if (searchParams["q_id"] && searchParams["q"]) {
+        if (searchParams["q_id"] && searchParams["q"] && searchParams["condition"]) {
             selectOne(
                 searchParams["q_id"],
                 searchParams["q"],
+                searchParams["condition"],
                 "1",
                 true
             );
@@ -219,10 +253,9 @@ $(document).ready(function() {
                 dataType: "json",
                 type: "GET",
                 success: function(data) {
-                    // id, value, item image
                     for (let returnedItem of data.data) {
                         if (returnedItem[1] === searchQuery) {
-                            selectOne(returnedItem[0].toString(), returnedItem[1], 1);
+                            selectOne(returnedItem[0].toString(), returnedItem[1], 3, 1, true);
                             return;
                         }
                     }
@@ -247,9 +280,11 @@ $(document).ready(function() {
         } else if (fieldCount < maxFields) {
             fieldCount++;
             $(inputWrapper).append(
-                '<div><input class="typeahead" readonly style="margin-bottom: 25px"' +
+                '<div><div><input class="typeahead" readonly style="margin-bottom: 25px"' +
                 ' value="' + typeaheadVal + '" onclick="cantEditHomeAlert()">' +
-                '<a href="#" style="padding-left: 9px" class="delete-input">Delete</a></div>'
+                '<a href="#" style="padding-left: 9px" class="delete-input">Delete</a></div>' +
+                '<div>Your ' + typeaheadVal + "'s condition: " +
+                document.getElementById("current-select").value + '</div>'
             );
             // Remove typeahead input.
             $(typeAheadID).val("");
@@ -267,16 +302,19 @@ $(document).ready(function() {
         // Remove item from arrays
         let nameArray = Array.from(sessionStorage.getItem(multiItemStrArrayKey).split(","));
         let idArray = Array.from(sessionStorage.getItem(multiItemArrayKey).split(","));
+        let conditionArray = Array.from(sessionStorage.getItem(multiItemConditionArrayKey).split(","));
         const index = nameArray.indexOf($(this).siblings('.typeahead').val());
         if (index > -1) {
             nameArray.splice(index, 1);
-            idArray.splice(index, 1)
+            idArray.splice(index, 1);
+            conditionArray.splice(index, 1);
             sessionStorage.setItem(multiItemStrArrayKey, nameArray.toString());
             sessionStorage.setItem(multiItemArrayKey, idArray.toString());
+            sessionStorage.setItem(multiItemConditionArrayKey, conditionArray.toString());
         }
 
         // Remove element
-        $(this).parent('div').remove();
+        $(this).parent('div').parent('div').remove();
         fieldCount--;
         if (fieldCount === 1) {
             $('#search-multi-button').hide();

@@ -1,13 +1,22 @@
 {% extends 'base.html' %}
-{% load static compress %}
+{% load static compress i18n %}
 {# Shows org's currently active items #}
 
 {% block content %}
   <h2 data-paging-url="{% url 'item:list-item' id %}" id="heading-with-data">
     Items that <a href="{% url 'charity:organization' id %}">{{ name }}</a> can fulfill
   </h2>
-  <p><small>Note: this list is in alphabetical order.</small></p>
-  <div id="items-list"></div>
+  {% blocktranslate %}
+    <p>
+      The organization accepts the following items in the listed conditions.
+      This organization <i>may</i> accept your item(s) if it is in better condition
+      than listed here. No organization will accept an item that is in worse condition
+      than what is listed.
+    </p>
+    <p><small>Note: this list is in alphabetical order.</small></p>
+  {% endblocktranslate %}
+  <hr>
+  <ul id="items-list"></ul>
 {% endblock %}
 
 {% block javascript %}

@@ -9,6 +9,10 @@ function paginateItem() {
     const scrollPos = Math.floor($(window).height() + $(window).scrollTop());
     const isBottom = scrollHeight - 350 < scrollPos;
 
+    const conditions = [
+        "Poor Condition", "Used - Acceptable", "Used - Very Good", "Brand New"
+    ];
+
     if (isBottom && currentScrollHeight < scrollHeight && !lockScroll) {
         $.ajax({
             url: $("#heading-with-data").attr("data-paging-url") + "?page=" + page,
@@ -16,9 +20,12 @@ function paginateItem() {
             dataType: "json",
             success: function(data) {
                 for (let x of data["data"]) {
-                    document.getElementById("items-list").innerHTML += "<p>"+ x +"</p>"
+                    document.getElementById("items-list").innerHTML +=
+                        "<li>" + x[0] + "<ul><li>Condition: " +
+                        conditions[x[1]] + "</li></ul></li>"
                 }
                 page++
+                lockScroll = !(data["has_next"]);
             },
             error: function(_) {
                 lockScroll = true;

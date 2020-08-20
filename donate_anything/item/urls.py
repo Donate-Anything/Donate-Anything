@@ -20,7 +20,7 @@ urlpatterns = [
         views.search_category,
         name="category-filter",
     ),
-    path("lookup/<int:pk>/", views.search_item, name="lookup-item"),
+    path("lookup/<str:pk>/", views.search_item, name="lookup-item"),
     path("multi-lookup/", views.search_multiple_items, name="lookup-multi-item"),
     # Item List
     path("list/<int:entity_id>/", views.list_org_items_view, name="list-item-template"),

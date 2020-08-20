@@ -2,6 +2,7 @@ import pytest
 from django.urls import resolve, reverse
 
 from donate_anything.item.models import ProposedItem
+from donate_anything.item.utils.base_converter import item_encode_b64
 
 
 pytestmark = pytest.mark.django_db
@@ -39,10 +40,13 @@ def test_search_category():
 
 def test_search_item(item):
     assert (
-        reverse("item:lookup-item", kwargs={"pk": item.id})
-        == f"/item/lookup/{item.id}/"
+        reverse("item:lookup-item", kwargs={"pk": item_encode_b64(item.id)})
+        == f"/item/lookup/{item_encode_b64(item.id)}/"
     )
-    assert resolve(f"/item/lookup/{item.id}/").view_name == "item:lookup-item"
+    assert (
+        resolve(f"/item/lookup/{item_encode_b64(item.id)}/").view_name
+        == "item:lookup-item"
+    )
 
 
 def test_search_multiple_items():

@@ -5,6 +5,10 @@ import pytest
 
 from donate_anything.item.models import Item, ProposedItem, WantedItem
 from donate_anything.item.tests.factories import ItemFactory
+from donate_anything.item.utils.base_converter import (
+    b64_to_wanted_item,
+    item_encode_b64,
+)
 from donate_anything.item.utils.merge_proposed_to_active import merge
 
 
@@ -134,3 +138,28 @@ class TestMergeProposedItemToActive:
         merge(charity, proposed)
         assert Item.objects.count() == 0
         assert WantedItem.objects.count() == 0
+
+
+_big_serial_max = 9223372036854775807
+
+
+class TestUrlShortening:
+    @pytest.mark.parametrize("item_id", [1, 98345, _big_serial_max])
+    def test_encode(self, item_id):
+        """Checks the length actually decreased"""
+        condition = 2
+        assert len(item_encode_b64(item_id, condition)) < len(
+            str(item_id) + str(condition)
+        )
+
+    @pytest.mark.parametrize("item_id", [0, -1, -232])
+    def test_raise_if_item_id_is_less_than_0(self, item_id):
+        with pytest.raises(AssertionError):
+            item_encode_b64(item_id)
+
+    def test_decode(self):
+        b64_to_wanted_item(item_encode_b64(_big_serial_max))
+
+    def test_decode_must_not_be_empty(self):
+        with pytest.raises(AssertionError):
+            b64_to_wanted_item("")
