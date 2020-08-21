@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load compress static i18n %}
+{% load compress static i18n zip_iter %}
 
 {% block css %}
   {% compress css %}
@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{% static 'css/proposed_item.css' %}">
     {% endif %}
   {% endcompress %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/css/bootstrap-select.min.css" integrity="sha512-ARJR74swou2y0Q2V9k0GbzQ/5vJ2RBSoCWokg4zkfM29Fb3vZEQyv0iWBMW/yvKgyHSR/7D64pFMmU8nYmbRkg==" crossorigin="anonymous" />
 {% endblock %}
 
 {% block content %}
@@ -60,7 +61,16 @@
       <div class="col-md-9">
         <div django-media-url="{% get_media_prefix %}" id="main-scrollable-dropdown-menu">
           <input id="typeahead-input-field" class="typeahead" type="text"
-                 placeholder="Add an item (even if not on server)">
+                 placeholder="Add an item (even if it doesn't show in suggestion bar)">
+          <p class="h4"><b>Condition:</b></p>
+          <label>
+            <select id="current-select" class="selectpicker show-tick">
+              <option>Poor</option>
+              <option>Used - Acceptable</option>
+              <option>Used - Very Good</option>
+              <option selected>Brand New</option>
+            </select>
+          </label>
         </div>
       </div>
     </div>
@@ -73,12 +83,21 @@
     {% if can_edit %}
       <table id="non-existent-table">
         <tr>
-          <th>Name</th>
-          <th>Remove</th>
+          <th>{% translate 'Name' %}</th>
+          <th>{% translate 'Condition' %}</th>
+          <th>{% translate 'Remove' %}</th>
         </tr>
-      {% for name in proposed_item.names %}
+      {% for name, condition in proposed_item.names|zip:proposed_item.names_condition %}
         <tr>
           <td>{{ name }}</td>
+          <td>
+            <select>
+              <option {% if condition == 0 %}selected{% endif %}>Poor Condition</option>
+              <option {% if condition == 1 %}selected{% endif %}>Used - Acceptable</option>
+              <option {% if condition == 2 %}selected{% endif %}>Used - Very Good</option>
+              <option {% if condition == 3 %}selected{% endif %}>Brand New</option>
+            </select>
+          </td>
           <td><a class="text-danger">Remove</a></td>
         </tr>
       {% endfor %}
@@ -97,10 +116,11 @@
   <h4 id="heading-with-data" data-paging-url="{% url 'item:list-proposed-item' proposed_item.id %}">Items that the server has</h4>
   <p><small>Note: this list shows items in id order</small></p>
   {% if can_edit %}
-    <table id="existent-table" data-obj-id="{{ proposed_item.id }}" data-item-ids="{{ proposed_item.item }}">
+    <table id="existent-table" data-obj-id="{{ proposed_item.id }}" data-item-ids="{{ proposed_item.item }}" data-item-condition="{{ proposed_item.item_condition }}">
       <tr>
-        <th>Name</th>
-        <th>Remove</th>
+        <th>{% translate 'Name' %}</th>
+        <th>{% translate 'Condition' %}</th>
+        <th>{% translate 'Remove' %}</th>
       </tr>
     </table>
   {% else %}
@@ -113,12 +133,13 @@
 {% block javascript %}
   {% if can_edit %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/corejs-typeahead/1.3.1/typeahead.jquery.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js" integrity="sha512-yDlE7vpGDP7o2eftkCiPZ+yuUyEcaBwoJoIhdXv71KZWugFqEphIS3PU60lEkFaz8RxaVsMpSvQxMBaKVwA5xg==" crossorigin="anonymous"></script>
   {% endif %}
 
   {% compress js %}
-    <script src="{% static 'js/item/propose.js' %}" type="application/javascript"></script>
     {% if can_edit %}
       <script src="{% static 'js/item/search.js' %}" type="application/javascript"></script>
     {% endif %}
+    <script src="{% static 'js/item/propose.js' %}" type="application/javascript"></script>
   {% endcompress %}
 {% endblock %}

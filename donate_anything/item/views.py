@@ -267,8 +267,16 @@ def list_proposed_existing_item(request, proposed_item_pk):
         .filter(id__in=page_obj.object_list, is_appropriate=True)
         .order_by("id")
     )
+    # Sort by id so that the condition array is also sorted
+    conditions = [
+        proposed_item_obj.item_condition[proposed_item_obj.item.index(x.id)] for x in qs
+    ]
     return JsonResponse(
-        {"data": [(x.id, x.name) for x in qs], "has_next": page_obj.has_next()}
+        {
+            "data": [(x.id, x.name) for x in qs],
+            "condition": conditions,
+            "has_next": page_obj.has_next(),
+        }
     )
 
 

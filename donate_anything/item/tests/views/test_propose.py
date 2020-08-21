@@ -77,32 +77,45 @@ def _shortcut_test_proposed_template_test(
 class TestViewEntityProposedItemList:
     def test_list_proposed_existing_item(self, rf, user, charity):
         items = sorted(ItemFactory.create_batch(10), key=lambda x: x.id)
+        item_condition = [randint(0, 3) for _ in range(len(items))]
         proposed = ProposedItem.objects.create(
-            user=user, entity=charity, item=[x.id for x in items]
+            user=user,
+            entity=charity,
+            item=[x.id for x in items],
+            item_condition=item_condition,
         )
         request = rf.get("blah")
         response = views.list_proposed_existing_item(request, proposed.id)
         assert response.status_code == 200
-        data = json.loads(response.content)["data"]
-        for d, item in zip(data, items):
+        data = json.loads(response.content)
+        for d, item in zip(data["data"], items):
             # Should be in the same order
             assert d == [item.id, item.name]
+        for condition, item_condition in zip(data["condition"], item_condition):
+            assert item_condition == condition
 
     def test_list_proposed_existing_item_not_exist(self, rf):
         request = rf.get("blah")
         with pytest.raises(Http404):
             views.list_proposed_existing_item(request, 123)
 
-    def test_list_proposed_existing_names(self, rf, user, charity):
+    def test_list_proposed_nonexisting_names(self, rf, user, charity):
         names = [Faker("bs") for _ in range(10)]
-        proposed = ProposedItem.objects.create(user=user, entity=charity, names=names)
+        proposed = ProposedItem.objects.create(
+            user=user,
+            entity=charity,
+            names=names,
+            names_condition=[randint(0, 3) for _ in range(len(names))],
+        )
         request = rf.get("blah")
         response = views.list_proposed_existing_item(request, proposed.id)
         assert response.status_code == 200
-        data = json.loads(response.content)["data"]
-        for d, name in zip(data, names):
+        data = json.loads(response.content)
+        for d, name in zip(data["data"], names):
             # Should be in the same order
             assert d == name
+        for condition, name in zip(data["condition"], names):
+            assert name.names_condition == condition
 
     def test_list_proposed_item_template(self, client, user, charity):
         proposed = ProposedItem.objects.create(entity=charity, user=user)

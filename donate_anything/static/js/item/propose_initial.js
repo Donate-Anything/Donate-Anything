@@ -39,16 +39,31 @@ $.ajaxSetup({
 function saveProgress(url) {
     // Assuming this isn't the first time...
     let existentTable = document.getElementById("existent-table");
-
+    let item_condition = [];
+    for (let row of existentTable.rows) {
+        if (row.cells[1].innerText === "Condition") {
+            continue
+        }
+        item_condition.push(row.cells[1].children[0].selectedIndex);
+    }
+    let names = [];
+    let names_condition = [];
+    for (let row of document.getElementById("non-existent-table").rows) {
+        if (row.cells[1].innerText === "Condition") {
+            continue
+        }
+        names.push(row.cells[0].innerText);
+        names_condition.push(row.cells[1].children[0].selectedIndex);
+    }
     $.ajax({
         url: url,
         method: "POST",
         data: {
             entity: _temp_org_id,
             item: existentTable.getAttribute("data-item-ids"),
-            names: $('#non-existent-table tr').find('td:first').map(function() {
-                 return $(this).text()
-            }).get().toString()
+            item_condition: item_condition.toString(),
+            names: names.toString(),
+            names_condition: names_condition.toString()
         },
         success: function() {
             document.getElementById("success-alert").style.visibility = "visible";

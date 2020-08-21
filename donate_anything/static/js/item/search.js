@@ -2,7 +2,7 @@
 // since we need to add (non)existing items to two tables
 
 const typeAheadID = "#typeahead-input-field.tt-input";
-
+const _itemDataIDs = "data-item-ids";
 let selectedName = null;
 let selectedID = null;
 
@@ -38,7 +38,8 @@ $('#typeahead-input-field').typeahead({
     templates: {
         empty: [
             '<div id="">',
-            "Item doesn't exist in the server. We'll add it for you.",
+            "If you're seeing this, the item doesn't exist in the server. " +
+            "Don't worry, we'll add it for you. Just hit enter or press \"Add Item\"",
             '</div>'
         ].join("\n"),
         suggestion: function(data) {
@@ -96,13 +97,49 @@ $('#typeahead-input-field').typeahead({
     }
 })
 
-const _itemDataIDs = "data-item-ids";
+function existentTableSelectChange(elem) {
+    const table = document.getElementById("existent-table")
+    let conditionArray = Array.from(table.getAttribute(_DATA_ITEM_CONDITION_ATTR).split(","));
+    let idArray = Array.from(table.getAttribute(_DATA_IDS_LIST_STRING).split(","));
+    const index = idArray.indexOf(elem.getAttribute(_DATA_ID_SINGLE_STRING))
+    conditionArray[index] = elem.selectedIndex;
+    table.setAttribute(_DATA_ITEM_CONDITION_ATTR, conditionArray.toString());
+}
 
 function addTableItem(tableID, item_id, name) {
     let table = document.getElementById(tableID);
     let row = table.insertRow(-1);
     row.insertCell(0).innerText = name;
-    let remove = row.insertCell(1);
+    // Add condition dropdown
+    let conditionRow = row.insertCell(1);
+    let selectNode = document.createElement("select");
+    if (tableID === "existent-table") {
+        selectNode.setAttribute("onchange", "existentTableSelectChange(this)");
+    }
+    const conditionStringArray = [
+        "Poor Condition", "Used - Acceptable", "Used - Very Good", "Brand New"
+    ];
+    const currentCondition = document.getElementById("current-select");
+    for (let x of conditionStringArray) {
+        let option = document.createElement("option");
+        option.value = x;
+        option.text = x;
+        if (x === currentCondition.value) {
+            option.setAttribute("selected", "selected");
+            if (tableID === "existent-table") {
+                let currentConditions = table.getAttribute("data-item-condition");
+                if (currentConditions !== null && currentConditions !== "") {
+                    currentConditions += ",";
+                }
+                currentConditions += currentCondition.selectedIndex;
+                table.setAttribute("data-item-condition", currentConditions);
+            }
+        }
+        selectNode.appendChild(option);
+    }
+    conditionRow.appendChild(selectNode);
+    // Add remove
+    let remove = row.insertCell(2);
     let aNode = document.createElement("a");
     let textNode = document.createTextNode("Remove");
     aNode.appendChild(textNode);
@@ -122,7 +159,7 @@ function addTableItem(tableID, item_id, name) {
 }
 
 function isDuplicateExistingID(string_item_id, clear_typeahead=true) {
-    for (let x of Array.from(document.getElementById("existent-table").getAttribute("data-item-ids").split(","))) {
+    for (let x of Array.from(document.getElementById("existent-table").getAttribute(_itemDataIDs).split(","))) {
         if (x === string_item_id) {
             if (clear_typeahead) {
                 $(typeAheadID).val("");
