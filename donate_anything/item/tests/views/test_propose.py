@@ -9,7 +9,7 @@ from django.urls import reverse
 from factory import Faker
 
 from donate_anything.item import views
-from donate_anything.item.models import ProposedItem
+from donate_anything.item.models.item import WANTED_ITEM_CONDITIONS, ProposedItem
 from donate_anything.item.tests.factories import ItemFactory, WantedItemFactory
 from donate_anything.users.tests.factories import UserFactory
 
@@ -134,14 +134,18 @@ class TestViewEntityProposedItemList:
             views.list_org_proposed_item_view(request, 123)
 
 
-def _assert_response_form_create_update(response, user, charity, item, name):
+def _assert_response_form_create_update(
+    response, user, charity, item, item_condition, name, names_condition
+):
     assert response.status_code == 200
     assert ProposedItem.objects.count() == 1
-    obj = ProposedItem.objects.first()
+    obj: ProposedItem = ProposedItem.objects.first()
     assert obj.user == user
     assert obj.entity == charity
     assert obj.item == item
+    assert obj.item_condition == item_condition
     assert obj.names == name
+    assert obj.names_condition == names_condition
 
 
 def _format_list_to_str(elem: List) -> str:
@@ -160,22 +164,54 @@ class TestProposedItemForm:
 
     def test_proposed_item_form_create(self, client, user, charity):
         item = [x.id for x in ItemFactory.create_batch(3)]
+        item_condition = [randint(0, 3) for _ in range(len(item))]
         name = [_random_string() for _ in range(3)]
+        names_condition = [randint(0, 3) for _ in range(len(name))]
         client.force_login(user)
         response = client.post(
             self.view_url,
             data={
                 "entity": charity.id,
                 "item": _format_list_to_str(item),
+                "item_condition": _format_list_to_str(item_condition),
                 "names": _format_list_to_str(name),
+                "names_condition": _format_list_to_str(names_condition),
             },
         )
-        _assert_response_form_create_update(response, user, charity, item, name)
+        _assert_response_form_create_update(
+            response, user, charity, item, item_condition, name, names_condition
+        )
+
+    @pytest.mark.parametrize("attribute_name", ["names", "item"])
+    @pytest.mark.parametrize("neg", [-2, 1])
+    def test_attribute_and_condition_not_equal_in_length(
+        self, attribute_name, client, user, charity, neg
+    ):
+        # Doesn't matter since we're stringifying everything
+        array = [x.id for x in ItemFactory.create_batch(3)]
+        array_condition = _format_list_to_str(
+            [randint(0, 3) for _ in range((len(array) - neg))]
+        )
+        client.force_login(user)
+        response = client.post(
+            self.view_url,
+            data={
+                "entity": charity.id,
+                attribute_name: _format_list_to_str(array),
+                attribute_name + "_condition": array_condition,
+            },
+        )
+        assert response.status_code == 400
+        errors = json.loads(response.content)["errors"]
+        assert attribute_name in errors
+        assert attribute_name + "_condition" in errors
 
     def test_proposed_item_form_update(self, client, user, charity):
         """The updating of the form"""
         item = [x.id for x in ItemFactory.create_batch(10)]
+        item_condition = [3] * len(item)
         name = [_random_string() for _ in range(10)]
+        names_condition = [3] * len(name)
         obj = ProposedItem.objects.create(
             user=user, entity=charity, item=item[:5], names=name[:5]
         )
@@ -185,10 +221,14 @@ class TestProposedItemForm:
             data={
                 "id": obj.id,
                 "item": _format_list_to_str(item),
+                "item_condition": _format_list_to_str(item_condition),
                 "names": _format_list_to_str(name),
+                "names_condition": _format_list_to_str(names_condition),
             },
         )
-        _assert_response_form_create_update(response, user, charity, item, name)
+        _assert_response_form_create_update(
+            response, user, charity, item, item_condition, name, names_condition
+        )
 
     def test_form_not_update_for_wrong_user(self, client, user, charity):
         item = [x.id for x in ItemFactory.create_batch(3)]
@@ -202,7 +242,9 @@ class TestProposedItemForm:
             data={
                 "id": obj.id,
                 "item": _format_list_to_str(item),
+                "item_condition": _format_list_to_str([3] * len(item)),
                 "names": _format_list_to_str(name),
+                "names_condition": _format_list_to_str([3] * len(name)),
             },
         )
         assert response.status_code == 200
@@ -213,7 +255,15 @@ class TestProposedItemForm:
 
     def test_proposed_item_form_id_and_entity_not_filled(self, client, user):
         client.force_login(user)
-        response = client.post(self.view_url, data={"item": [1], "name": ["bs"]})
+        response = client.post(
+            self.view_url,
+            data={
+                "item": [1],
+                "item_condition": [1],
+                "name": ["bs"],
+                "names_condition": [1],
+            },
+        )
         assert response.status_code == 400
         errors = json.loads(response.content)["errors"]
         assert "entity" in errors
@@ -221,7 +271,14 @@ class TestProposedItemForm:
     def test_entity_does_not_exist(self, client, user):
         client.force_login(user)
         response = client.post(
-            self.view_url, data={"entity": 123, "item": [1], "names": ["bs"]}
+            self.view_url,
+            data={
+                "entity": 123,
+                "item": [1],
+                "item_condition": [1],
+                "names": ["bs"],
+                "names_condition": [1],
+            },
         )
         assert response.status_code == 400
         errors = json.loads(response.content)["errors"]
@@ -229,13 +286,17 @@ class TestProposedItemForm:
 
     def test_proposed_item_form_empty_item(self, client, user, charity):
         client.force_login(user)
-        response = client.post(self.view_url, data={"entity": charity.id, "item": [1]})
+        response = client.post(
+            self.view_url,
+            data={"entity": charity.id, "item": [1], "item_condition": [2]},
+        )
         assert response.status_code == 200
 
     def test_escape(self, client, user, charity):
         client.force_login(user)
         response = client.post(
-            self.view_url, data={"entity": charity.id, "names": ["<p>hi</p>"]}
+            self.view_url,
+            data={"entity": charity.id, "names": ["<p>hi</p>"], "names_condition": [1]},
         )
         assert response.status_code == 200
         assert ProposedItem.objects.count() == 1
@@ -246,16 +307,95 @@ class TestProposedItemForm:
     def test_proposed_item_form_empty_name(self, client, user, charity):
         client.force_login(user)
         response = client.post(
-            self.view_url, data={"entity": charity.id, "names": ["bs"]}
+            self.view_url,
+            data={"entity": charity.id, "names": ["bs"], "names_condition": [1]},
         )
         assert response.status_code == 200
 
-    def test_not_appropriate_raise(self, client, user, charity):
+    def test_item_not_appropriate_raise(self, client, user, charity):
         item = ItemFactory.create(is_appropriate=False)
         client.force_login(user)
         response = client.post(
-            self.view_url, data={"entity": charity.id, "item": str(item.id)}
+            self.view_url,
+            data={"entity": charity.id, "item": str(item.id), "item_condition": [1]},
         )
         assert response.status_code == 400
         errors = json.loads(response.content)["errors"]
         assert "item" in errors
+
+    def test_item_missing_condition(self, client, user, charity):
+        item = ItemFactory.create(is_appropriate=False)
+        client.force_login(user)
+        response = client.post(
+            self.view_url, data={"entity": charity.id, "item": str(item.id)},
+        )
+        assert response.status_code == 400
+        errors = json.loads(response.content)["errors"]
+        assert "item" in errors
+
+    def test_name_missing_condition(self, client, user, charity):
+        client.force_login(user)
+        response = client.post(
+            self.view_url, data={"entity": charity.id, "names": "bs"},
+        )
+        assert response.status_code == 400
+        errors = json.loads(response.content)["errors"]
+        assert "names" in errors
+
+    @pytest.mark.parametrize("neg", [-2, 1])
+    def test_item_condition_incorrect_length(self, client, user, charity, neg):
+        item = ItemFactory.create(is_appropriate=False)
+        client.force_login(user)
+        response = client.post(
+            self.view_url,
+            data={
+                "entity": charity.id,
+                "item": str(item.id),
+                "item_condition": [1] * (1 - neg),
+            },
+        )
+        assert response.status_code == 400
+        errors = json.loads(response.content)["errors"]
+        assert "item" in errors
+
+    @pytest.mark.parametrize("neg", [-2, 1])
+    def test_name_condition_incorrect_length(self, client, user, charity, neg):
+        client.force_login(user)
+        response = client.post(
+            self.view_url,
+            data={
+                "entity": charity.id,
+                "names": "bs",
+                "item_condition": [2] * (1 - neg),
+            },
+        )
+        assert response.status_code == 400
+        errors = json.loads(response.content)["errors"]
+        assert "names" in errors
+
+    @pytest.mark.parametrize("incorrect", [-1, len(WANTED_ITEM_CONDITIONS)])
+    def test_item_condition_invalid_choice(self, client, user, charity, incorrect):
+        item = ItemFactory.create(is_appropriate=False)
+        client.force_login(user)
+        response = client.post(
+            self.view_url,
+            data={
+                "entity": charity.id,
+                "item": str(item.id),
+                "item_condition": [incorrect],
+            },
+        )
+        assert response.status_code == 400
+        errors = json.loads(response.content)["errors"]
+        assert "item" in errors
+
+    @pytest.mark.parametrize("incorrect", [-1, len(WANTED_ITEM_CONDITIONS)])
+    def test_name_condition_invalid_choice(self, client, user, charity, incorrect):
+        client.force_login(user)
+        response = client.post(
+            self.view_url,
+            data={"entity": charity.id, "names": "bs", "names_condition": [incorrect]},
+        )
+        assert response.status_code == 400
+        errors = json.loads(response.content)["errors"]
+        assert "names_condition" in errors

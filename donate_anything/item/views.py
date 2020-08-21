@@ -306,17 +306,18 @@ class ProposedItemFormView(LoginRequiredMixin, FormView):
 
     def form_valid(self, form):
         # Prepare data:
-        item = form.cleaned_data["item"]
-        names = form.cleaned_data["names"]
+        updated = {
+            "item": form.cleaned_data["item"],
+            "item_condition": form.cleaned_data["item_condition"],
+            "names": form.cleaned_data["names"],
+            "names_condition": form.cleaned_data["names_condition"],
+        }
 
         # Determine if create or update
         if form.cleaned_data["id"] is None:
             # User is redirected to forum
             ProposedItem.objects.create(
-                user=self.request.user,
-                entity_id=form.cleaned_data["entity"],
-                item=item,
-                names=names,
+                user=self.request.user, entity_id=form.cleaned_data["entity"], **updated
             )
             messages.add_message(
                 self.request,
@@ -331,7 +332,7 @@ class ProposedItemFormView(LoginRequiredMixin, FormView):
         else:
             ProposedItem.objects.filter(
                 id=form.cleaned_data["id"], user=self.request.user
-            ).update(item=item, names=names)
+            ).update(**updated)
         return HttpResponse()
 
     def form_invalid(self, form):

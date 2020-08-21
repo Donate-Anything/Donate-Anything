@@ -14,7 +14,9 @@ def setup_thread(thread, entity):
     thread.type = 4
     user = UserFactory.create()
     items = [x.id for x in ItemFactory.create_batch(10)]
-    proposed = ProposedItem.objects.create(user_id=user.id, entity=entity, item=items)
+    proposed = ProposedItem.objects.create(
+        user_id=user.id, entity=entity, item=items, item_condition=[2] * len(items)
+    )
     thread.extra = {
         "OP_id": user.id,
         "entity_id": entity.id,
