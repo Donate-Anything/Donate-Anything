@@ -16,7 +16,7 @@ class Charity(models.Model):
     # charity is not verified via domain email.
     description = models.TextField(max_length=1000)
     # Address or drop off instructions
-    how_to_donate = models.TextField(max_length=300)
+    how_to_donate = models.TextField(max_length=1000)
 
     # Items are in a M2M ES model
 
@@ -34,4 +34,4 @@ class ProposedEdit(models.Model):
     entity = models.ForeignKey(Charity, on_delete=models.CASCADE)
     link = models.URLField(blank=True, null=True)
     description = models.TextField(max_length=1000, blank=True, null=True)
-    how_to_donate = models.TextField(max_length=300, blank=True, null=True)
+    how_to_donate = models.TextField(max_length=1000, blank=True, null=True)

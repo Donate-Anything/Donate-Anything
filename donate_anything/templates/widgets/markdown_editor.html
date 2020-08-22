@@ -1,7 +1,5 @@
 <div class="row">
   <div class="col"></div>
-  <textarea name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %} placeholder="**Type here** for Markdown text (what is saved is shown below)">
-    {% if widget.value %}{{ widget.value }}{% endif %}
-  </textarea>
+  <textarea name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %} placeholder="**Type here** for Markdown text (what is saved is shown below)">{% if widget.value %}{{ widget.value }}{% endif %}</textarea>
   <div style="overflow: auto; min-width:25px; min-height: 300px;" name="{{ widget.name }}-showdown"{% for name, value in widget.attrs.items %}{% if value is not False %} {{ name }}{% if value is not True %}="{% if name == "id" %}{{ value|stringformat:'s' }}-showdown{% else %}{{ value|stringformat:'s' }}{% endif %}"{% endif %}{% endif %}{% endfor %}></div>
 </div>
