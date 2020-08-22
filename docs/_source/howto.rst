@@ -16,6 +16,8 @@ items to the least number of items that an organization can fulfill.
 That's it! Hint, we'll be adding a leaderboard soon for the most fulfilled
 donations. `You can check out our roadmap by clicking here`_.
 
+From an organization? Refer to ":ref:`how-to-from-an-organization`".
+
 .. _You can check out our roadmap by clicking here: https://donate-anything.org/roadmap/
 
 Process of Adding an Organization
@@ -48,6 +50,8 @@ through our forums and threads.
 In the near future, we will be adding a game-like point system, similar to Wikipedia,
 for contributing in some form to maintaining the website.
 
+.. _how-to-verified-account:
+
 Verified Accounts
 ------------------------------------------------
 
@@ -69,3 +73,24 @@ and temporary password. You can change and add multiple email accounts and
 you can change your password once you login. These are NOT time-sensitive
 credentials, but we encourage you to quickly change several parameters.
 You will not be able to change your username.
+
+.. _how-to-from-an-organization:
+
+From An Organization?
+---------------------
+
+Here are some quick steps that you should do:
+
+#. Create a personal account at: https://donate-anything.org/accounts/signup/
+#. Verify your account via email and login.
+#. If your organization hasn't been added, go to the `Apply`_ tab and fill out the form.
+#. Once your organization shows up in our `community list`_, you can create new items by clicking into your organization and pressing the "To suggest new items, click here"
+#. Write as many as you need. There are some generic items that will add hundreds of items at a time like food, female apparel, and others. `You can find the generic items here`_
+#. Save it. You can edit it later by following the link the forum.
+#. If you'd like a verified account, refer to :ref:`how-to-verified-account`. This will be separate from your personal account, and only one account is created for one organization (for security purposes).
+
+.. _Apply: https://donate-anything.org/organization/apply/
+.. _community list: https://donate-anything.org/organization/all/
+.. _You can find the generic items here: https://gist.github.com/Andrew-Chen-Wang/1422ea2838188f6d318315e1fdcdbbd6
+
+Share our website! https://donate-anything.org
