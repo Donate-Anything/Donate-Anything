@@ -31,11 +31,15 @@ function selectOne(id, value, condition_int_id, page, direct_link=false) {
         success: function(data) {
             // returned data is list_of(charity id, name, description[:150]) and has_next bool
             let html;
+            const conditionStringArray = [
+                "Poor Condition", "Used - Acceptable", "Used - Very Good", "Brand New"
+            ];
+            const condition = " (" + conditionStringArray[condition_int_id] + ")";
             if (page.toString() === "1") {
                 if (data.data.length === 0) {
-                    html = "<h4>No results for: " + value + "</h4><hr>";
+                    html = "<h4>No results for: " + value + condition + "</h4><hr>";
                 } else {
-                    html = "<h4>Showing organizations that accept: " + value + "</h4><hr>"
+                    html = "<h4>Showing organizations that accept: " + value + condition + "</h4><hr>"
                 }
             } else {
                 html = document.getElementById("organizations").innerHTML;
@@ -210,6 +214,16 @@ function noValueHomeAlert() {
     $("#no-value-alert").fadeTo(2000, 500).delay(3500).slideUp(500, function() {
         $("#no-value-alert").slideUp(500);
     });
+}
+
+function searchOnConditionChange(elem) {
+    const searchParams = getParams(window.location.href);
+    selectOne(
+        searchParams["q_id"],
+        searchParams["q"],
+        elem.selectedIndex,
+        "1"
+    );
 }
 
 $(document).ready(function() {
