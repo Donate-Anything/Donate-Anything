@@ -41,19 +41,29 @@
                 <div class="col-md-7 pl-4">
                   <div class="row"><a href="{% url 'forum:thread' obj.id %}">{{ obj.title|escape }}</a></div>
                   {% with first_msg=obj.message_set.first %}
+                    {% if first_msg %}
                     <div class="row"><small>
                       By: <a href="{% url 'users:detail' first_msg.user %}">{{ first_msg.user.username }}</a> on {{ obj.created }}
                     </small></div>
+                    {% else %}
+                      <div class="row"><small>By: System Generator</small></div>
+                    {% endif %}
                   {% endwith %}
                 </div>
                 <div class="col-md-5 mobile-viz">
                   <div class="row">
-                    <div class="col-md-2">{{ obj.num_posts }}</div>
+                    {% with num_posts=obj.num_posts %}
+                    <div class="col-md-2">{% if num_posts > 0 %}{{ num_posts }}{% else %}0{% endif %}</div>
+                    {% endwith %}
                     <div class="col-md-2">{{ obj.views }}</div>
                     {% with last_message=obj.message_set.last %}
+                      {% if first_msg %}
                       <div class="col-md-8"><small>
                         By: <a href="{% url 'users:detail' last_message.user %}">{{ last_message.user.username }}</a> on {{ last_message.created }}
                       </small></div>
+                      {% else %}
+                        <div class="col-md-8 pl-4"><small>None</small></div>
+                      {% endif %}
                     {% endwith %}
                   </div>
                 </div>

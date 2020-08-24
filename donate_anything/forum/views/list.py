@@ -53,20 +53,21 @@ class ThreadView(ListView):
         except Thread.DoesNotExist:
             raise Http404
         context["thread_obj"] = thread
-        if self.request.user.is_authenticated:
-            try:
-                user_vote = UserVote.objects.only("direction").get(
-                    thread=thread, user=self.request.user
-                )
-                context["user_vote"] = 1 if user_vote.direction else 0
-            except UserVote.DoesNotExist:
-                pass
-        context["upvotes"] = UserVote.objects.filter(
-            thread=thread, direction=True
-        ).count()
-        context["downvotes"] = UserVote.objects.filter(
-            thread=thread, direction=False
-        ).count()
+        if thread.is_votable_thread:
+            if self.request.user.is_authenticated:
+                try:
+                    user_vote = UserVote.objects.only("direction").get(
+                        thread=thread, user=self.request.user
+                    )
+                    context["user_vote"] = 1 if user_vote.direction else 0
+                except UserVote.DoesNotExist:
+                    pass
+            context["upvotes"] = UserVote.objects.filter(
+                thread=thread, direction=True
+            ).count()
+            context["downvotes"] = UserVote.objects.filter(
+                thread=thread, direction=False
+            ).count()
         context["show_vote"] = (
             thread.is_votable_thread
             and self.request.user.is_authenticated
