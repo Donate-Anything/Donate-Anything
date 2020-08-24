@@ -104,7 +104,7 @@ $("#search-multi-button").click(function() {
             continue
         }
         prefix += 'q=' + base10_to_base64(
-            parseInt(itemID, cond)
+            parseInt(itemID), cond
         ) + '&';
     }
     window.location.href = prefix + 'page=1'
