@@ -26,6 +26,7 @@
     {% endblock %}
 
     {% block css %}{% endblock %}
+    {% if not DEBUG %}
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-176173345-1"></script>
     <script>
@@ -35,6 +36,7 @@
 
       gtag('config', 'UA-176173345-1');
     </script>
+    {% endif %}
   </head>
 
   <body>

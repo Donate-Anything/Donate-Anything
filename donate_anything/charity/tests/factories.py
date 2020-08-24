@@ -8,6 +8,7 @@ from donate_anything.charity.models import (
     OrganizationApplication,
     ProposedEdit,
 )
+from donate_anything.users.models.charity import VerifiedAccount
 from donate_anything.users.tests.factories import UserFactory
 
 
@@ -22,6 +23,16 @@ class CharityFactory(DjangoModelFactory):
 
     class Meta:
         model = Charity
+
+
+class VerifiedAccountFactory(DjangoModelFactory):
+    user = SubFactory(UserFactory)
+    charity = SubFactory(CharityFactory)
+    reason = Faker("sentence")
+
+    class Meta:
+        model = VerifiedAccount
+        django_get_or_create = ["user"]
 
 
 # Applied Models

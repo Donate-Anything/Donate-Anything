@@ -4,11 +4,18 @@ from typing import Iterable
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.http import Http404, HttpResponse, HttpResponseBadRequest, JsonResponse
+from django.http import (
+    Http404,
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseForbidden,
+    JsonResponse,
+)
 from django.shortcuts import get_object_or_404, render
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_protect, requires_csrf_token
+from django.views.decorators.http import require_POST
 from django.views.generic import FormView, TemplateView
 
 from donate_anything.charity.models.charity import Charity
@@ -19,6 +26,7 @@ from donate_anything.item.utils.base_converter import (
     b64_to_wanted_item,
     item_encode_b64,
 )
+from donate_anything.users.models.charity import VerifiedAccount
 
 
 # TODO Add django-ratelimit and develop debounce method
@@ -209,6 +217,20 @@ def search_multiple_items(request):
     return render(request, "organization/multiple_orgs.html", context=context)
 
 
+def _can_delete_wanted_items(request, charity_id: int) -> bool:
+    try:
+        if request.user.is_anonymous:
+            return False
+        if not VerifiedAccount.objects.filter(
+            user=request.user, charity_id=charity_id, accepted=True
+        ).exists():
+            if not request.user.is_staff:
+                return False
+        return True
+    except AttributeError:
+        return False
+
+
 def list_active_entity_items(request, charity_id):
     """Lists the items that an active entity can fulfill.
     Returns item names, paginated.
@@ -225,12 +247,16 @@ def list_active_entity_items(request, charity_id):
     QS Timing: 2.5512770001796523e-06
     QS Timing: 3.3379649991047698e-06
     """
+    can_delete = _can_delete_wanted_items(request, charity_id)
+    _wanted_item_args = ["item__name", "condition"]
+    if can_delete:
+        _wanted_item_args.append("id")
     if Charity.objects.filter(id=charity_id).exists():
         # Apparently using select/prefetch_related("item") makes it 10x slower
         qs = (
-            WantedItem.objects.filter(charity_id=charity_id)
+            WantedItem.objects.filter(charity_id=charity_id, item__is_appropriate=True)
             .order_by("item__name")
-            .values_list("item__name", "condition")
+            .values_list(*_wanted_item_args)
         )
     else:
         raise Http404
@@ -250,7 +276,13 @@ def list_org_items_view(request, entity_id):
     """
     obj = get_object_or_404(Charity, id=entity_id)
     return render(
-        request, "organization/list_item.html", {"id": entity_id, "name": obj.name}
+        request,
+        "organization/list_item.html",
+        {
+            "id": entity_id,
+            "name": obj.name,
+            "can_delete": _can_delete_wanted_items(request, entity_id),
+        },
     )
 
 
@@ -348,3 +380,15 @@ class ProposedItemFormView(LoginRequiredMixin, FormView):
 
 
 proposed_item_form_view = ProposedItemFormView.as_view()
+
+
+@require_POST
+def delete_items(request, wanted_item_id):
+    """Only VerifiedAccounts can delete items from list_item.html"""
+    if not request.user.is_authenticated:
+        return HttpResponseForbidden
+    obj = get_object_or_404(WantedItem.objects.only("charity_id"), pk=wanted_item_id)
+    if not _can_delete_wanted_items(request, obj.charity_id):
+        return HttpResponseForbidden
+    obj.delete()
+    return HttpResponse()

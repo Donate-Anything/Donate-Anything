@@ -70,6 +70,17 @@ def test_list_item_api(charity):
     assert resolve(f"/item/api/v1/list/{charity.id}/").view_name == "item:list-item"
 
 
+def test_delete_wanted_item(wanted_item):
+    assert (
+        reverse("item:delete-wanted-item", kwargs={"wanted_item_id": wanted_item.id})
+        == f"/item/api/v1/delete/{wanted_item.id}/"
+    )
+    assert (
+        resolve(f"/item/api/v1/delete/{wanted_item.id}/").view_name
+        == "item:delete-wanted-item"
+    )
+
+
 def test_list_proposed_item_template(charity, user):
     proposed = ProposedItem.objects.create(entity=charity, user=user)
     assert (

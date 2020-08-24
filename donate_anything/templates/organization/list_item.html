@@ -16,7 +16,8 @@
     <p><small>Note: this list is in alphabetical order.</small></p>
   {% endblocktranslate %}
   <hr>
-  <ul id="items-list"></ul>
+  {% csrf_token %}
+  <ul id="items-list" data-can-delete="{{ can_delete }}" data-delete-url="{% url 'item:delete-wanted-item' 0 %}"></ul>
 {% endblock %}
 
 {% block javascript %}

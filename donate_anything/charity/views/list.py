@@ -158,7 +158,7 @@ class CommunityListView(ListView):
     template_name = "organization/list.html"
 
     def get_queryset(self):
-        return Charity.objects.only("id", "name").all()
+        return Charity.objects.only("id", "name").order_by("id")
 
 
 all_entities_list_view = CommunityListView.as_view()

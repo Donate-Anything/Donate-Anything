@@ -30,6 +30,11 @@ urlpatterns = [
         name="list-item",
     ),
     path(
+        "api/v1/delete/<int:wanted_item_id>/",
+        views.delete_items,
+        name="delete-wanted-item",
+    ),
+    path(
         "list/proposed/<int:proposed_item_pk>/",
         views.list_org_proposed_item_view,
         name="list-proposed-template",

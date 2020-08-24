@@ -1,2 +1,5 @@
+from django.conf import settings
+
+
 def settings_context(_request):
-    return {}
+    return {"DEBUG": settings.DEBUG}
