@@ -34,7 +34,7 @@ function selectOne(id, value, condition_int_id, page, direct_link=false) {
             const conditionStringArray = [
                 "Poor Condition", "Used - Acceptable", "Used - Very Good", "Brand New"
             ];
-            const condition = " (" + conditionStringArray[condition_int_id] + ")";
+            const condition = " (" + conditionStringArray[condition_int_id] + " or better)";
             if (page.toString() === "1") {
                 if (data.data.length === 0) {
                     html = "<h4>No results for: " + value + condition + "</h4><hr>";
