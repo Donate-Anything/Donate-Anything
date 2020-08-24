@@ -55,7 +55,7 @@ function paginateItem() {
                     } else {
                         let ul = document.getElementById("existent-list");
                         let li = document.createElement("li");
-                        li.appendChild(document.createTextNode(data["data"][i][1] + " (" + data["condition"][i] + ")"));
+                        li.appendChild(document.createTextNode(data["data"][i][1] + " (" + conditionStringArray[data["condition"][i]] + ")"));
                         ul.appendChild(li);
                     }
                 }

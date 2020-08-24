@@ -105,8 +105,12 @@
       </table>
     {% else %}
       <ul>
-      {% for name in proposed_item.names %}
-        <li>{{ name }}</li>
+      {% for name, condition in proposed_item.names|zip:proposed_item.names_condition %}
+        <li>
+          {{ name }} ({% if condition == 0 %}Poor Condition{% endif %}{% if condition == 1 %}Used - Acceptable{% endif %}{% if condition == 2 %}Used - Very Good{% endif %}{% if condition == 3 %}Brand New{% endif %})
+        </li>
+      {% empty %}
+        <li>The user didn't propose to add any non-server-existing items.</li>
       {% endfor %}
       </ul>
     {% endif %}
