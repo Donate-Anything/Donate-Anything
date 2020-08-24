@@ -218,6 +218,13 @@ function noValueHomeAlert() {
 
 function searchOnConditionChange(elem) {
     const searchParams = getParams(window.location.href);
+    const index = Array.from(sessionStorage.getItem(multiItemArrayKey).split(",")).indexOf(searchParams["q_id"]);
+    const conditionArray = Array.from(sessionStorage.getItem(multiItemConditionArrayKey).split(","));
+    if (index !== -1) {
+        conditionArray[index] = elem.selectedIndex;
+    }
+    sessionStorage.setItem(multiItemConditionArrayKey, conditionArray.toString());
+
     selectOne(
         searchParams["q_id"],
         searchParams["q"],
@@ -282,6 +289,11 @@ $(document).ready(function() {
                 }
             })
         }
+    } else if (fieldCount === 1 && $(typeAheadID).val() === "") {
+        // refresh page of going back to home page via button
+        sessionStorage.setItem(multiItemArrayKey, "");
+        sessionStorage.setItem(multiItemStrArrayKey, "");
+        sessionStorage.setItem(multiItemConditionArrayKey, "");
     }
 
     // add custom input box, not typeahead

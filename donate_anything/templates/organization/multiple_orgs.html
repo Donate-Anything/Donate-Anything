@@ -1,13 +1,19 @@
 {% extends "base.html" %}
-{% load static compress paginate %}
+{% load static compress paginate i18n %}
 {# Displays a custom UI for multiple organizations rather than staying on one page. #}
 {# Context in format {data: {c_id: [list of item IDs, name, desc.[:150]}, has_next: bool} #}
 {# Quick setup if used create_item_data command http://localhost:8000/item/multi-lookup/?q=1&q=2&page=1 #}
 {% block content %}
-  <p class="text-danger text-center">
-    Warning: you won't be able to bookmark this page. Closing the tab
-    will have irreversible effects. We're working on a solution!
-  </p>
+  {% blocktranslate %}
+    <p class="text-danger text-center">
+      Warning: you won't be able to bookmark this page. Closing the tab
+      will have irreversible effects. We're working on a solution!
+    </p>
+    <p><i>
+      For each item in "Can fulfill," the condition in parenthesis means
+      the organization accept that item at that condition or better.
+    </i></p>
+  {% endblocktranslate %}
   {% for org_id, value in data.items %}
     <h2 id="item-count-{{ value|length|add:"-2" }}">{{ value|length|add:"-2" }} Item{% if value|length|add:"-2" != 1 %}s{% endif %}</h2>
     <hr id="item-count-hr-{{ value|length|add:"-2" }}">
@@ -16,7 +22,10 @@
     <p><i class="item-data-treasure" data-item-ids="{{ value|slice:":-2" }}"></i></p>
   {% empty %}
     <h2>Whoops!</h2>
-    <p>Looks like no organization can fulfill your donation.</p>
+    <p>
+      Looks like no organization can fulfill your donation.
+      It may be due to the condition of your item.
+    </p>
   {% endfor %}
 
   <!-- Show 10 numbers. If in middle, show 5 left, 4 right. -->
