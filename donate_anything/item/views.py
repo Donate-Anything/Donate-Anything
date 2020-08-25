@@ -3,6 +3,7 @@ from typing import Iterable
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.postgres.search import TrigramSimilarity
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import (
     Http404,
@@ -29,7 +30,6 @@ from donate_anything.item.utils.base_converter import (
 from donate_anything.users.models.charity import VerifiedAccount
 
 
-# TODO Add django-ratelimit and develop debounce method
 def search_item_autocomplete(request):
     """Simple autocomplete for all existing items.
     """
@@ -40,8 +40,10 @@ def search_item_autocomplete(request):
         raise Http404(_("You must specify a query"))
     queryset = (
         Item.objects.defer("is_appropriate")
+        .annotate(similarity=TrigramSimilarity("name", query))
         .filter(name__icontains=str(query), is_appropriate=True)
-        .values_list("id", "name", "image")[:15]
+        .values_list("id", "name", "image")
+        .order_by("-similarity")[:15]
     )
     data = {"data": list(queryset)}
     try:

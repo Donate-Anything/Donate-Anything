@@ -18,56 +18,12 @@ from donate_anything.item.views import (
     item_children,
     search_category,
     search_item,
-    search_item_autocomplete,
     search_multiple_items,
 )
 
 
 pytestmark = pytest.mark.django_db
 _wanted_items_condition_ids = [x[0] for x in WANTED_ITEM_CONDITIONS]
-
-
-class TestItemAutocompleteView:
-    def test_typeahead(self, rf):
-        query = "an"
-        ItemFactory.create(name="pan")
-        ItemFactory.create(name="canned food")
-        ItemFactory.create(name="blah")
-        request = rf.get("item/api/v1/item-autocomplete/", {"q": query})
-        response = search_item_autocomplete(request)
-        assert response.status_code == 200
-        data = json.loads(response.content)
-        assert len(data["data"]) == 2, f"Response {data}"
-        assert query in data["data"][0][1]
-        assert query in data["data"][1][1]
-
-    def test_dissimilar_item_names(self, rf):
-        query = "chair"
-        ItemFactory.create(name="blah blah")  # DONATABLE BTW
-        target = ItemFactory.create(name=query)
-        request = rf.get("item/api/v1/item-autocomplete/", {"q": query})
-        response = search_item_autocomplete(request)
-        assert response.status_code == 200
-        data = json.loads(response.content)
-        assert len(data["data"]) == 1, f"Response {data}"
-        assert data["data"][0] == [target.id, target.name, target.image]
-
-    def test_404_on_empty_query(self, rf):
-        request = rf.get("item/api/v1/item-autocomplete/")
-        with pytest.raises(Http404):
-            search_item_autocomplete(request)
-
-    def test_show_only_appropriate(self, rf):
-        # Remember, "name" is unique.
-        ItemFactory.create(name="chai", is_appropriate=False)
-        ItemFactory.create(name="hair", is_appropriate=False)  # DONATABLE BTW
-        target = ItemFactory.create(name="chair", is_appropriate=True)
-        request = rf.get("item/api/v1/item-autocomplete/", {"q": "chair"})
-        response = search_item_autocomplete(request)
-        assert response.status_code == 200
-        data = json.loads(response.content)
-        assert len(data["data"]) == 1
-        assert data["data"][0] == [target.id, target.name, target.image]
 
 
 class TestItemInformation:
