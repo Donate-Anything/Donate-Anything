@@ -3,6 +3,7 @@
 html, body {
   height: 100%;
   margin: 0;
+  font-family: 'PT Sans', sans-serif;
 }
 
 .alert-debug {
@@ -22,12 +23,12 @@ html, body {
 }
 
 .navbar-custom {
-  background-color: #97BC62FF;
+  background-color: #FFFFFF;
 }
 
 .navbar-custom a {
-  color: #2C5F2D !important;
-  font-weight: 330;
+  color: black !important;
+  font-weight: 220;
 }
 
 #full-body-wrapper {

@@ -37,11 +37,14 @@
 
 {% block content %}
   <div id="home-container" django-media-url="{% get_media_prefix %}">
-    <h1 class="da-text-color">Donate Anything!</h1>
+    <img id="logo-img" alt="" src="{% static 'images/logo.png' %}">
     <div id="main-scrollable-dropdown-menu">
-      <input id="typeahead-input-field" class="typeahead shadow-sm" type="text"
+      <form action=".">
+        <input id="typeahead-input-field" class="typeahead shadow-sm" type="search"
              placeholder="Can I donate a(n)..." style="margin-bottom: 25px">
+      </form>
       <div>
+        <p>Search items you want to donate; returns non-profits that'll accept your donations.</p>
         <p class="h4"><b>Condition:</b></p>
         <label>
           <select id="current-select" onchange="searchOnConditionChange(this)" class="selectpicker show-tick">

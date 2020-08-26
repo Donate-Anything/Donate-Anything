@@ -8,6 +8,10 @@ const multiItemConditionArrayKey = "multiItemConditionArrayKey";
 const maxFields = 100;
 const typeAheadID = "#typeahead-input-field.tt-input";
 const base_order = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-";
+// if typeahead is not empty and was just selectOne'd
+let isTypeaheadSelectOned = false;
+// for scrolling to search results the first time
+let hasShownSearch = false;
 
 function base10_to_base64(num, condition="3") {
     num = parseInt(num.toString() + condition.toString());
@@ -49,6 +53,7 @@ function selectOne(id, value, condition_int_id, page, direct_link=false) {
                     x[0] + '/">' + x[1] + '</a></h3><p>' + x[2] + '</p>'
             }
             $('#organizations').html(html);
+            isTypeaheadSelectOned = true;
             let refresh = window.location.protocol + "//" + window.location.host + window.location.pathname +
                 '?q=' + value + '&page=' + page + '&q_id=' + id + '&condition=' + condition_int_id;
             window.history.pushState({path: refresh}, 'Donate Anything', refresh)
@@ -58,10 +63,18 @@ function selectOne(id, value, condition_int_id, page, direct_link=false) {
                 $('#more-organizations-button').css("visibility", "hidden");
             }
             if (direct_link) {
-                $(typeAheadID).val(value);
+                $("#typeahead-input-field").typeahead("val", value);
                 sessionStorage.setItem(multiItemArrayKey, id + ",");
                 sessionStorage.setItem(multiItemStrArrayKey, value + ",");
                 sessionStorage.setItem(multiItemConditionArrayKey, condition_int_id + ",");
+                document.activeElement.blur();
+                if (!hasShownSearch) {
+                    window.scroll({
+                        top: findPos(document.getElementById("organizations")),
+                        behavior: 'smooth'
+                    });
+                    hasShownSearch = true;
+                }
             }
         },
         fail: function(_) {
@@ -92,6 +105,33 @@ $("#more-organizations-button").click(function() {
       (parseInt(searchParams["page"], 10) + 1).toString()
   );
 });
+
+function findPos(obj) {
+    let curtop = 0;
+    if (obj.offsetParent) {
+        do {
+            curtop += obj.offsetTop;
+        } while (obj === obj.offsetParent);
+        return [curtop];
+    }
+}
+
+function removeLast(q_name) {
+    let nameArray = Array.from(sessionStorage.getItem(multiItemStrArrayKey).split(","));
+    if (nameArray[nameArray.length - 2] === q_name) {
+        let idArray = Array.from(sessionStorage.getItem(multiItemArrayKey).split(","));
+        let conditionArray = Array.from(sessionStorage.getItem(multiItemConditionArrayKey).split(","));
+        idArray.splice(-2); // deletes last space which gives the last comma
+        idArray.push(""); // Adds a comma at the end
+        nameArray.splice(-2);
+        nameArray.push("");
+        conditionArray.splice(-2);
+        conditionArray.push("");
+        sessionStorage.setItem(multiItemStrArrayKey, nameArray.toString());
+        sessionStorage.setItem(multiItemArrayKey, idArray.toString());
+        sessionStorage.setItem(multiItemConditionArrayKey, conditionArray.toString());
+    }
+}
 
 $("#search-multi-button").click(function() {
     let prefix = window.location.protocol + "//" + window.location.host + '/item/multi-lookup/?';
@@ -172,6 +212,7 @@ $('#typeahead-input-field').typeahead({
     sessionStorage.setItem(multiItemConditionArrayKey, sessionStorage.getItem(multiItemConditionArrayKey) + currentCondition + ",");
 }
 ).on("keydown", function(e) {
+    // $(this).val() will get the typeahead val before the keypress
     // https://github.com/twitter/typeahead.js/issues/332#issuecomment-379579385
     if (e.which === 13 /* ENTER */) {
         const typeahead = $(this).data().ttTypeahead;
@@ -179,28 +220,40 @@ $('#typeahead-input-field').typeahead({
         const sel = menu.getActiveSelectable() || menu.getTopSelectable();
         if (menu.isOpen()) {
             menu.trigger('selectableClicked', sel);
+            document.activeElement.blur();
+            if (!hasShownSearch) {
+                window.scroll({
+                    top: findPos(document.getElementById("organizations")),
+                    behavior: 'smooth'
+                });
+                hasShownSearch = true;
+            }
             e.preventDefault();
         }
     } else if (e.which === 8 /* Backspace */) {
         /* This is mainly used if a user goes back and deletes typeahead value.
-        Since the typeahead value is always second-to last in the list
-        we only check that value. (Last is a space) */
-        let nameArray = Array.from(sessionStorage.getItem(multiItemStrArrayKey).split(","));
-        if (nameArray[nameArray.length - 2] === $(this).val()) {
-            let idArray = Array.from(sessionStorage.getItem(multiItemArrayKey).split(","));
-            let conditionArray = Array.from(sessionStorage.getItem(multiItemConditionArrayKey).split(","));
-            idArray.splice(-2); // deletes last space which gives the last comma
-            idArray.push(""); // Adds a comma at the end
-            nameArray.splice(-2);
-            nameArray.push("");
-            conditionArray.splice(-2);
-            conditionArray.push("");
-            sessionStorage.setItem(multiItemStrArrayKey, nameArray.toString());
-            sessionStorage.setItem(multiItemArrayKey, idArray.toString());
-            sessionStorage.setItem(multiItemConditionArrayKey, conditionArray.toString());
-        }
+        * Since the typeahead value is always second-to last in the list
+        * we only check that value. (Last is a space) */
+        removeLast($(this).val())
+        isTypeaheadSelectOned = false;
+    } else {
+        /* FIXME If the user "selects all" with Ctrl A and types, the arrays are not updated
+        * to account for the new typeahead value which replaced the "deleted"
+        * typeahead value. */
     }
 });
+
+$('input[type=search]').on('search', function () {
+    const _typeahead = $(typeAheadID);
+    if (_typeahead.val() === "" && isTypeaheadSelectOned) {
+        // user pressed X button on Safari
+        const params = getParams(window.location.href);
+        removeLast(params["q"]);
+        isTypeaheadSelectOned = false;
+    }
+    // else user searched for a suggestion that works
+    // doesn't work if no suggestion appeared
+})
 
 function cantEditHomeAlert() {
     document.getElementById("cant-edit-alert").style.visibility = "visible";
@@ -267,7 +320,7 @@ $(document).ready(function() {
         } else if (searchParams["q"]) {
             // For search bar in Google
             const searchQuery = searchParams["q"];
-            $(typeAheadID).val(searchQuery);
+            $("#typeahead-input-field").typeahead("val", searchQuery);
             $.ajax({
                 url: '/item/api/v1/item-autocomplete/',
                 data: { "q": searchQuery },
@@ -314,6 +367,7 @@ $(document).ready(function() {
             );
             // Remove typeahead input.
             $(typeAheadID).val("");
+            isTypeaheadSelectOned = false;
             if (fieldCount > 1) {
                 $('#search-multi-button').show();
             }

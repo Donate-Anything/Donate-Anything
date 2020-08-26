@@ -1,7 +1,7 @@
 .typeahead,
 .tt-query,
 .tt-hint {
-  width: 396px;
+  width: 500px;
   height: 44px;
   padding: 8px 12px;
   font-size: 24px;
@@ -32,7 +32,7 @@
 }
 
 .tt-menu {
-  width: 396px;
+  width: 500px;
   margin: -12px 0;
   padding: 8px 0;
   background-color: #fff;
@@ -68,18 +68,56 @@
   margin: 0;
 }
 
-@media screen and (max-device-width: 480px) {
-  .typeahead,
-  .tt-query,
-  .tt-hint,
-  .tt-menu {
-    width: 240px;
-  }
+#logo-img {
+  text-align:center;
+  width: 550px;
 }
 
 #home-container {
   text-align: center;
   padding-top: 70px;
+}
+
+@media screen and (max-width: 850px) {
+  .typeahead,
+  .tt-query,
+  .tt-hint,
+  .tt-menu {
+    margin-left: -65px;
+    width: 640px;
+  }
+
+  #logo-img {
+    width: 300px;
+  }
+
+  #home-container {
+    padding-top: 0;
+  }
+}
+
+@media screen and (max-width: 700px) {
+  .typeahead,
+  .tt-query,
+  .tt-hint,
+  .tt-menu {
+    margin-left: 0;
+    width: 380px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .typeahead,
+  .tt-query,
+  .tt-hint,
+  .tt-menu {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  #logo-img {
+    width: 100%;
+  }
 }
 
 #home-container .rounded-button {
