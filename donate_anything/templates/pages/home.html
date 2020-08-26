@@ -37,11 +37,12 @@
 
 {% block content %}
   <div id="home-container" django-media-url="{% get_media_prefix %}">
-    <img id="logo-img" alt="" src="{% static 'images/logo.png' %}">
+    <img id="logo-img" alt="" src="{% static 'images/donate_anything_logo_2.png' %}">
     <div id="main-scrollable-dropdown-menu">
-      <form action=".">
+      <form class="search-div-form" action="." style="text-align: center">
         <input id="typeahead-input-field" class="typeahead shadow-sm" type="search"
              placeholder="Can I donate a(n)..." style="margin-bottom: 25px">
+        <i class="fa fa-search" aria-hidden="true"></i>
       </form>
       <div>
         <p>Search items you want to donate; returns non-profits that'll accept your donations.</p>

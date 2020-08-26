@@ -68,11 +68,11 @@
   margin: 0;
 }
 
-@media screen and (max-device-width: 480px) {
+@media screen and (max-width: 410px) {
   .typeahead,
   .tt-query,
   .tt-hint,
   .tt-menu {
-    width: 240px;
+    width: 100%;
   }
 }

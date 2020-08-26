@@ -3,7 +3,7 @@
 .tt-hint {
   width: 500px;
   height: 44px;
-  padding: 8px 12px;
+  padding: 8px 35px;
   font-size: 24px;
   line-height: 30px;
   border: 2px solid #ccc;
@@ -75,16 +75,42 @@
 
 #home-container {
   text-align: center;
-  padding-top: 70px;
+  /*For old logo with middle slash thing: padding-top: 70px;*/
 }
 
-@media screen and (max-width: 850px) {
+.search-div-form {
+  position: relative;
+}
+
+.search-div-form i {
+  position: absolute;
+  left: 318px;
+  top: 13px;
+  color: gray;
+}
+
+/*
+Bootstrap container dimensions
+https://www.w3schools.com/bootstrap4/bootstrap_containers.asp
+*/
+@media screen and (max-width: 1200px) {
+  .search-div-form i {
+    left: 230px;
+  }
+}
+
+@media screen and (max-width: 992px) {
+  .search-div-form i {
+    left: 108px;
+  }
+}
+
+@media screen and (max-width: 768px) {
   .typeahead,
   .tt-query,
   .tt-hint,
   .tt-menu {
-    margin-left: -65px;
-    width: 640px;
+    width: 500px;
   }
 
   #logo-img {
@@ -94,15 +120,23 @@
   #home-container {
     padding-top: 0;
   }
+
+  .search-div-form i {
+    left: 20px;
+  }
 }
 
-@media screen and (max-width: 700px) {
+@media screen and (max-width: 576px) {
   .typeahead,
   .tt-query,
   .tt-hint,
   .tt-menu {
-    margin-left: 0;
     width: 380px;
+  }
+
+  .search-div-form i {
+    width: 100%;
+    left: -165px;
   }
 }
 
@@ -111,12 +145,23 @@
   .tt-query,
   .tt-hint,
   .tt-menu {
-    margin-left: 0;
     width: 100%;
   }
 
   #logo-img {
     width: 100%;
+  }
+
+  .search-div-form i {
+    width: 100%;
+    left: -140px;
+  }
+}
+
+@media screen and (max-width: 350px) {
+  .search-div-form i {
+    width: auto;
+    left: 15px;
   }
 }
 

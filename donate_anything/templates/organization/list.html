@@ -12,9 +12,11 @@
 {% block content %}
   <h2 class="pt-4">Supported Organizations</h2>
   <p class="font-italic">
-    {% trans 'Disclaimer: many of these organizations are listed here by volunteer users. These organizations and entities were voted in to this list to be shown to people who want to donate their items, either to a cause, for recycling, or simply not knowing what to do with material that pollute the earth.' %}
+    {% translate 'Disclaimer: many of these organizations are listed here by volunteer users. These organizations and entities were voted in to this list to be shown to people who want to donate their items, either to a cause, for recycling, or simply not knowing what to do with material that pollute the earth.' %}
   </p>
-  <input id="typeahead-input-field" class="typeahead shadow-sm" type="text" placeholder="Organization Search" style="margin-bottom: 25px">
+  <form action=".">
+    <input id="typeahead-input-field" class="typeahead shadow-sm" type="search" placeholder="Organization Search" style="margin-bottom: 25px">
+  </form>
   <ul>
   {% for org in page_obj.object_list %}
     <li><a href="{% url 'charity:organization' org.id %}">{{ org.name }}</a></li>
