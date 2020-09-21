@@ -24,6 +24,7 @@ jobs:
         - redis
       install:
         - pip install -r requirements/local.txt
+        - pip install pytest-cov==2.10.1
       before_script:
         - sudo mkdir /var/run/celery
         - sudo mkdir /var/log/celery
@@ -31,7 +32,7 @@ jobs:
         - sudo chown travis /var/run/celery
         - celery multi start worker beat -A config.celery_app --pool=solo
       script:
-        - "pytest"
+        - pytest --cov-report term --cov=donate_anything donate_anything/
 
   allow_failures:
     - name: "Lint"
