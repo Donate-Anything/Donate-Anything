@@ -32,7 +32,7 @@ jobs:
         - sudo chown travis /var/run/celery
         - celery multi start worker beat -A config.celery_app --pool=solo
       script:
-        - pytest --cov-report term --cov=donate_anything donate_anything/
+        - pytest --cov-report=term --cov=donate_anything donate_anything/
 
   allow_failures:
     - name: "Lint"
