@@ -19,7 +19,7 @@ sphinx-rtd-theme==0.5.0  # https://github.com/readthedocs/sphinx_rtd_theme
 
 # Code quality
 # ------------------------------------------------------------------------------
-isort==4.3.21  # https://github.com/timothycrosley/isort/
+isort==5.5.4  # https://github.com/timothycrosley/isort/
 coverage==5.2  # https://github.com/nedbat/coveragepy
 black==19.10b0  # https://github.com/ambv/black
 pylint-django==2.3.0  # https://github.com/PyCQA/pylint-django
