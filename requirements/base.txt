@@ -21,7 +21,7 @@ django-redis==4.12.1  # https://github.com/jazzband/django-redis
 django-axes==5.4.2  # https://github.com/jazzband/django-axes
 django-recaptcha==2.0.6  # https://github.com/praekelt/django-recaptcha
 django-ratelimit==3.0.1  # https://github.com/jsocol/django-ratelimit
-django-cachalot==2.3.1  # https://github.com/noripyt/django-cachalot
+django-cachalot==2.3.2  # https://github.com/noripyt/django-cachalot
 
 # AWS
 # ------------------------------------------------------------------------------
