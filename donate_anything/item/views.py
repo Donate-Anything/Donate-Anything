@@ -31,8 +31,7 @@ from donate_anything.users.models.charity import VerifiedAccount
 
 
 def search_item_autocomplete(request):
-    """Simple autocomplete for all existing items.
-    """
+    """Simple autocomplete for all existing items."""
     # TODO Migrate to elasticsearch once there's enough items
     # TODO Use websockets instead since elasticsearch-dsl supports asyncio
     query = request.GET.get("q", None)
@@ -274,8 +273,7 @@ def list_active_entity_items(request, charity_id):
 
 
 def list_org_items_view(request, entity_id):
-    """View that renders the initial items list
-    """
+    """View that renders the initial items list"""
     obj = get_object_or_404(Charity, id=entity_id)
     return render(
         request,

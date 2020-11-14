@@ -143,8 +143,7 @@ class SuggestedEditForm(forms.Form):
 
 
 class ExistingSuggestEditForm(forms.ModelForm):
-    """Suggesting edits for active/existing organizations in the db
-    """
+    """Suggesting edits for active/existing organizations in the db"""
 
     class Meta:
         model = ProposedEdit

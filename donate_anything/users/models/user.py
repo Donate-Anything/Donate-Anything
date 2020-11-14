@@ -8,8 +8,7 @@ from donate_anything.users.models.charity import VerifiedAccount
 
 
 class User(AbstractUser):
-    """Default user for Donate Anything.
-    """
+    """Default user for Donate Anything."""
 
     id = models.BigAutoField(_("ID"), primary_key=True)
 

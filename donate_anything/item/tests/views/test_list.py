@@ -128,8 +128,7 @@ class TestPaginateViaCharity:
         _assert_org_list_eq(data["data"], categories)
 
     def test_filter_category_search_by_page(self, rf):
-        """Test pagination of category filtering
-        """
+        """Test pagination of category filtering"""
         category_type = choice(CATEGORY_TYPES)[0]
         # Test the second page
         CategoryFactory.create_batch(26, category=category_type)
@@ -237,8 +236,7 @@ class TestSearchMultipleItems:
 
     @pytest.mark.parametrize("condition", _wanted_items_condition_ids)
     def test_search_multi_better_condition(self, client, charity, condition):
-        """Only filter by item of searched conditions(s) or better
-        """
+        """Only filter by item of searched conditions(s) or better"""
 
     def test_search_multiple_items_with_page(self, rf):
         request = rf.get(f"item/multi-lookup/", {"q": item_encode_b64(1), "page": "1"})

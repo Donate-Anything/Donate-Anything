@@ -22,6 +22,6 @@
 
 {% block javascript %}
   {% compress js %}
-    <script src="{% static 'js/item/active.js' %}" type="application/javascript"></script>
+    <script defer src="{% static 'js/item/active.js' %}" type="application/javascript"></script>
   {% endcompress %}
 {% endblock %}

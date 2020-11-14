@@ -78,31 +78,17 @@
   margin: 0;
 }
 
-#logo-img {
-  text-align:center;
-  width: 550px;
-}
-
-#home-container {
-  text-align: center;
-  /*For old logo with middle slash thing: padding-top: 70px;*/
-}
-
 .search-div-form {
   position: relative;
 }
 
 .search-div-form i {
   position: absolute;
-  left: 318px;
+  left: 21px;
   top: 13px;
   color: gray;
 }
 
-/*
-Bootstrap container dimensions
-https://www.w3schools.com/bootstrap4/bootstrap_containers.asp
-*/
 @media screen and (min-width: 1200px) {
   .search-div-form i {
     left: 320px;
@@ -183,68 +169,51 @@ https://www.w3schools.com/bootstrap4/bootstrap_containers.asp
   }
 }
 
-#home-container .rounded-button {
-  margin-bottom: 25px;
-}
-
-.rounded-button {
-  -webkit-border-radius: 40px;
-     -moz-border-radius: 40px;
-          border-radius: 40px;
+.grow-charity-card {
+  background-color: #1E5175;
+  color: lightgray;
+  padding: 5px 5px 5px 5px;
+  border-radius: 10px;
+  height: 180px;
   width: 100%;
-  text-align: center;
-  border-color: gray;
-}
-
-#more-organizations-button {
-  visibility: hidden;
-}
-
-.rounded-button b {
-  color: #1e90ff;
-  padding: 20px;
-  text-decoration: none;
-  border-color: gray;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-}
-
-.rounded-button:hover {
-  background-color: lightgray;
-  cursor: pointer;
-}
-
-.down-arrow {
-  border: solid black;
-  border-width: 0 3px 3px 0;
-  display: inline-block;
-  padding: 3px;
-
-  transform: rotate(45deg);
-  -webkit-transform: rotate(45deg);
-}
-
-.feature-container {
+  margin: 5px 1% 5px 1%;
+  float: left;
   position: relative;
+  transition: height 0.5s, width 0.5s;
+  -webkit-transition: height 0.5s, width 0.5s;
   text-align: center;
-  font-size: 2em;
+  overflow: hidden;
 }
 
-.feature-container a {
-  color: black;
+.grow-charity-card a {
+  color: inherit;
 }
 
-.feature-container img {
-  height: 200px;
-  width: 350px;
-}
-
-.feature-centered {
-  background-color: rgba(255,255,255,.7);
+.grow-charity-card:hover {
   width: 100%;
+  height: 275px;
+}
+
+.grow-charity-card p {
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+.grow-charity-card:hover p {
+  opacity: 1;
+}
+
+.add-cart {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  bottom: 10px;
+}
+
+.fa-hand-holding-heart {
+  font-size: 4em;
+}
+
+#listed-added-cart {
+  overflow: auto;
+  display: flex;
+  /*white-space: nowrap;*/
 }

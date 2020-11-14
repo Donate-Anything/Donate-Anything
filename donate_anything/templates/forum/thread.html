@@ -75,14 +75,14 @@
 {% endblock %}
 
 {% block javascript %}
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js" integrity="sha512-L03kznCrNOfVxOUovR6ESfCz9Gfny7gihUX/huVbQB9zjODtYpxaVtIaAkpetoiyV2eqWbvxMH9fiSv5enX7bw==" crossorigin="anonymous"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js" integrity="sha512-L03kznCrNOfVxOUovR6ESfCz9Gfny7gihUX/huVbQB9zjODtYpxaVtIaAkpetoiyV2eqWbvxMH9fiSv5enX7bw==" crossorigin="anonymous"></script>
   {% compress js %}
-    <script src="{% static 'js/forum/thread.js' %}"></script>
+    <script defer src="{% static 'js/forum/thread.js' %}"></script>
     {% if request.user.is_authenticated %}
-      <script src="{% static 'js/markdown_editor.js' %}"></script>
+      <script defer src="{% static 'js/markdown_editor.js' %}"></script>
     {% endif %}
     {% if show_vote %}
-      <script src="{% static 'js/forum/vote.js' %}"></script>
+      <script defer src="{% static 'js/forum/vote.js' %}"></script>
     {% endif %}
   {% endcompress %}
 {% endblock %}

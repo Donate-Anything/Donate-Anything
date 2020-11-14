@@ -53,8 +53,7 @@ class TestOrganizationForm:
 
 
 class TestExistingSuggestEditForm:
-    """Assumes entity already exists
-    """
+    """Assumes entity already exists"""
 
     def test_no_fields_changed(self, charity, user):
         form = ExistingSuggestEditForm(
@@ -72,7 +71,7 @@ class TestExistingSuggestEditForm:
         assert len(form.errors) == 1
 
     @pytest.mark.parametrize(
-        "link,description,how_to", [("a", "", ""), ("", "a", ""), ("", "", "a"),]
+        "link,description,how_to", [("a", "", ""), ("", "a", ""), ("", "", "a"),],
     )
     def test_at_least_one_field_filled(self, charity, user, link, description, how_to):
         form = ExistingSuggestEditForm(

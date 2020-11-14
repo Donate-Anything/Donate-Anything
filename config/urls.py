@@ -21,7 +21,8 @@ sitemaps = {
 
 
 urlpatterns = [
-    path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
+    path("", TemplateView.as_view(template_name="pages/homepage.html"), name="home"),
+    path("", include("donate_anything.cart.urls", namespace="cart")),
     path(
         "about/", TemplateView.as_view(template_name="pages/about.html"), name="about"
     ),

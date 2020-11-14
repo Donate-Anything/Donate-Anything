@@ -109,14 +109,14 @@
 
 {% block javascript %}
   <!-- Markdown viewer -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js" integrity="sha512-L03kznCrNOfVxOUovR6ESfCz9Gfny7gihUX/huVbQB9zjODtYpxaVtIaAkpetoiyV2eqWbvxMH9fiSv5enX7bw==" crossorigin="anonymous"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js" integrity="sha512-L03kznCrNOfVxOUovR6ESfCz9Gfny7gihUX/huVbQB9zjODtYpxaVtIaAkpetoiyV2eqWbvxMH9fiSv5enX7bw==" crossorigin="anonymous"></script>
   {% compress js %}
-    <script src="{% static 'js/markdown_editor.js' %}" type="text/javascript"></script>
+    <script defer src="{% static 'js/markdown_editor.js' %}" type="text/javascript"></script>
     {% if request.user == obj.applier %}
-      <script src="{% static 'js/organization/view_edit.js' %}" type="text/javascript"></script>
+      <script defer src="{% static 'js/organization/view_edit.js' %}" type="text/javascript"></script>
     {% else %}
-      <script src="{% static 'js/organization/view_app.js' %}" type="text/javascript"></script>
+      <script defer src="{% static 'js/organization/view_app.js' %}" type="text/javascript"></script>
     {% endif %}
-    <script src="{% static 'js/organization/suggestion_sidebar.js' %}" type="text/javascript"></script>
+    <script defer src="{% static 'js/organization/suggestion_sidebar.js' %}" type="text/javascript"></script>
   {% endcompress %}
 {% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load static compress i18n %}
+
+{% block javascript %}
+  {% compress js %}
+    <script defer src="{% static 'js/cart/cart.js' %}"></script>
+  {% endcompress %}
+{% endblock %}
+
+{% block content %}
+  <h2 class="pt-4">{% translate "Checkout" %}</h2>
+  <hr>
+  <div id="main" data-org-url="{% url "charity:organization" 0 %}"></div>
+{% endblock content %}

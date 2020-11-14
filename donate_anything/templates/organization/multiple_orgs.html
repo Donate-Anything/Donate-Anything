@@ -66,6 +66,6 @@
 
 {% block javascript %}
   {% compress js %}
-    <script src="{% static 'js/multi_lookup.js' %}" type="text/javascript"></script>
+    <script defer src="{% static 'js/multi_lookup.js' %}" type="text/javascript"></script>
   {% endcompress %}
 {% endblock %}

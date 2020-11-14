@@ -12,6 +12,8 @@ const base_order = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWX
 let isTypeaheadSelectOned = false;
 // for scrolling to search results the first time
 let hasShownSearch = false;
+// if text in typeahead is being selected/highlighted
+let isSelectHighlighting = false;
 
 function base10_to_base64(num, condition="3") {
     num = parseInt(num.toString() + condition.toString());
@@ -83,19 +85,6 @@ function selectOne(id, value, condition_int_id, page, direct_link=false) {
     })
 }
 
-const getParams = function (url) {
-    let params = {};
-    const parser = document.createElement('a');
-    parser.href = url;
-    const query = parser.search.substring(1);
-    const vars = query.split('&');
-    for (let i = 0; i < vars.length; i++) {
-        const pair = vars[i].split('=');
-        params[pair[0]] = decodeURIComponent(pair[1]);
-    }
-    return params;
-};
-
 $("#more-organizations-button").click(function() {
   const searchParams = getParams(window.location.href);
   selectOne(
@@ -117,6 +106,8 @@ function findPos(obj) {
 }
 
 function removeLast(q_name) {
+    /* Since the typeahead value is always second-to last in the list
+    * we only check that value. (Last is a space) */
     let nameArray = Array.from(sessionStorage.getItem(multiItemStrArrayKey).split(","));
     if (nameArray[nameArray.length - 2] === q_name) {
         let idArray = Array.from(sessionStorage.getItem(multiItemArrayKey).split(","));
@@ -231,15 +222,18 @@ $('#typeahead-input-field').typeahead({
             e.preventDefault();
         }
     } else if (e.which === 8 /* Backspace */) {
-        /* This is mainly used if a user goes back and deletes typeahead value.
-        * Since the typeahead value is always second-to last in the list
-        * we only check that value. (Last is a space) */
-        removeLast($(this).val())
+        // This is mainly used if a user goes back and deletes typeahead value.
+        removeLast($(this).val());
         isTypeaheadSelectOned = false;
     } else {
         /* FIXME If the user "selects all" with Ctrl A and types, the arrays are not updated
         * to account for the new typeahead value which replaced the "deleted"
         * typeahead value. */
+        let q_name = getParams(window.location.href)["q"];
+        if (isTypeaheadSelectOned && $(this).val() === q_name) {
+            removeLast(q_name);
+            isTypeaheadSelectOned = false;
+        }
     }
 });
 

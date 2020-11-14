@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load compress i18n static paginate %}
+{# TODO Need to also add "How to donate" here as well #}
+{# TODO In the cart, final page, do we want to show How to mail? Probably #}
+{% block css %}
+  {% compress css %}
+  <link rel="stylesheet" href="{% static 'css/search.css' %}" />
+  {% endcompress %}
+{% endblock %}
+
+{% block javascript %}
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/corejs-typeahead/1.3.1/typeahead.jquery.min.js" crossorigin="anonymous"></script>
+  <script defer src="{% static "js/cart/search.js" %}"></script>
+{% endblock %}
+
+{% block content %}
+  <form class="search-div-form" action="." style="text-align: center">
+    <input spellcheck="true" id="typeahead-input-field" class="typeahead shadow-sm" type="search"
+           placeholder="Can I donate a(n)..." style="margin-bottom: 25px">
+    <i class="fa fa-search" aria-hidden="true"></i>
+  </form>
+  <div id="listed-added-cart" data-organization-url="{% url "charity:organization" 0 %}"></div>
+  <div id="listed-carts" data-item-id="{{ item_id }}" data-item-name="{{ item_name }}" data-remove-text="{% translate "Remove" %}">
+  {% for charity_id, name, description in page_obj %}
+    {% if forloop.counter0|divisibleby:2 %}
+    <div class="row">
+    {% endif %}
+    {# Now for the actual content #}
+    <div class="col-12 col-md-6 d-flex justify-content-center">
+      <div class="grow-charity-card" data-charity-id="{{ charity_id }}">
+        <h2><a href="{% url "charity:organization" charity_id %}">{{ name }}</a></h2>
+        <a href="{% url "charity:organization" charity_id %}"><i class="fa fa-hand-holding-heart py-2"></i></a>
+        <p>{{ description|truncatechars:99 }}</p>
+        {# Buttons #}
+        <div class="add-cart col text-center">
+          <button class="btn btn-primary px-3 py-1">{% translate "Add to Cart" %}</button>
+        </div>
+      </div>
+    </div>
+    {% if not forloop.counter0|divisibleby:2 %}
+    </div>
+    {% endif %}
+  {% endfor %}
+  </div>
+  {# Pagination #}
+  <div class="pt-4 d-flex justify-content-center">
+    <nav>
+      <ul class="pagination">
+        <li class="page-item{% if not page_obj.has_previous %} disabled{% endif %}">
+          <a class="page-link" href="?q_id={{ item_id|urlencode }}&q={{ item_name|urlencode }}&page={% if page_obj.has_previous %}{{ page_obj.previous_page_number }}{% endif %}" tabindex="-1">{% translate "Previous" %}</a>
+        </li>
+        {% for link, value in request.get_full_path|paginate:page_obj.paginator.num_pages %}
+          <li class="page-item{% if page_obj.number == value %} active{% endif %}">
+            <a class="page-link" href="{{ link }}&q_id={{ item_id }}">{{ value }}</a>
+          </li>
+        {% endfor %}
+        <li class="page-item{% if not page_obj.has_next %} disabled{% endif %}">
+          <a class="page-link" href="?q_id={{ item_id|urlencode }}&q={{ item_name|urlencode }}&page={% if page_obj.has_next %}{{ page_obj.next_page_number }}{% endif %}">{% translate "Next" %}</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+{% endblock content %}

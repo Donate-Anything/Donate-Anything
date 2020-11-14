@@ -17,7 +17,7 @@
 
     <!-- Latest compiled and minified Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
     {% block corecss %}
       {% compress css %}
       <!-- This file stores site-wide CSS -->
@@ -38,9 +38,16 @@
       gtag('config', 'UA-176173345-1');
     </script>
     {% endif %}
+    <script defer src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script defer src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    {% compress js %}
+    <script defer src="{% static 'js/project.js' %}"></script>
+    {% endcompress %}
+    {% block javascript %}{% endblock javascript %}
   </head>
 
-  <body>
+  <body data-media-url="{% get_media_prefix %}" data-static-url="{% get_static_prefix %}" data-search-url="{% url 'cart:search' %}">
   {# TODO Add search to top right https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_searchbar3 #}
 
     <div id="full-body-wrapper">
@@ -52,7 +59,7 @@
             <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
               <span class="navbar-toggler-icon"></span>
             </button>
-            <a class="navbar-brand" href="{% url 'home' %}"><img src="{% static 'images/short_logo.png' %}" width="50" height="50"></a>
+            <a class="navbar-brand" href="{% url 'home' %}"><img alt="Donate Anything Logo" src="{% static 'images/short_logo.png' %}" width="50" height="50"></a>
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
               <ul class="navbar-nav mr-auto" style="font-weight: 100">
@@ -94,6 +101,12 @@
                 {% endif %}
               </ul>
             </div>
+            <div>
+              <a href="{% url "cart:cart" %}">
+                <i class="fa fa-lg fa-shopping-cart pr-2 pt-2 pt-md-0"></i>
+                <p class="d-inline-block d-md-none">{% translate "Cart" %}</p>
+              </a>
+            </div>
           </nav>
         </div>
 
@@ -128,16 +141,5 @@
       </div>
     </footer>
     {% endblock %}
-
-    <!-- Le javascript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <!-- Bootstrap JS and its dependencies-->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-
-    {% block javascript %}
-    {% endblock javascript %}
   </body>
 </html>

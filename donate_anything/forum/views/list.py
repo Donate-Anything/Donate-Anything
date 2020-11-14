@@ -10,8 +10,7 @@ from donate_anything.forum.models import Message, Thread, UserVote
 
 
 class ForumView(ListView):
-    """Show list of threads with last message
-    """
+    """Show list of threads with last message"""
 
     model = Thread
     paginate_by = 20

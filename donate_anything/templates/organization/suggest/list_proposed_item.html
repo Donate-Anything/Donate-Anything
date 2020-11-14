@@ -138,14 +138,14 @@
 
 {% block javascript %}
   {% if can_edit %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/corejs-typeahead/1.3.1/typeahead.jquery.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js" integrity="sha512-yDlE7vpGDP7o2eftkCiPZ+yuUyEcaBwoJoIhdXv71KZWugFqEphIS3PU60lEkFaz8RxaVsMpSvQxMBaKVwA5xg==" crossorigin="anonymous"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/corejs-typeahead/1.3.1/typeahead.jquery.min.js" crossorigin="anonymous"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js" integrity="sha512-yDlE7vpGDP7o2eftkCiPZ+yuUyEcaBwoJoIhdXv71KZWugFqEphIS3PU60lEkFaz8RxaVsMpSvQxMBaKVwA5xg==" crossorigin="anonymous"></script>
   {% endif %}
 
   {% compress js %}
     {% if can_edit %}
-      <script src="{% static 'js/item/search.js' %}" type="application/javascript"></script>
+      <script defer src="{% static 'js/item/search.js' %}" type="application/javascript"></script>
     {% endif %}
-    <script src="{% static 'js/item/propose.js' %}" type="application/javascript"></script>
+    <script defer src="{% static 'js/item/propose.js' %}" type="application/javascript"></script>
   {% endcompress %}
 {% endblock %}

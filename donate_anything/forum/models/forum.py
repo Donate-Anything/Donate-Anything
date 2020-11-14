@@ -39,8 +39,7 @@ class Thread(models.Model):
 
 
 class Message(models.Model):
-    """A message in a thread is a simple message. Nothing special.
-    """
+    """A message in a thread is a simple message. Nothing special."""
 
     id = models.BigAutoField(primary_key=True)
     created = models.DateTimeField(auto_now_add=True)

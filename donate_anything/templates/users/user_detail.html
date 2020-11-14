@@ -3,10 +3,6 @@
 
 {% block title %}User: {{ object.username }} | Donate Anything{% endblock %}
 
-{% block css %}
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-{% endblock %}
-
 {% block content %}
 <div class="container">
 
@@ -51,7 +47,7 @@
 
 {% block javascript %}
 <script type="application/javascript">
-$(function () {
+window.addEventListener('DOMContentLoaded', function() {
   $('[data-toggle="tooltip"]').tooltip()
 })
 </script>

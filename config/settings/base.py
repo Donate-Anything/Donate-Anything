@@ -81,6 +81,7 @@ LOCAL_APPS = [
     "donate_anything.users.apps.UsersConfig",
     "donate_anything.charity.apps.CharityConfig",
     "donate_anything.item.apps.ItemConfig",
+    "donate_anything.cart.apps.CartConfig",
     "donate_anything.forum.apps.ForumConfig",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps

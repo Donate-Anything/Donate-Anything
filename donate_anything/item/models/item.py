@@ -74,8 +74,7 @@ class WantedItem(models.Model):
 
 
 class ProposedItem(models.Model):
-    """User inputted items that can be merged.
-    """
+    """User inputted items that can be merged."""
 
     id = models.BigAutoField(primary_key=True)
     entity = models.ForeignKey(Charity, on_delete=models.SET_NULL, null=True)

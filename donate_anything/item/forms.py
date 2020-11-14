@@ -13,8 +13,7 @@ _max_condition_value = WANTED_ITEM_CONDITIONS[-1][0]
 
 
 class ModifyItemsForm(forms.Form):
-    """Form for ADDING new items and names for an org.
-    """
+    """Form for ADDING new items and names for an org."""
 
     id = forms.IntegerField(min_value=1, max_value=9223372036854775807, required=False)
     entity = forms.IntegerField(
