@@ -11,7 +11,7 @@ flower==0.9.5  # https://github.com/mher/flower
 
 # Django
 # ------------------------------------------------------------------------------
-django==3.1  # https://www.djangoproject.com/
+django==3.1.1  # https://www.djangoproject.com/
 django-environ==0.4.5  # https://github.com/joke2k/django-environ
 django-model-utils==4.0.0  # https://github.com/jazzband/django-model-utils
 django-allauth==0.42.0  # https://github.com/pennersr/django-allauth
@@ -26,7 +26,7 @@ django-cachalot==2.3.1  # https://github.com/noripyt/django-cachalot
 # AWS
 # ------------------------------------------------------------------------------
 boto3==1.14.42  # https://github.com/boto/boto3
-django-anymail[amazon_ses]==7.2.1  # https://github.com/anymail/django-anymail
+django-anymail[amazon_ses]==8.1  # https://github.com/anymail/django-anymail
 django-ses[bounce]==1.0.2  # https://github.com/django-ses/django-ses
 
 # Elasticsearch
