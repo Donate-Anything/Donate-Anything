@@ -25,10 +25,17 @@ def search_view(request):
     # TODO Add pic to charities
     paginator = Paginator(
         WantedItem.objects.annotate(
-            charity_description=Left("charity__description", 100)
+            charity_description=Left("charity__description", 200),
+            how_to_donate=Left("charity__how_to_donate", 200),
         )
         .select_related("charity")
-        .values_list("charity_id", "charity__name", "charity_description",)
+        .values_list(
+            "charity_id",
+            "charity__name",
+            "charity__logo",
+            "charity_description",
+            "how_to_donate",
+        )
         .filter(item_id=item_id)
         .order_by("-id"),
         20,

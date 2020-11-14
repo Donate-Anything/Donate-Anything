@@ -11,6 +11,7 @@
 {% block content %}
   <div class="landing text-center" style="padding-top: 70px">
     <h1 id="content-header" data-org-id="{{ id }}" data-aos="fade-up">{{ name }}</h1><br>
+    {% if logo %}<img alt="Logo" class="pb-4" src="{{ logo.url }}">{% endif %}
     <div data-aos="fade-up">
       <p id="org-description">{{ description|escape }}</p>
     </div><br>

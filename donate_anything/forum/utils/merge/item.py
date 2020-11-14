@@ -43,7 +43,8 @@ def merge_proposed_items(instance: UserVote):
                         id=thread.extra["proposed_item_id"]
                     )
                     merge(
-                        Charity.objects.get(id=thread.extra["entity_id"]), proposed,
+                        Charity.objects.get(id=thread.extra["entity_id"]),
+                        proposed,
                     )
                     ProposedItem.objects.filter(id=proposed.id).update(closed=True)
                 except (ProposedItem.DoesNotExist, Charity.DoesNotExist):

@@ -28,8 +28,17 @@ function addItem(item_id, name, pic) {
  * Optional parameters
  * @param charity_name {string, null} Charity name
  * @param charity_desc {string, null} Charity description
+ * @param charity_how_to {string, null} Charity How To Donate
+ * @param charity_logo {string, undefined/null} Charity's Logo
  */
-function addCharity(charity_id, item_id, charity_name, charity_desc) {
+function addCharity(
+    charity_id,
+    item_id,
+    charity_name,
+    charity_desc,
+    charity_how_to,
+    charity_logo,
+) {
     let data = localStorage.getItem(charityCartKey);
     data = data === null ? {} : JSON.parse(data);
     let c_data = localStorage.getItem(charityDescKey);
@@ -47,6 +56,10 @@ function addCharity(charity_id, item_id, charity_name, charity_desc) {
         c_data[c_string] = {
             name: charity_name || "",
             description: charity_desc || "",
+            how_to: charity_how_to || "",
+        }
+        if (charity_logo) {
+            c_data[c_string]["logo"] = charity_logo;
         }
     }
     localStorage.setItem(charityCartKey, JSON.stringify(data));

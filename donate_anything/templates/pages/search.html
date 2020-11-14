@@ -21,7 +21,7 @@
   </form>
   <div id="listed-added-cart" data-organization-url="{% url "charity:organization" 0 %}"></div>
   <div id="listed-carts" data-item-id="{{ item_id }}" data-item-name="{{ item_name }}" data-remove-text="{% translate "Remove" %}">
-  {% for charity_id, name, description in page_obj %}
+  {% for charity_id, name, logo, description, how_to_donate in page_obj %}
     {% if forloop.counter0|divisibleby:2 %}
     <div class="row">
     {% endif %}
@@ -29,8 +29,15 @@
     <div class="col-12 col-md-6 d-flex justify-content-center">
       <div class="grow-charity-card" data-charity-id="{{ charity_id }}">
         <h2><a href="{% url "charity:organization" charity_id %}">{{ name }}</a></h2>
-        <a href="{% url "charity:organization" charity_id %}"><i class="fa fa-hand-holding-heart py-2"></i></a>
-        <p>{{ description|truncatechars:99 }}</p>
+        <a href="{% url "charity:organization" charity_id %}">
+          {% if logo %}
+            <img alt="logo" src="{% get_media_prefix %}{{ logo }}">
+          {% else %}
+            <i class="fa fa-hand-holding-heart py-2"></i>
+          {% endif %}
+        </a>
+        <p data-text="desc">{{ description|truncatechars:99 }}</p>
+        <p data-text="how">{{ how_to_donate|truncatechars:99 }}</p>
         {# Buttons #}
         <div class="add-cart col text-center">
           <button class="btn btn-primary px-3 py-1">{% translate "Add to Cart" %}</button>

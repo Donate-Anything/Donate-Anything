@@ -70,11 +70,21 @@ function ___start() {
             const headerLink = document.createElement("a");
             headerLink.href = `${orgURL}${charity_id}/`;
             const organizationHeader = document.createElement("div");
-            // const organizationImg = document.createElement("img");
-            // organizationImg.src = charity[1];
+            if (charity["logo"]) {
+                const organizationImg = document.createElement("img");
+                organizationImg.src = charity.logo;
+                organizationImg.width = 50;
+                organizationImg.height = 50;
+                organizationHeader.appendChild(organizationImg)
+            }
             const organizationTitle = document.createElement("h3");
             organizationTitle.innerText = charity.name;
+            organizationTitle.classList.add("pl-2", "d-inline-block");
             organizationHeader.append(organizationTitle);
+            headerLink.appendChild(organizationHeader);
+            const howToDonate = document.createElement("p");
+            howToDonate.innerText = `How to donate: ${charity.how_to}`;
+            howToDonate.classList.add("pt-2");
             // Add items
             const itemList = document.createElement("ul");
             itemList.classList.add("list-unstyled");
@@ -88,7 +98,7 @@ function ___start() {
                 liEl.append(checkboxEl, textEl);
                 itemList.append(liEl);
             }
-            organizationDiv.append(organizationHeader, itemList);
+            organizationDiv.append(headerLink, howToDonate, itemList);
             targetDiv.appendChild(organizationDiv);
         }
     }

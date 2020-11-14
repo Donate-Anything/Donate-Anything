@@ -1,5 +1,13 @@
+from os.path import splitext
+from uuid import uuid4
+
 from django.conf import settings
 from django.db import models
+from django.utils.translation import gettext_lazy as _
+
+
+def unique_image(_instance, filename: str) -> str:
+    return f"{str(uuid4())}{splitext(filename)[1]}"
 
 
 class Charity(models.Model):
@@ -17,6 +25,7 @@ class Charity(models.Model):
     description = models.TextField(max_length=1000)
     # Address or drop off instructions
     how_to_donate = models.TextField(max_length=1000)
+    logo = models.ImageField(_("Logo"), upload_to=unique_image, null=True, blank=True)
 
     # Items are in a M2M ES model
 

@@ -147,12 +147,12 @@ class ExistingSuggestEditForm(forms.ModelForm):
 
     class Meta:
         model = ProposedEdit
-        fields = (
+        fields = [
             "link",
             "description",
             "how_to_donate",
             "commit_message",
-        )
+        ]
         widgets = {
             **_default_widgets,
             "commit_message": MDWidget(),
@@ -164,33 +164,29 @@ class ExistingSuggestEditForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
         self.entity: Union[int, Charity] = kwargs.pop("entity", None)
+        self.is_verified = kwargs.pop("is_verified", False)
         super(ExistingSuggestEditForm, self).__init__(*args, **kwargs)
+        if self.is_verified:
+            self.fields["logo"] = forms.ImageField(
+                widget=forms.ClearableFileInput(), required=False
+            )
 
     def clean(self):
         cleaned_data = super(ExistingSuggestEditForm, self).clean()
-        entity = Charity.objects.get(id=self.entity)
-        link = cleaned_data["link"]
-        description = cleaned_data["description"]
-        how_to_donate = cleaned_data["how_to_donate"]
-        if link in (entity.link, None, ""):
-            link = None
-        if description in (entity.description, None, ""):
-            description = None
-        if how_to_donate in (entity.how_to_donate, None, ""):
-            how_to_donate = None
-
-        data = {
-            False if link is None else True,
-            False if description is None else True,
-            False if how_to_donate is None else True,
-        }
-        if True not in data:
+        if type(self.entity) == int:
+            self.entity = Charity.objects.get(id=self.entity)
+        fields = ("description", "link", "how_to_donate")
+        if self.is_verified:
+            fields += ("logo",)
+        for field in fields:
+            if cleaned_data[field] not in (getattr(self.entity, field), None, ""):
+                break
+        else:
+            print(getattr(self.entity, "logo"))
+            print(cleaned_data.get("logo"))
             raise ValidationError(
-                _(
-                    "One of the fields must be filled out: link, description, how_to_donate."
-                )
+                _(f"One of the fields must be filled out: {', '.join(fields)}.")
             )
-        self.entity = entity
         return cleaned_data
 
     def save(self, commit=True):

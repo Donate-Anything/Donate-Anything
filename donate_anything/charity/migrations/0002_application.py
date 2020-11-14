@@ -68,7 +68,9 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"abstract": False,},
+            options={
+                "abstract": False,
+            },
         ),
         migrations.CreateModel(
             name="OrganizationApplication",
@@ -112,7 +114,9 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"abstract": False,},
+            options={
+                "abstract": False,
+            },
         ),
         migrations.CreateModel(
             name="AppliedOrganizationEdit",
@@ -139,7 +143,9 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"abstract": False,},
+            options={
+                "abstract": False,
+            },
         ),
         migrations.CreateModel(
             name="AppliedBusinessEdit",
@@ -166,6 +172,8 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"abstract": False,},
+            options={
+                "abstract": False,
+            },
         ),
     ]

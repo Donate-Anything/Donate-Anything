@@ -214,7 +214,8 @@ class TestSearchMultipleItems:
         assert (
             len(data[first_key][:-2])
             == WantedItem.objects.filter(
-                item_id__in=[chair.id, pan.id, jeans.id], charity=charity,
+                item_id__in=[chair.id, pan.id, jeans.id],
+                charity=charity,
             ).count()
         ), (
             "Assuming the additional information is only name and description"

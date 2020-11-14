@@ -240,6 +240,12 @@ https://www.w3schools.com/bootstrap4/bootstrap_containers.asp
   width: 350px;
 }
 
+@media screen and (max-width: 350px) {
+  .feature-container img {
+    width: 100%;
+  }
+}
+
 .feature-centered {
   background-color: rgba(255,255,255,.7);
   width: 100%;
@@ -247,4 +253,5 @@ https://www.w3schools.com/bootstrap4/bootstrap_containers.asp
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  margin-left: 10px;
 }

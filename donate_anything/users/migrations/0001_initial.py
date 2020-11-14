@@ -17,7 +17,9 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.BigAutoField(
-                        primary_key=True, serialize=False, verbose_name="ID",
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 ("password", models.CharField(max_length=128, verbose_name="password")),

@@ -2,7 +2,10 @@ import pytest
 
 from donate_anything.charity.forms import ExistingSuggestEditForm, OrganizationForm
 from donate_anything.charity.models import OrganizationApplication, ProposedEdit
-from donate_anything.charity.tests.factories import OrganizationApplicationFactory
+from donate_anything.charity.tests.factories import (
+    CharityFactory,
+    OrganizationApplicationFactory,
+)
 
 
 pytestmark = pytest.mark.django_db
@@ -55,14 +58,17 @@ class TestOrganizationForm:
 class TestExistingSuggestEditForm:
     """Assumes entity already exists"""
 
-    def test_no_fields_changed(self, charity, user):
+    @pytest.mark.parametrize("is_verified", [True, False])
+    def test_no_fields_changed(self, charity, user, is_verified):
         form = ExistingSuggestEditForm(
             {
                 "link": charity.link,
                 "description": charity.description,
                 "how_to_donate": charity.how_to_donate,
                 "commit_message": "Reason",
-            }
+            },
+            {"logo": charity.logo},
+            is_verified=is_verified,
         )
         form.user = user
         form.entity = charity.id
@@ -71,19 +77,31 @@ class TestExistingSuggestEditForm:
         assert len(form.errors) == 1
 
     @pytest.mark.parametrize(
-        "link,description,how_to", [("a", "", ""), ("", "a", ""), ("", "", "a"),],
+        "link,description,how_to,logo",
+        [
+            ("a", "", "", None),
+            ("", "a", "", None),
+            ("", "", "a", None),
+            ("", "", "", True),
+        ],
     )
-    def test_at_least_one_field_filled(self, charity, user, link, description, how_to):
+    def test_at_least_one_field_filled(
+        self, charity, user, link, description, how_to, logo
+    ):
+        if logo:
+            logo = CharityFactory.create().logo
         form = ExistingSuggestEditForm(
             {
                 "link": charity.link + link,
                 "description": charity.description + description,
                 "how_to_donate": charity.how_to_donate + how_to,
                 "commit_message": "Reason",
-            }
+            },
+            {"logo": logo if logo else charity.logo},
+            is_verified=True,
         )
         form.user = user
         form.entity = charity.id
-        assert form.is_valid()
+        assert form.is_valid(), form.errors
         form.save()
         assert ProposedEdit.objects.count() == 1

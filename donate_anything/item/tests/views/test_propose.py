@@ -295,7 +295,8 @@ class TestProposedItemForm:
         item = ItemFactory.create(is_appropriate=False)
         client.force_login(user)
         response = client.post(
-            self.view_url, data={"entity": charity.id, "item": str(item.id)},
+            self.view_url,
+            data={"entity": charity.id, "item": str(item.id)},
         )
         assert response.status_code == 400
         errors = json.loads(response.content)["errors"]
@@ -304,7 +305,8 @@ class TestProposedItemForm:
     def test_name_missing_condition(self, client, user, charity):
         client.force_login(user)
         response = client.post(
-            self.view_url, data={"entity": charity.id, "names": "bs"},
+            self.view_url,
+            data={"entity": charity.id, "names": "bs"},
         )
         assert response.status_code == 400
         errors = json.loads(response.content)["errors"]

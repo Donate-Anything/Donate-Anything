@@ -98,13 +98,17 @@ class ThreadFormView(FormView):
         """If the form is valid, save the associated model."""
         form.save()
         messages.add_message(
-            self.request, messages.INFO, _("Successfully posted."),
+            self.request,
+            messages.INFO,
+            _("Successfully posted."),
         )
         return super().form_valid(form)
 
     def form_invalid(self, form):
         messages.add_message(
-            self.request, messages.ERROR, form.errors,
+            self.request,
+            messages.ERROR,
+            form.errors,
         )
         return HttpResponseRedirect(self.get_success_url())
 

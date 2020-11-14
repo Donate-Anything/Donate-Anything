@@ -1,4 +1,5 @@
-from factory import DjangoModelFactory, Faker, SubFactory
+from factory import Faker, SubFactory
+from factory.django import DjangoModelFactory, ImageField
 
 from donate_anything.charity.models import (
     AppliedBusinessEdit,
@@ -20,6 +21,7 @@ class CharityFactory(DjangoModelFactory):
     link = Faker("url")
     description = Faker("text", max_nb_chars=1000)
     how_to_donate = Faker("text", max_nb_chars=300)
+    logo = ImageField()
 
     class Meta:
         model = Charity

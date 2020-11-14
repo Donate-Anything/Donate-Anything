@@ -29,11 +29,14 @@ document.getElementById("listed-carts")
     .forEach(function(el) {
         const charity_id = el.getAttribute("data-charity-id");
         el.querySelector(".btn-primary").addEventListener("click", function() {
+            const img = el.querySelector("img");
             addCharity(
                 charity_id,
                 ___CURRENT_ITEM_ID,
                 el.querySelector("h2").innerText,
-                el.querySelector("p").innerText,
+                el.querySelector("p[data-text='desc']").innerText,
+                el.querySelector("p[data-text='how']").innerText,
+                img ? img.src : undefined,
             )
             const removeButton = buildRemoveButton(charity_id);
             removeButton.addEventListener("click", function() {
@@ -124,13 +127,15 @@ $(__TYPEAHEAD_ID).typeahead({
 $(__TYPEAHEAD_ID).typeahead("val", urlParams["q"]).blur();
 
 /**
- *
+ * Creates a card that displays charity info for already added
  * @param charity_id {number, string} Charity ID
  * @param name {string} Charity name
  * @param desc {string} Charity description
+ * @param img {string, undefined/null} URL of charity's logo
+ * @param how_to_donate {string} Charity's How to Donate section
  * @return {HTMLDivElement} Charity card
  */
-function createCharityCard(charity_id, name, desc) {
+function createCharityCard(charity_id, name, desc,img, how_to_donate) {
     const card = document.createElement("div");
     card.classList.add("grow-charity-card");
     card.style.flexShrink = "0";
@@ -141,13 +146,18 @@ function createCharityCard(charity_id, name, desc) {
     link.href = `${ORGANIZATION_URL}${charity_id}/`;
     link.innerText = name;
     header.appendChild(link);
-    // TODO Change this when implementing charity pictures
+
     const linkPic = document.createElement("a");
     linkPic.href = `${ORGANIZATION_URL}${charity_id}/`;
-
-    const handHold = document.createElement("i");
-    handHold.classList.add("fa", "fa-hand-holding-heart", "py-2");
-    linkPic.appendChild(handHold);
+    if (img) {
+        const image = document.createElement("img");
+        image.src = img;
+        linkPic.appendChild(image);
+    } else {
+        const handHold = document.createElement("i");
+        handHold.classList.add("fa", "fa-hand-holding-heart", "py-2");
+        linkPic.appendChild(handHold);
+    }
 
     // Buttons
     const actionButtons = document.createElement("div");
@@ -160,7 +170,11 @@ function createCharityCard(charity_id, name, desc) {
 
     const description = document.createElement("p");
     description.innerText = desc;
-    card.append(header, linkPic, actionButtons, description);
+    description.setAttribute("data-text", "desc");
+    const howTo = document.createElement("p");
+    howTo.innerText = how_to_donate;
+    howTo.setAttribute("data-text", "how");
+    card.append(header, linkPic, actionButtons, description, howTo);
     return card;
 }
 
@@ -187,7 +201,13 @@ function setupAlreadyAdded() {
     // Add to scrollable carousel
     for (const charity_id of charitiesAdded) {
         const charityInfo = c_data[charity_id]
-        const build = createCharityCard(charity_id, charityInfo.name, charityInfo.description);
+        const build = createCharityCard(
+            charity_id,
+            charityInfo.name,
+            charityInfo.description,
+            charityInfo["logo"],
+            charityInfo.how_to,
+        );
         build.classList.add("d-inline-block");
         listedAdded.appendChild(build);
     }

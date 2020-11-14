@@ -28,6 +28,7 @@ def organization(request, pk):
         "name": charity.name,
         "description": charity.description,
         "how_to_donate": charity.how_to_donate,
+        "logo": charity.logo,
     }
     user = request.user
     if user.is_authenticated:

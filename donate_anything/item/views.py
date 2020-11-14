@@ -102,7 +102,8 @@ def _paginate_via_charity(
     ),
 ) -> dict:
     paginator = Paginator(
-        list(queryset.select_related("charity").values_list(*values_list)), page_limit,
+        list(queryset.select_related("charity").values_list(*values_list)),
+        page_limit,
     )
     # Can't raise error since Django makes sures there's always one page...
     # Even on an empty page or a string page...
@@ -121,7 +122,8 @@ def search_category(request, category_type: int):
         raise Http404(_("You must specify a category."))
     return JsonResponse(
         _paginate_via_charity(
-            Category.objects.filter(category=category_type), request.GET.get("page"),
+            Category.objects.filter(category=category_type),
+            request.GET.get("page"),
         )
     )
 
@@ -196,7 +198,10 @@ def search_multiple_items(request):
         )
     }
     # Get the charity IDs that are paginated.
-    paginator = Paginator(list(charity_fulfillment.keys()), 25,)
+    paginator = Paginator(
+        list(charity_fulfillment.keys()),
+        25,
+    )
     page_obj = paginator.get_page(page_number)
     # Memory management: remove all that are not a part of this list.
     charity_fulfillment = {k: charity_fulfillment[k] for k in page_obj.object_list}

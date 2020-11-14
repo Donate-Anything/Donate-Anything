@@ -174,13 +174,13 @@
   color: lightgray;
   padding: 5px 5px 5px 5px;
   border-radius: 10px;
-  height: 180px;
+  max-height: 250px;
   width: 100%;
   margin: 5px 1% 5px 1%;
   float: left;
   position: relative;
-  transition: height 0.5s, width 0.5s;
-  -webkit-transition: height 0.5s, width 0.5s;
+  transition: max-height 0.6s;
+  -webkit-transition: max-height 0.6s;
   text-align: center;
   overflow: hidden;
 }
@@ -190,17 +190,20 @@
 }
 
 .grow-charity-card:hover {
-  width: 100%;
-  height: 275px;
+  max-height: 1000px;
 }
 
 .grow-charity-card p {
   opacity: 0;
-  transition: opacity 0.5s;
+  transition: opacity 1.2s, padding-bottom 0.8s;
 }
 
 .grow-charity-card:hover p {
   opacity: 1;
+}
+
+.grow-charity-card:hover p[data-text="how"] {
+  padding-bottom: 40px;
 }
 
 .add-cart {
