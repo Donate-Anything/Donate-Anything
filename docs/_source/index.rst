@@ -32,6 +32,7 @@ This project's code is licensed under the Apache 2.0 license.
    users
    organizations
    forum
+   license
 
 
 Indices and tables
