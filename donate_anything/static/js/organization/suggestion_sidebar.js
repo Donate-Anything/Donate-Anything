@@ -4,28 +4,34 @@ $("#menu-toggle").click(function(e) {
 });
 
 function add_to_sidebar(edit_id, username, edit, created, updated) {
-    let converter = new showdown.Converter();
-    converter.setFlavor('github');
-    let date;
-    if (created === updated) {
-        date = "Created: " + created;
-    } else {
-        date = "Updated: " + updated;
-    }
-    let canMarkRead = "";
-    if ($("sidebar-body").attr("data-allow-read")) {
-        canMarkRead = '<button class="btn btn-small" onclick="markRead(this,' + edit_id + ')">Mark Read</button>';
-    }
-    // escape texts
-    username = document.createTextNode(username).wholeText;
-    edit = document.createTextNode(edit).wholeText;
+    const sidebarBody = document.getElementById("sidebar-body");
 
-    let html = '<div class="list-group-item bg-light"><h4><a href="'+
-        $("#sidebar-body").attr("data-username-url").replace("placeholder", username) +'">' +
-        username + '</a></h4>' + canMarkRead +
-        '<p class="font-italic font-weight-light">' + date + '</p><div>' +
-        converter.makeHtml(edit) + '</div></div>';
-    document.getElementById("sidebar-body").innerHTML += html;
+    const header = document.createElement("h4");
+    header.classList.add("list-group-item", "bg-light");
+    const link = document.createElement("a");
+    link.href = document.createTextNode(sidebarBody.getAttribute("data-username-url").replace("placeholder", username));
+    link.innerText = document.createTextNode(username).wholeText;
+    header.appendChild(link);
+    sidebarBody.appendChild(header);
+    
+    if (sidebarBody.hasAttribute("data-allow-read")) {
+        const markReadButton = document.createElement("button");
+        markReadButton.classList.add("btn", "btn-small");
+        markReadButton.addEventListener("click", function() {
+            markRead(this, edit_id);
+        });
+        markReadButton.innerText = "Mark Read";
+        sidebarBody.appendChild(markReadButton);
+    }
+    
+    const editP = document.createElement("p");
+    editP.classList.add("font-italic", "font-weight-light");
+    editP.innerText = created === updated ? `Created: ${created}` : `Updated: ${updated}`;
+    const editDiv = document.createElement("div");
+    const converter = new showdown.Converter();
+    converter.setFlavor("github");
+    editDiv.innerHtml = converter.makeHtml(document.createTextNode(edit).wholeText);
+    sidebarBody.append(editP, editDiv);
 }
 
 function markRead(elem, edit_id) {
