@@ -16,7 +16,7 @@ class UsersConfig(AppConfig):
 
 # noinspection PyPackageRequirements,PyProtectedMember
 def patch_rate_limit():
-    from axes.utils import get_client_ip_address
+    from axes.helpers import get_client_ip_address
     from ratelimit.core import _SIMPLE_KEYS, ip_mask
 
     def user_or_ip(request):
