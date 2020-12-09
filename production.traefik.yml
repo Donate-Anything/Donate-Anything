@@ -1,0 +1,45 @@
+version: '3'
+
+volumes:
+  production_postgres_data: { }
+  production_postgres_data_backups: { }
+  production_traefik: {}
+
+services:
+  traefik:
+    build:
+      context: .
+      dockerfile: ./compose/production/self/traefik/Dockerfile
+    image: da_production_traefik
+    networks:
+      - da-front-network
+    volumes:
+      - production_traefik:/etc/traefik/acme
+    ports:
+      - 8080:8080
+      - 80:80
+      - 443:443
+      - 5555:5555
+    command: --api.insecure=true --providers.docker.swarmmode
+
+  redis:
+    image: redis:5.0
+    networks:
+      - da-front-network
+
+  postgres:
+    build:
+      context: .
+      dockerfile: ./compose/production/postgres/Dockerfile
+    image: da_production_postgres
+    networks:
+      - da-front-network
+    volumes:
+      - production_postgres_data:/var/lib/postgresql/data
+      - production_postgres_data_backups:/backups
+    env_file:
+      - ./.envs/.production/.postgres
+
+networks:
+  da-front-network:
+    external: true

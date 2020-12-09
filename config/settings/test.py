@@ -16,9 +16,10 @@ SECRET_KEY = env(
 # https://docs.djangoproject.com/en/dev/ref/settings/#test-runner
 TEST_RUNNER = "django.test.runner.DiscoverRunner"
 
-# Axes
+# Security
 # ------------------------------------------------------------------------------
 AXES_ENABLED = False
+RATELIMIT_ENABLE = False
 
 # CACHES
 # ------------------------------------------------------------------------------
