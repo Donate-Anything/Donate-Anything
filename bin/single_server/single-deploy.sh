@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # single-deploy.sh
 # Velnota
@@ -9,21 +9,47 @@
 
 # Does Blue/Green Deployment
 
-BLUE_FILE=./blue.txt
-GREEN_FILE=./green.txt
+# Rebuild
+cd $DONATE_ANYTHING_HOME_DIR
+# ~/donate_anything
+deactivate || echo
+VENV_DIR=$DONATE_ANYTHING_HOME_DIR/venv
+if [ ! -f "$VENV_DIR" ]; then
+  virtualenv venv
+fi
+source $VENV_DIR/bin/activate
+pip install -r requirements/raspberry.txt
+export DJANGO_SETTINGS_MODULE=config.settings.self_hosted
+python manage.py collectstatic --noinput
+python manage.py compress
 
-# Rebuild the images
-docker-compose -f production.blue.yml build
+BLUE_FILE=/etc/nginx/sites-enabled/da-blue.conf
+GREEN_FILE=/etc/nginx/sites-enabled/da-green.conf
 
-# It's not really blue green
 if [ -f "$BLUE_FILE" ]; then
+  # Switch to green
   rm $BLUE_FILE
-  touch $GREEN_FILE
-  docker service update --label-add "traefik.http.routers.colors-green.priority=100" appli-green_django
-  docker service update --label-add "traefik.http.routers.colors-blue.priority=0" appli-blue_django
+  ln -s /etc/nginx/sites-available/da-green.conf /etc/nginx/sites-enabled
+  DEL_PORT=49152
+  NEW_PORT=49153
 else
   rm $GREEN_FILE
-  touch $BLUE_FILE
-  docker service update --label-add "traefik.http.routers.colors-blue.priority=100" appli-blue_django
-  docker service update --label-add "traefik.http.routers.colors-green.priority=0" appli-green_django
+  ln -s /etc/nginx/sites-available/da-blue.conf /etc/nginx/sites-enabled
+  DEL_PORT=49153
+  NEW_PORT=49152
 fi
+
+# Below is from https://stackoverflow.com/a/51866665
+# Some variables were changed from the answer
+# By: takasoft
+# Licensed under CC BY-SA 4.0
+pid=`ps ax | grep gunicorn | grep $DEL_PORT | awk '{split($0,a," "); print a[1]}' | head -n 1`
+if [ -z "$pid" ]; then
+  echo "no gunicorn deamon on port $DEL_PORT"
+else
+  kill $pid
+  echo "killed gunicorn deamon on port $DEL_PORT"
+fi
+
+service nginx reload
+gunicorn config.wsgi -w 2 --bind 0.0.0.0:$NEW_PORT --chdir $DONATE_ANYTHING_HOME_DIR

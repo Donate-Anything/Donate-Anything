@@ -4,12 +4,12 @@ Deploying on a Raspberry Pi involves
 manually doing blue/green deployment.
 The stack is not in a Docker compose
 orchestration like before, but instead
-will have Postgres + Redis in the Pi
-itself and Django + Celery will run in
-a Docker compose stack.
+will use different ports for gunicorn
+to bind to.
 
-This was mostly copied from
-[rodolpheche/bluegreen-traefik-docker](https://github.com/rodolpheche/bluegreen-traefik-docker)
+Unfortunately, I have zero clue on how
+to run this smoothly like Blue/Green
+since the program keeps auto-restarting.
 
 ---
 ## How to run
@@ -23,11 +23,14 @@ sh ./bin/single_server/initial-deploy.sh
 To update the code, run:
 
 ```shell
-sh ./bin/single_server/single-deploy.sh
+bash ./bin/single_server/single-deploy.sh
 ```
 
-To clean up:
-```shell
-docker stack rm http appli-green appli-blue
-docker network rm da-front-network
-```
+On the server, we'll run `supervisorctl update donateanything`.
+
+Some elements like the nginx.conf files
+and supervisor configuration files are not
+displayed here in case of malicious usage
+posing danger to the website.
+
+To debug while following the logs: `tail -fn +1 supervisord.log`

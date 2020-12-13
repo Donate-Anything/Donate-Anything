@@ -1,0 +1,2 @@
+*.conf
+!*.template.conf

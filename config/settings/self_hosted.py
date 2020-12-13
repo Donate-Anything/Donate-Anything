@@ -1,6 +1,7 @@
 from .production import *  # noqa
 from .production import env
 
+
 # CACHES
 # ------------------------------------------------------------------------------
 CACHES = {
@@ -60,6 +61,8 @@ AWS_SES_VERIFY_BOUNCE_SIGNATURES = True
 # ------------------------------------------------------------------------------
 # https://django-compressor.readthedocs.io/en/latest/settings/#django.conf.settings.COMPRESS_ENABLED
 COMPRESS_ENABLED = env.bool("COMPRESS_ENABLED", default=True)
+# https://django-compressor.readthedocs.io/en/latest/settings/#django.conf.settings.COMPRESS_OFFLINE
+COMPRESS_OFFLINE = True
 # https://django-compressor.readthedocs.io/en/latest/settings/#django.conf.settings.COMPRESS_STORAGE
 # https://django-compressor.readthedocs.io/en/latest/remote-storages/#using-staticfiles
 COMPRESS_STORAGE = "compressor.storage.GzipCompressorFileStorage"
@@ -69,4 +72,7 @@ COMPRESS_URL = STATIC_URL
 
 # Your stuff...
 # ------------------------------------------------------------------------------
-AXES_META_PRECEDENCE_ORDER = ["REMOTE_ADDR"]
+AXES_META_PRECEDENCE_ORDER = [
+    "HTTP_X_FORWARDED_FOR",
+    "REMOTE_ADDR",
+]
