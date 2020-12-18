@@ -44,5 +44,5 @@ else
   export NEW_PORT=49152
 fi
 
-bash ./health-check.sh &
+bash $DONATE_ANYTHING_HOME_DIR/bin/single_server/health-check.sh &
 gunicorn config.wsgi -w 2 --bind 127.0.0.1:$NEW_PORT --chdir $DONATE_ANYTHING_HOME_DIR
