@@ -1,5 +1,5 @@
 os: linux
-dist: xenial
+dist: focal
 
 language: python
 cache: pip
@@ -15,14 +15,22 @@ jobs:
         - black donate_anything config --check && isort -c -rc -lai 2 -df
 
     - name: "Django Test"
+      addons:
+        postgresql: '12'
+        apt:
+          packages:
+            - postgresql-12
+            - postgresql-client-12
       env:
+        - PGVER=12
+        - PGPORT=5433
         - USE_DOCKER="no"
         - DATABASE_URL="postgres:///donate_anything"
         - CELERY_BROKER_URL="redis://localhost:6379/0"
       services:
-        - postgresql
         - redis
       install:
+        - sudo apt-get install -y swig
         - pip install -r requirements/local.txt
       before_script:
         - sudo mkdir /var/run/celery
