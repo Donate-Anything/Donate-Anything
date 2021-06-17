@@ -18,7 +18,7 @@ django-allauth==0.42.0  # https://github.com/pennersr/django-allauth
 django-crispy-forms==1.9.2  # https://github.com/django-crispy-forms/django-crispy-forms
 django-compressor==2.4  # https://github.com/django-compressor/django-compressor
 django-redis==4.12.1  # https://github.com/jazzband/django-redis
-django-axes==5.4.2  # https://github.com/jazzband/django-axes
+django-axes==5.19.0  # https://github.com/jazzband/django-axes
 django-recaptcha==2.0.6  # https://github.com/praekelt/django-recaptcha
 django-ratelimit==3.0.1  # https://github.com/jsocol/django-ratelimit
 django-cachalot==2.3.3  # https://github.com/noripyt/django-cachalot
