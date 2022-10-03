@@ -27,7 +27,7 @@ django-cachalot==2.3.3  # https://github.com/noripyt/django-cachalot
 # ------------------------------------------------------------------------------
 boto3==1.14.42  # https://github.com/boto/boto3
 django-anymail[amazon_ses]==8.1  # https://github.com/anymail/django-anymail
-django-ses[bounce]==1.0.2  # https://github.com/django-ses/django-ses
+django-ses[bounce]==3.2.0  # https://github.com/django-ses/django-ses
 
 # Elasticsearch
 # ------------------------------------------------------------------------------
